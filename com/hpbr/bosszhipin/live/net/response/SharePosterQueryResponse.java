@@ -1,0 +1,61 @@
+package com.hpbr.bosszhipin.live.net.response;
+
+import com.hpbr.bosszhipin.live.campus.bean.LuckyDrawBean;
+import com.hpbr.bosszhipin.live.campus.bean.ResumeTopBrandBean;
+import com.hpbr.bosszhipin.live.campus.bean.SalaryTopJobBean;
+import com.hpbr.bosszhipin.live.net.bean.PostCompanyInfoBean;
+import com.hpbr.bosszhipin.live.net.bean.PostJobShareBean;
+import java.util.List;
+import net.bosszhipin.base.HttpResponse;
+
+/* JADX INFO: loaded from: classes5.dex */
+public class SharePosterQueryResponse extends HttpResponse {
+    private static final long serialVersionUID = -1;
+    public long applaudCount;
+    public String background;
+    public String backgroundColor;
+    public long barrageNum;
+    public boolean bossBrand;
+    public String bossBrandLogo;
+    public String bossBrandName;
+    public String bossImage;
+    public String brandLogo;
+    public String brandName;
+    public int brandNum;
+    public int cityNum;
+    public int companyCount;
+    public List<PostCompanyInfoBean> companyInfoList;
+    public long intention;
+    public long interactiveNum;
+    public int isResumeKing;
+    public int jobCount;
+    public List<PostJobShareBean> jobList;
+    public int liveStage;
+    public long lookNum;
+    public int luckyDrawFlag;
+    public List<LuckyDrawBean> luckyDrawList;
+    public long maxLookNum;
+    public String maxResumeBrandLogo;
+    public String maxResumeBrandName;
+    public int maxResumeNum;
+    public String miniQrcodeUrl;
+    public String positionCodeNameDes;
+    public List<String> proxyBrandList;
+    public List<String> proxyCityList;
+    public List<String> proxyJobList;
+    public String registerBrandLogo;
+    public String registerBrandName;
+    public long resumNum;
+    public List<ResumeTopBrandBean> resumeTopBrandList;
+    public int roomKind;
+    public int roomLevel;
+    public List<SalaryTopJobBean> salaryTopJobList;
+    public String slogan;
+    public String speakerDuty;
+    public String speakerName;
+    public String startTimeMonthDayDesc;
+    public String startTimeYearDesc;
+    public int templateType;
+    public String title;
+    public String titleColor;
+}

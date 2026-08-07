@@ -1,0 +1,115 @@
+package com.hpbr.bosszhipin.module.onlineresume.view;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.FrameLayout;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+import com.hpbr.bosszhipin.recycleview.BaseRvAdapter;
+import com.hpbr.bosszhipin.recycleview.BaseViewHolder;
+import com.monch.lbase.util.LText;
+import java.util.List;
+import net.bosszhipin.api.bean.SubLevelModelListBean;
+import net.bosszhipin.api.bean.WorkEmphasisBean;
+
+/* JADX INFO: loaded from: classes6.dex */
+public class SkillsView extends FrameLayout {
+
+    /* JADX INFO: renamed from: b, reason: collision with root package name */
+    @NonNull
+    private final A f76190b;
+
+    /* JADX INFO: renamed from: c, reason: collision with root package name */
+    private List<WorkEmphasisBean> f76191c;
+
+    private static class A extends BaseRvAdapter<WorkEmphasisBean, BaseViewHolder> {
+
+        /* JADX INFO: renamed from: c, reason: collision with root package name */
+        @Nullable
+        private y f76192c;
+
+        class a implements y {
+            a() {
+            }
+
+            @Override // com.hpbr.bosszhipin.module.onlineresume.view.y
+            public void a(@NonNull SubLevelModelListBean subLevelModelListBean) {
+                if (A.this.f76192c != null) {
+                    A.this.f76192c.a(subLevelModelListBean);
+                }
+            }
+
+            @Override // com.hpbr.bosszhipin.module.onlineresume.view.y
+            public void b(@NonNull SubLevelModelListBean subLevelModelListBean) {
+                if (A.this.f76192c != null) {
+                    A.this.f76192c.b(subLevelModelListBean);
+                }
+            }
+
+            @Override // com.hpbr.bosszhipin.module.onlineresume.view.y
+            public boolean c(@NonNull SubLevelModelListBean subLevelModelListBean) {
+                if (A.this.f76192c != null) {
+                    return A.this.f76192c.c(subLevelModelListBean);
+                }
+                return false;
+            }
+
+            @Override // com.hpbr.bosszhipin.module.onlineresume.view.y
+            public void d() {
+                if (A.this.f76192c != null) {
+                    A.this.f76192c.d();
+                }
+            }
+        }
+
+        public A() {
+            super(ba.h.f4277fl);
+        }
+
+        /* JADX INFO: Access modifiers changed from: protected */
+        @Override // com.chad.library.adapter.base.BaseQuickAdapter
+        /* JADX INFO: renamed from: j, reason: merged with bridge method [inline-methods] */
+        public void convert(@NonNull BaseViewHolder baseViewHolder, WorkEmphasisBean workEmphasisBean) {
+            int i11 = ba.g.Ct;
+            baseViewHolder.setText(i11, workEmphasisBean.name);
+            baseViewHolder.getView(i11).setVisibility((LText.empty(workEmphasisBean.name) || !workEmphasisBean.showTitle) ? 8 : 0);
+            SkillGroupItemView skillGroupItemView = (SkillGroupItemView) baseViewHolder.getView(ba.g.Bt);
+            skillGroupItemView.setSkillsCallback(new a());
+            skillGroupItemView.setSkills(workEmphasisBean.subLevelModelList);
+        }
+
+        public void k(@Nullable y yVar) {
+            this.f76192c = yVar;
+        }
+    }
+
+    public SkillsView(@NonNull Context context, @Nullable AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
+    }
+
+    public List<WorkEmphasisBean> getSkills() {
+        return this.f76191c;
+    }
+
+    public void setSkills(@NonNull List<WorkEmphasisBean> list) {
+        this.f76191c = list;
+        this.f76190b.getData().clear();
+        this.f76190b.getData().addAll(list);
+        this.f76190b.notifyDataSetChanged();
+    }
+
+    public void setSkillsCallback(@Nullable y yVar) {
+        this.f76190b.k(yVar);
+    }
+
+    public SkillsView(@NonNull Context context, @Nullable AttributeSet attributeSet, int i11) {
+        super(context, attributeSet, i11);
+        View.inflate(context, ba.h.f4347il, this);
+        RecyclerView recyclerView = (RecyclerView) findViewById(ba.g.Et);
+        A a11 = new A();
+        this.f76190b = a11;
+        recyclerView.setAdapter(a11);
+    }
+}

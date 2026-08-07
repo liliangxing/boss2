@@ -1,0 +1,68 @@
+package com.hpbr.bosszhipin.search.geek.bean.response;
+
+import com.hpbr.bosszhipin.search.geek.bean.BrandAdConfig;
+import com.hpbr.bosszhipin.search.geek.bean.BrandAggregationInfoBean;
+import com.hpbr.bosszhipin.search.geek.bean.CitySuggestTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.CorrectQueryBean;
+import com.hpbr.bosszhipin.search.geek.bean.DifferentCityTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.ExpectAddressTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.FeedbackTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.GeekSearchEmptyBean;
+import com.hpbr.bosszhipin.search.geek.bean.GeekSearchNlpFilterItemBean;
+import com.hpbr.bosszhipin.search.geek.bean.HeadHuntingRecommendTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.MaskComTipInfoBean;
+import com.hpbr.bosszhipin.search.geek.bean.PeaceOfMindProtectBean;
+import com.hpbr.bosszhipin.search.geek.bean.PeopleAlsoSearchTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.QueryGuideTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.SearchLabelFilterBean;
+import com.hpbr.bosszhipin.search.geek.bean.SearchPrimaryBean;
+import com.hpbr.bosszhipin.search.geek.bean.SearchRecommendQueryBean;
+import com.hpbr.bosszhipin.search.geek.bean.SearchResultSortBean;
+import com.hpbr.bosszhipin.search.geek.bean.SearchSubscribeInfoBean;
+import com.hpbr.bosszhipin.search.geek.bean.SwitchPositionGuideTipBean;
+import com.hpbr.bosszhipin.search.geek.bean.SwitchSortTipBean;
+import java.util.List;
+import net.bosszhipin.base.HttpResponse;
+
+/* JADX INFO: loaded from: classes7.dex */
+public class GeekSearchCardResponse extends HttpResponse {
+    private static final long serialVersionUID = -67446807362448725L;
+    public AiSupplementTipBean aiSupplementEmptyToastTip;
+    public AiSupplementTipBean aiSupplementTip;
+    public DifferentCityTipBean alternativeCityTip;
+    public boolean askAiEntrance;
+    public SearchAskAiTipJobCardBean askAiTip;
+    public BrandAdConfig brandAdConfig;
+    public BrandAggregationInfoBean brandAggregationInfo;
+    public List<SearchPrimaryBean> cardList;
+    public CitySuggestTipBean citySuggestTip;
+    public CorrectQueryBean correctQuery;
+    public AccessibleApplyJobBean disabledTip;
+    public GeekSearchEmptyBean emptyTip;
+    public ExpectAddressTipBean expectAddressTip;
+    public PeaceOfMindProtectBean factoryAd;
+    public FeedbackTipBean feedbackTip;
+    public SearchHandicappedZoneBannerBean handicappedZoneBanner;
+    public IndustryBean industryAtlasTip;
+    public boolean isSupplySearch;
+    public int jobCardStyle;
+    public SearchLabelFilterBean labelFilter;
+    public MaskComTipInfoBean maskComTipInfo;
+    public List<GeekSearchNlpFilterItemBean> nlpFilters;
+    public HeadHuntingRecommendTipBean openViewHunterJobTip;
+    public PeopleAlsoSearchTipBean peopleAlsoSearchTip;
+    public QueryGuideTipBean queryGuideTip;
+    public int rcdIndex;
+    public String rcdTip;
+    public int rcdType;
+    public SearchRecommendQueryBean recommendQuery;
+    public SearchSchoolRecruitSpecTipCardBean schoolRecruitSpecTip;
+    public int searchFilterExp;
+    public String searchLid;
+    public int showSearchNearestPosition;
+    public int sort;
+    public List<SearchResultSortBean> sorts;
+    public SearchSubscribeInfoBean subscribeInfo;
+    public SwitchPositionGuideTipBean switchPositionGuideTip;
+    public SwitchSortTipBean switchSortTip;
+}

@@ -1,0 +1,11 @@
+package com.hpbr.bosszhipin.network;
+
+import com.hpbr.bosszhipin.network.bean.QuestionListBean;
+import java.util.List;
+import net.bosszhipin.base.HttpResponse;
+
+/* JADX INFO: loaded from: classes7.dex */
+public class QuestionListResponse extends HttpResponse {
+    private static final long serialVersionUID = 7431543737163616535L;
+    public List<QuestionListBean> questions;
+}

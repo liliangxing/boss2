@@ -1,0 +1,13 @@
+package com.kanzhun.zpcloud.data;
+
+/* JADX INFO: loaded from: classes8.dex */
+public enum NebulaUploadStatus {
+    NUPLOADSTATUS_PREPARE,
+    NUPLOADSTATUS_WAITING,
+    NUPLOADSTATUS_INPROGRESS,
+    NUPLOADSTATUS_PAUSED,
+    NUPLOADSTATUS_RESUMED,
+    NUPLOADSTATUS_CANCELED,
+    NUPLOADSTATUS_COMPLETED,
+    NUPLOADSTATUS_FAILED
+}

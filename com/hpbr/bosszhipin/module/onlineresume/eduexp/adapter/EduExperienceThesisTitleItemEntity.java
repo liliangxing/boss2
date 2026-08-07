@@ -1,0 +1,20 @@
+package com.hpbr.bosszhipin.module.onlineresume.eduexp.adapter;
+
+import androidx.annotation.Nullable;
+import java.util.List;
+import net.bosszhipin.api.ServerResumeDiagnoseItemBean;
+import net.bosszhipin.api.bean.ServerResumeFieldsItemDetailBean;
+
+/* JADX INFO: loaded from: classes6.dex */
+public class EduExperienceThesisTitleItemEntity extends EduExperienceBaseEntity {
+    private static final long serialVersionUID = 2985500156359281567L;
+    public String thesisTitle;
+
+    public EduExperienceThesisTitleItemEntity(String str, @Nullable List<String> list, @Nullable List<ServerResumeFieldsItemDetailBean> list2, @Nullable List<ServerResumeDiagnoseItemBean> list3) {
+        super(11);
+        this.thesisTitle = str;
+        this.errorTip = list;
+        this.warningTip = list2;
+        this.diagnoseTip = list3;
+    }
+}

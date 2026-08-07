@@ -1,0 +1,42 @@
+package com.hpbr.bosszhipin.live.boss.live.dialog.setting.item;
+
+import androidx.annotation.NonNull;
+import com.hpbr.bosszhipin.live.boss.live.dialog.setting.AbsSettingItem;
+import xo.b;
+import xo.g;
+
+/* JADX INFO: loaded from: classes5.dex */
+public class AnchorBeautyItem extends AbsSettingItem {
+    private static final long serialVersionUID = 8575271198332078850L;
+
+    @Override // com.hpbr.bosszhipin.live.boss.live.dialog.setting.AbsSettingItem
+    public int getLogoResId() {
+        return g.L0;
+    }
+
+    @Override // com.hpbr.bosszhipin.live.boss.live.dialog.setting.AbsSettingItem
+    public int getSelLogoResId() {
+        return getLogoResId();
+    }
+
+    @Override // com.hpbr.bosszhipin.live.boss.live.dialog.setting.AbsSettingItem
+    public String getSelTitle() {
+        return getTitle();
+    }
+
+    @Override // com.hpbr.bosszhipin.live.boss.live.dialog.setting.AbsSettingItem
+    public int getTextColorState() {
+        return b.f145704p1;
+    }
+
+    @Override // com.hpbr.bosszhipin.live.boss.live.dialog.setting.AbsSettingItem
+    public String getTitle() {
+        return "美颜";
+    }
+
+    @Override // com.hpbr.bosszhipin.live.boss.live.dialog.setting.AbsSettingItem
+    @NonNull
+    public String getType() {
+        return AnchorBeautyItem.class.getSimpleName();
+    }
+}

@@ -1,0 +1,158 @@
+package com.hpbr.bosszhipin.group.factory;
+
+import ah0.u;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.hpbr.bosszhipin.chat.o;
+import com.hpbr.bosszhipin.chat.p;
+import com.hpbr.bosszhipin.data.db.entry.GroupMemberBean;
+import com.hpbr.bosszhipin.data.manager.r;
+import com.hpbr.bosszhipin.group.adapter.base.BaseChatGroupHolder;
+import com.hpbr.bosszhipin.group.adapter.base.BaseItemViewClickHolder;
+import com.hpbr.bosszhipin.group.exception.ObjectNullPointException;
+import com.hpbr.bosszhipin.module.contacts.entity.ChatBean;
+import com.hpbr.bosszhipin.module.contacts.entity.protobuf.ChatMessageBean;
+import com.hpbr.bosszhipin.module.contacts.entity.protobuf.ChatMessageBodyBean;
+import com.hpbr.bosszhipin.utils.p3;
+import com.hpbr.bosszhipin.views.MTextView;
+import com.kanzhun.zpsdksupport.utils.TimeUtils;
+import com.twl.ui.ToastUtils;
+import el.f;
+import hd.d;
+
+/* JADX INFO: loaded from: classes5.dex */
+public class FriendSendWebPFactory implements xn.e<ChatBean> {
+
+    /* JADX INFO: renamed from: a, reason: collision with root package name */
+    private xn.c f54309a;
+
+    /* JADX INFO: renamed from: b, reason: collision with root package name */
+    private d.b f54310b;
+
+    /* JADX INFO: Access modifiers changed from: private */
+    static class FriendSendWebPHolder extends BaseItemViewClickHolder {
+
+        /* JADX INFO: renamed from: d, reason: collision with root package name */
+        private SimpleDraweeView f54311d;
+
+        /* JADX INFO: renamed from: e, reason: collision with root package name */
+        private SimpleDraweeView f54312e;
+
+        /* JADX INFO: renamed from: f, reason: collision with root package name */
+        private MTextView f54313f;
+
+        /* JADX INFO: renamed from: g, reason: collision with root package name */
+        private MTextView f54314g;
+
+        /* JADX INFO: renamed from: h, reason: collision with root package name */
+        private xn.c f54315h;
+
+        /* JADX INFO: renamed from: i, reason: collision with root package name */
+        private d.b f54316i;
+
+        class a implements f.d {
+
+            /* JADX INFO: renamed from: a, reason: collision with root package name */
+            final /* synthetic */ ChatBean f54317a;
+
+            a(ChatBean chatBean) {
+                this.f54317a = chatBean;
+            }
+
+            @Override // el.f.d
+            public void a() {
+            }
+
+            @Override // el.f.d
+            public void b() {
+                if (FriendSendWebPHolder.this.f54316i != null) {
+                    FriendSendWebPHolder.this.f54316i.x6(this.f54317a);
+                }
+            }
+
+            @Override // el.f.d
+            public void e() {
+                p3.o(((BaseChatGroupHolder) FriendSendWebPHolder.this).f54063b, this.f54317a.f66897message.messageBody.text);
+                ToastUtils.showText("复制完成");
+            }
+        }
+
+        public FriendSendWebPHolder(xn.c cVar, d.b bVar, Context context, View view) {
+            super(context, view);
+            this.f54315h = cVar;
+            this.f54316i = bVar;
+            this.f54311d = (SimpleDraweeView) view.findViewById(o.f31675n5);
+            this.f54312e = (SimpleDraweeView) view.findViewById(o.Ai);
+            this.f54313f = (MTextView) view.findViewById(o.Wp);
+            this.f54314g = (MTextView) view.findViewById(o.Br);
+        }
+
+        /* JADX INFO: Access modifiers changed from: private */
+        public /* synthetic */ boolean m(ChatBean chatBean, View view) {
+            if (chatBean.msgId <= 0) {
+                return true;
+            }
+            if (this.f54316i == null) {
+                return false;
+            }
+            ed.d.a().g(chatBean, this.itemView, this.f54312e, new a(chatBean));
+            return false;
+        }
+
+        @Override // com.hpbr.bosszhipin.group.adapter.base.BaseItemViewClickHolder, com.hpbr.bosszhipin.group.adapter.base.BaseChatGroupHolder
+        /* JADX INFO: renamed from: i */
+        public void h(ChatBean chatBean, final ChatBean chatBean2, int i11) throws ObjectNullPointException {
+            String str;
+            super.h(chatBean, chatBean2, i11);
+            GroupMemberBean groupMemberBeanA = com.hpbr.bosszhipin.data.manager.o.C().A(chatBean2.toUserId, chatBean2.fromUserId);
+            if (groupMemberBeanA != null) {
+                this.f54311d.setImageURI(p3.R(groupMemberBeanA.avatarUrl));
+                str = groupMemberBeanA.name;
+                co.a.b(this.f54315h, this.f54311d, str, chatBean2.fromUserId);
+            } else {
+                this.f54311d.setImageURI(p3.R(""));
+                str = chatBean2.f66897message.fromUser.name;
+                co.a.b(this.f54315h, this.f54311d, str, chatBean2.fromUserId);
+            }
+            co.a.a(this.f54063b, this.f54311d, chatBean2.toUserId, chatBean2.fromUserId);
+            this.f54312e.setOnLongClickListener(new View.OnLongClickListener() { // from class: com.hpbr.bosszhipin.group.factory.d
+                @Override // android.view.View.OnLongClickListener
+                public final boolean onLongClick(View view) {
+                    return this.f54629b.m(chatBean2, view);
+                }
+            });
+            MTextView mTextView = this.f54313f;
+            String[] strArr = new String[2];
+            strArr[0] = co.g.b(chatBean2.toUserId, chatBean2.fromUserId) ? "群主" : "";
+            strArr[1] = str;
+            mTextView.b(u.c(TimeUtils.PATTERN_SPLIT, strArr), 8);
+            co.e.e(this.f54314g, chatBean, chatBean2);
+            this.f54312e.setController(Fresco.newDraweeControllerBuilder().setUri(p3.R(i70.d.e().l(chatBean2.f66897message.messageBody.text))).setAutoPlayAnimations(true).build());
+        }
+    }
+
+    public FriendSendWebPFactory(xn.c cVar) {
+        this.f54309a = cVar;
+    }
+
+    @Override // xn.e
+    public BaseChatGroupHolder a(Context context, ViewGroup viewGroup) {
+        return new FriendSendWebPHolder(this.f54309a, this.f54310b, context, LayoutInflater.from(context).inflate(p.U9, viewGroup, false));
+    }
+
+    @Override // xn.e
+    /* JADX INFO: renamed from: c, reason: merged with bridge method [inline-methods] */
+    public boolean b(ChatBean chatBean) {
+        ChatMessageBean chatMessageBean = chatBean.f66897message;
+        ChatMessageBodyBean chatMessageBodyBean = chatMessageBean.messageBody;
+        return chatMessageBodyBean.type == 1 && chatMessageBodyBean.templateId == 1 && chatMessageBean.fromUser.f21395id != r.A() && i70.d.e().q(chatBean.f66897message.messageBody.text);
+    }
+
+    public void setOnQuoteListener(d.b bVar) {
+        this.f54310b = bVar;
+    }
+}

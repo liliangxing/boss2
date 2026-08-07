@@ -1,0 +1,41 @@
+package com.hpbr.bosszhipin.company.module.discovery.recommend.viewholder.base;
+
+/* JADX INFO: loaded from: classes4.dex */
+public enum ComRecItemType {
+    TYPE_COMMON_UNKNOWN(0),
+    TYPE_COMMON_DIVIDER_1DP_F0F0F0(1),
+    TYPE_COMMON_DIVIDER_6DP_F5F5F6(2),
+    TYPE_COMMON_DIVIDER(3),
+    TYPE_COMMON_TITLE(4),
+    TYPE_COM_REC_BASIC_INFO(4097),
+    TYPE_COM_REC_PROFILE(4098),
+    TYPE_COM_REC_WORK_EXP(4099),
+    TYPE_COM_REC_WEAL_INFO(4100),
+    TYPE_COM_REC_PHOTO(4101),
+    TYPE_COM_REC_BRAND_AGGREGATION(4102),
+    TYPE_COM_REC_BOSS(4103),
+    TYPE_COM_REC_POSITION(4104),
+    TYPE_COM_REC_POSITION_SEE_MORE(4105),
+    TYPE_COM_REC_WORK_EXP_TOPIC(4112),
+    TYPE_COM_REC_POSITION_V2(4113),
+    TYPE_COM_REC_WORK_EXP_V2(4114),
+    TYPE_COM_REC_PHOTO_V2(4115),
+    TYPE_COM_REC_BOSS_V2(4116),
+    TYPE_COM_REC_TALENT_DEVELOPMENT(4119),
+    TYPE_COM_REC_WELFARE(4120),
+    TYPE_COM_REC_STALE_DEVELOPMENT(4121),
+    TYPE_COM_REC_STALE_SCHOOL_RECRUIT(4128),
+    TYPE_COM_REC_FOCUS_V2(4117),
+    TYPE_COM_REC_ITEM_VIEW_MORE(4118),
+    TYPE_COM_REC_ITEM_END(Integer.MAX_VALUE);
+
+    private int viewType;
+
+    ComRecItemType(int i11) {
+        this.viewType = i11;
+    }
+
+    public int getViewType() {
+        return this.viewType;
+    }
+}

@@ -1,0 +1,39 @@
+package com.hpbr.bosszhipin.interviews.network;
+
+import b8.a;
+import com.twl.http.config.RequestMethod;
+import net.bosszhipin.base.BaseApiRequest;
+import so.n;
+
+/* JADX INFO: loaded from: classes5.dex */
+public class BossInterviewMarkGeekRequest extends BaseApiRequest<BossInterviewMarkGeekResponse> {
+
+    @a
+    public String encryptInterviewId;
+
+    @a
+    public long geekId;
+
+    @a
+    public long interviewId;
+
+    @a
+    public String labels;
+
+    @a
+    public String note;
+
+    public BossInterviewMarkGeekRequest(com.twl.http.callback.a<BossInterviewMarkGeekResponse> aVar) {
+        super(aVar);
+    }
+
+    @Override // com.twl.http.client.a
+    public RequestMethod getMethod() {
+        return RequestMethod.POST;
+    }
+
+    @Override // com.twl.http.client.a
+    public String getUrl() {
+        return n.O2;
+    }
+}
