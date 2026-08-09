@@ -49,6 +49,22 @@
 
 ## APK说明
 
+### v3.0.0 欢迎页点击"同意"闪退修复版
+
+修复了点击"同意"后闪退的问题，主要改动：
+
+1. **修复 native 库加载 (YZWG$a.smali)**: 将 `SoLoader.loadLibrary` 替换为 `System.loadLibrary`。SoLoader 在静态初始化阶段可能未正确初始化，导致 `libyzwg.so` 加载失败，进而引发后续所有签名加密/解密操作抛出 `UnsatisfiedLinkError`。
+2. **添加 native 方法异常保护 (YZWG.smali)**: 为 `encodePassword`、`decodePassword` 等 native 方法调用添加 try/catch，即使 native 调用失败也不会导致应用崩溃，而是返回空字符串降级处理。
+3. **修补 TinkerUncaughtHandler**: 移除 `Process.killProcess()` 调用，防止 Tinker 框架在捕获未处理异常时直接杀死进程（v2.0.0 已修复，此版本保留）。
+4. **修复签名方案**: 使用 uber-apk-signer 重新签名（v1+v2+v3），参考 trae-cn3 的打包指南思路（v2.0.0 已修复，此版本保留）。
+5. **签名信息**:
+   ```
+   Alias: trae3
+   Algorithm: SHA256withRSA (2048-bit)
+   Signature: v1 + v2 + v3
+   Keystore: /data/user/work/trae3.keystore
+   ```
+
 ### v2.0.0 闪退修复版
 
 修复了重签名后闪退的问题，主要改动：
