@@ -49,6 +49,22 @@
 
 ## APK说明
 
+### v2.0.0 闪退修复版
+
+修复了重签名后闪退的问题，主要改动：
+
+1. **修复签名方案**: 原APK的v2签名被剥离但v1签名仍引用v2，导致签名验证失败。使用 uber-apk-signer 重新签名（v1+v2+v3），参考 trae-cn3 的打包指南思路。
+2. **修补 TinkerUncaughtHandler**: 移除了 `Process.killProcess()` 调用，防止 Tinker 框架在捕获异常时直接杀死进程。
+3. **签名信息**:
+   ```
+   Alias: trae3
+   Algorithm: SHA256withRSA (2048-bit)
+   Signature: v1 + v2 + v3
+   Keystore: /data/user/work/trae3.keystore
+   ```
+
+### v1.0.0 原始重签名版
+
 Release中的APK已使用自定义密钥重新签名：
 
 ```
