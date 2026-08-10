@@ -30,6 +30,47 @@
 
 ---
 
+## v9.0.0 恢复libyzwg.so签名能力修复版（Lack sig修复）
+
+修复了 v8.0.0 引入的"输入手机号提交下一步提示 Lack sig"问题。
+
+**根因**：v8.0.0 物理删除 `libyzwg.so` 并设置 `YZWG$a.clinit` 中 `a=false`，导致 `YZWG.signature()`/`calculateCRC32()` 等所有签名方法在 `loadSo()` 返回 false 时直接返回空值，API 请求头中的 `sig` 参数缺失，服务端返回 `Lack sig`。
+
+**修复方案（恢复so路线）**：基于 v3.0.0 APK（含完整 libyzwg.so）重建，恢复原生签名能力：
+
+1. **恢复libyzwg.so**：
+   - 保留 `lib/arm64-v8a/libyzwg.so`（一苇数格签名库），使 `YZWG.signature()` 能正常生成 API 请求签名
+   - `YZWG$a.smali` clinit 保持原始加载逻辑：`loadLibrary("yzwg")` + `a=true`
+
+2. **注入PmsHookHelper**（沿用v4.0.0方案）：
+   - 在 `App.attachBaseContext` 中调用 `PmsHookHelper.hook()`，拦截 `IPackageManager.getPackageInfo` 返回原始BOSS签名
+   - 使重签名后的 `libyzwg.so` 签名校验通过，正常生成签名
+   - 编译后的类：`com/hpbr/bosszhipin/base/PmsHookHelper` 及其 `PmsProxyHandler`
+
+3. **保留v8.0.0关键防闪退修复**：
+   - 继续物理删除 `libdexvmp.so`（数盟VMP，JNI_OnLoad 签名校验后 abort）
+   - `Xlog.smali` PUB_KEY 保持空字符串（禁用日志加密）
+
+4. **保留v5-v7防崩溃修复**：
+   - System.exit/Process.killProcess 40处全部替换为nop
+   - JniLib1716343241 11个native方法stub实现
+   - k60/i$b IdleHandler/Runnable 添加catchall保护
+   - k60/e.D() 的catch Exception改为catchall(Throwable)
+   - BZL handler 不再委托默认UncaughtExceptionHandler
+
+**验证结果**：
+- System.exit残留: 0处 ✅
+- Process.killProcess残留: 0处 ✅
+- libdexvmp.so: 已从APK删除 ✅
+- libyzwg.so: 已保留（恢复签名能力）✅
+- YZWG$a: 正常加载libyzwg.so (a=true) ✅
+- PmsHookHelper: 已注入App.attachBaseContext ✅
+- Xlog PUB_KEY: 已置空 ✅
+- resources.arsc: Stored（未压缩）✅
+- 签名: v1+v2+v3 全部通过 ✅
+
+---
+
 ## APK修改与重打包核心流程
 
 ### 工具链准备
