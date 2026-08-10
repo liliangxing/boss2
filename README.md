@@ -236,6 +236,39 @@ grep -rn "PUB_KEY" smali_all/ --include="*.smali"
 
 ## APK版本历史
 
+### v6.0.0 Native方法Stub修复版
+
+修复了点击"同意"后闪退的根因：`libdexvmp.so` 被禁用后，`JniLib1716343241` 的11个native方法调用抛出 `UnsatisfiedLinkError`。
+
+**根因分析**：
+- `libdexvmp.so`（数盟DEX VMP保护）在 `JNI_OnLoad` 中执行签名校验后调用 `abort()`，v5.0.0已禁用其加载
+- 但 `JniLib1716343241` 的11个native方法是VMP调度入口，被 `cn/wh/auth`（数盟认证SDK）的30个调用点使用
+- 禁用库加载后，这些native方法调用抛出未捕获的 `UnsatisfiedLinkError`，导致闪退
+- 崩溃路径：用户点击"同意" → `k60/i.a()` 延迟初始化 → `k60/e.D()` 数盟初始化 → `cn/wh/authapi/BuildConfig` 构造函数 → `JniLib1716343241.cV()` → `UnsatisfiedLinkError`
+
+**修复方案**：
+将 `JniLib1716343241` 中11个native方法声明替换为返回默认值的stub实现：
+
+| 方法 | 返回类型 | Stub返回值 |
+|------|---------|-----------|
+| `a(Class, int)` | void | return-void |
+| `cB(Object[])` | byte | 0 |
+| `cC(Object[])` | char | 0 |
+| `cD(Object[])` | double | 0.0 |
+| `cF(Object[])` | float | 0.0 |
+| `cI(Object[])` | int | 0 |
+| `cJ(Object[])` | long | 0 |
+| `cL(Object[])` | Object | null |
+| `cS(Object[])` | short | 0 |
+| `cV(Object[])` | void | return-void |
+| `cZ(Object[])` | boolean | false |
+
+**安全性验证**：
+- `libdu.so`（数盟核心库）无签名验证（`strings` 分析无 `signature`/`getPackageInfo` 字符串），可安全加载
+- `DUHelper` 的native方法不在初始化时调用，仅在后续SDK使用时触发
+- `k60/i.a()` 延迟初始化方法有 `try-catch(Throwable)` 包裹，NPE等异常可被捕获
+- `libyzwg.so` 由PMS签名代理Hook处理签名校验
+
 ### v5.0.0 闪退彻底修复版
 
 修复了点击"同意"闪退、安装包与系统不兼容等问题，主要改动：
