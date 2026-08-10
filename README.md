@@ -236,6 +236,59 @@ grep -rn "PUB_KEY" smali_all/ --include="*.smali"
 
 ## APK版本历史
 
+### v7.0.0 全面崩溃路径修复版
+
+修复了v6.0.0后仍然存在的"点击同意闪退"问题，通过全链路分析发现多个未保护的崩溃路径。
+
+**根因分析**：
+v6.0.0仅修复了 `JniLib1716343241` 的 `UnsatisfiedLinkError`，但实际存在多条未保护的崩溃路径：
+
+1. **延迟初始化IdleHandler无try-catch**：
+   - `k60/i.a()` 的try-catch(Throwable)只保护同步初始化代码
+   - 但 `k60/i$b` 作为 `IdleHandler` 和 `Runnable` 在 `a()` 返回后才执行
+   - `k60/i$b.run()` 调用 `k60/e.w()` 进行进一步初始化（华为延迟初始化、配置刷新等）
+   - `k60/e.w()` 及其调用链无任何try-catch保护，任何异常都会导致主线程崩溃
+
+2. **数盟初始化仅catch Exception**：
+   - `k60/e.D()` 的try-catch只捕获 `Exception`，不捕获 `Error`
+   - `UnsatisfiedLinkError` 继承自 `Error`，不会被捕获
+   - 虽然 `k60/i.a()` 的catchall会兜底，但修复D()的catch范围更精确
+
+3. **BZL崩溃保护器委托链问题**：
+   - BZL `a.b()` 方法在 `checkJavaCrash()` 返回false时，委托给默认 `UncaughtExceptionHandler`
+   - 默认handler可能是xcrash → 系统默认handler，形成调用链
+   - 系统默认handler调用 `Process.killProcess()` 和 `System.exit()`（已nop），但委托过程可能引发递归
+   - 修复后 `b()` 仅记录日志并返回，由 `c()` 的无限循环+`Looper.loop()` 保活
+
+**修复方案**：
+
+| 修复项 | 文件 | 修改内容 |
+|--------|------|---------|
+| IdleHandler try-catch | `k60/i$b.smali` | `run()` 和 `queueIdle()` 添加 `.catchall` (Throwable) 保护 |
+| 数盟init catch范围 | `k60/e.smali` | `D()` 方法 `.catch Exception` 改为 `.catchall` (Throwable) |
+| BZL handler委托链 | `com/bzl/safe/crashprotect/internal/handler/a.smali` | `b()` 不再委托给默认handler，直接返回 |
+| zipalign页面对齐 | `build_apk.sh` | 添加 `-p` 标志页面对齐.so文件 |
+
+**崩溃路径分析**：
+```
+用户点击"同意"
+  → k60/i.a() [try-catch(Throwable)保护] ✓
+    → 各种SDK初始化 (Bugly/Sentry/PushSDK/数盟等)
+    → k60/i$b.a() 注册IdleHandler和延迟Runnable
+  → k60/i.a() 返回
+  → [稍后] k60/i$b.queueIdle() 触发 [v6.0.0无保护 ✗ → v7.0.0已修复 ✓]
+    → k60/i$b.run() [v6.0.0无保护 ✗ → v7.0.0已修复 ✓]
+      → k60/e.w() [无try-catch，调用多个初始化方法]
+        → do/e.a() 配置刷新
+        → go/b.d() 配置检查
+        → 可能触发各种异常/Error
+```
+
+**关键教训**：
+- `try-catch(Throwable)` 只保护同步代码，异步回调（IdleHandler/Runnable/Handler.post）需要单独保护
+- `catch Exception` 不捕获 `Error`（包括 `UnsatisfiedLinkError`），需要用 `catchall` 
+- 崩溃保护器的委托链可能形成递归调用，需要打破委托循环
+
 ### v6.0.0 Native方法Stub修复版
 
 修复了点击"同意"后闪退的根因：`libdexvmp.so` 被禁用后，`JniLib1716343241` 的11个native方法调用抛出 `UnsatisfiedLinkError`。
