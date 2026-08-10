@@ -236,6 +236,55 @@ grep -rn "PUB_KEY" smali_all/ --include="*.smali"
 
 ## APK版本历史
 
+### v8.0.0 完整指南修复版（严格参考闪退排查指南）
+
+严格参照《BOSS直聘-闪退排查与修复完整指南》文档，逐一核对并完成所有修复项。
+
+**文档对照修复清单**：
+
+| 文档章节 | 修复项 | 状态 | 实施细节 |
+|---------|--------|------|---------|
+| 3.2 第一层 | 禁用所有System.exit/Process.killProcess | ✅ v5.0.0完成 | 替换为nop |
+| 3.3 第二层 | 删除libdexvmp.so | ✅ v8.0.0完成 | 从APK中物理删除.so文件 |
+| 3.3 第二层 | 删除libyzwg.so | ✅ v8.0.0完成 | 从APK中物理删除.so文件 |
+| 3.4 第三层 | 禁用libdexvmp.so加载 | ✅ v5.0.0完成 | 注释掉loadLibrary("dexvmp") |
+| 3.4 第三层 | 禁用libyzwg.so加载 | ✅ v8.0.0完成 | YZWG$a.clinit设a=false不加载库 |
+| 3.4 第三层 | JniLib1716343241 native方法stub | ✅ v6.0.0完成 | 11个native方法替换为stub |
+| 3.4 第三层 | IdleHandler/Runnable try-catch | ✅ v7.0.0完成 | k60/i$b添加catchall保护 |
+| 3.4 第三层 | k60/e.D() catch范围 | ✅ v7.0.0完成 | Exception改为catchall(Throwable) |
+| 3.4 第三层 | BZL handler委托链 | ✅ v7.0.0完成 | 不委托默认UncaughtExceptionHandler |
+| 2.4 xlog解密 | PUB_KEY设为空字符串 | ✅ v8.0.0完成 | 禁用日志加密便于后续调试 |
+| 安装兼容 | resources.arsc不压缩 | ✅ v5.0.0完成 | zip -n .arsc |
+| 安装兼容 | zipalign页面对齐(-p) | ✅ v7.0.0完成 | 适配Android 15+ 16KB页 |
+
+**v8.0.0新增修复**：
+
+1. **物理删除libdexvmp.so和libyzwg.so**：
+   - 之前版本仅禁用加载，但.so文件仍在APK中
+   - libdexvmp.so可能通过其他路径被加载
+   - libyzwg.so的JNI_OnLoad可能调用abort()
+   - 从APK中物理删除是最彻底的方案
+
+2. **YZWG$a.smali完全禁用库加载**：
+   - 修改`<clinit>`静态构造函数，直接设`a=false`
+   - 不调用`System.loadLibrary("yzwg")`
+   - YZWG所有方法检查`loadSo()`返回false时直接返回空值
+   - 双保险：删除.so文件 + 不调用loadLibrary
+
+3. **Xlog.smali PUB_KEY置空**：
+   - 将PUB_KEY字段值从长hex字符串改为空字符串`""`
+   - 同时修改`open()`方法中的const-string
+   - 禁用Mars xlog的ECDH加密，后续日志可直接解压读取
+   - 便于后续闪退问题的日志排查
+
+**验证结果**：
+- System.exit残留: 0处 ✅
+- Process.killProcess残留: 0处 ✅
+- libdexvmp.so: 已从APK删除 ✅
+- libyzwg.so: 已从APK删除 ✅
+- resources.arsc: Stored（未压缩）✅
+- 签名: v1+v2+v3 全部通过 ✅
+
 ### v7.0.0 全面崩溃路径修复版
 
 修复了v6.0.0后仍然存在的"点击同意闪退"问题，通过全链路分析发现多个未保护的崩溃路径。
