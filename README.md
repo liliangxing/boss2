@@ -49,6 +49,26 @@
 
 ## APK说明
 
+### v4.0.0 PMS签名代理修复版（修复"参数格式异常"）
+
+修复了重签名后libyzwg.so签名校验失败导致API请求"参数格式异常"的问题，主要改动：
+
+1. **添加 PMS签名代理Hook (PmsHookHelper.java)**: 在Application的`attachBaseContext`中（app启动最早的时机）安装了PMS签名代理hook，通过动态代理拦截`IPackageManager.getPackageInfo`调用。
+2. **提取原始签名**: 从原始APK中提取了两份证书（BOSSZHIP.RSA - 2026年新证书，CERT.RSA - 2014年原始证书），转换为hex格式嵌入代码。
+3. **创建动态代理**: 通过`Proxy.newProxyInstance`创建`IPackageManager`的代理对象，拦截所有`getPackageInfo`调用。
+4. **替换签名**: 当代码查询`com.hpbr.bosszhipin`的APK签名时，代理返回原始签名而非重签名后的签名。
+5. **清除signingInfo**: 同时将Android P+的`signingInfo`字段置空，强制回退到`signatures`数组。
+6. **修改App.smali**: 在`App.attachBaseContext`方法最前面（super调用之前）插入`PmsHookHelper.hook()`调用。
+7. **签名信息**:
+   ```
+   Alias: trae4
+   Algorithm: SHA256withRSA (2048-bit)
+   Signature: v1 + v2 + v3
+   Keystore: trae4.keystore
+   ```
+
+这样libyzwg.so在校验APK签名时会看到原始签名，签名验证通过，就能正常生成有效的API请求签名。
+
 ### v3.0.0 欢迎页点击"同意"闪退修复版
 
 修复了点击"同意"后闪退的问题，主要改动：
