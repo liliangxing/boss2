@@ -1,0 +1,30 @@
+.class Lcom/twl/signer/YZWG$a;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/twl/signer/YZWG;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0xa
+    name = "a"
+.end annotation
+
+
+# static fields
+.field public static a:Z
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .registers 1
+
+    const/4 v0, 0x0
+
+    sput-boolean v0, Lcom/twl/signer/YZWG$a;->a:Z
+
+    return-void
+.end method
