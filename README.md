@@ -165,6 +165,7 @@ python3 scripts/verify.py boss2_v5.apk
 | 修改 `cg0/b.smali` 中 `a()` 返回值 | 安全检测触发 / 闪退 | 该方法返回 false 禁用 Java 层安全检测，改为 true 会触发"清理AB配置" |
 | 修改 `YZWG$a.smali` 中 native 库加载逻辑 | API 签名失败 / "参数格式异常" | SoLoader.loadLibrary("yzwg") 是加载 API 签名 native 库的入口 |
 | 重新编译全部 DEX 而非仅修改的 DEX | 潜在闪退 | smali 重新编译可能引入细微差异，仅编译 classes3/8/9 |
+| 使用 apktool 全量反编译后重打包 | "安装包与系统不兼容" (INSTALL_FAILED_NO_MATCHING_ABIS) | apktool 会解码再重编译 `AndroidManifest.xml`，可能丢失 `native-code: arm64-v8a` 声明；`lib/arm64-v8a/` 下 53 个 .so 也可能被遗漏或改变压缩方式。必须使用 build.py 的 zip 级最小化改动方式 |
 | 修改包名回 `com.hpbr.bosszhipin` | 安装冲突 / 功能异常 | 包名 `com.hpbr.bosszhipin2` 是刻意的，用于与官方版共存 |
 | 删除 META-INF 目录后不重新签名 | "Lack Sig" | 必须使用 apksigner 重新签名 |
 | 删除或替换 libyzwg.so | API 签名失败 / 闪退 | libyzwg.so 包含 API 签名生成逻辑和安全检测代码 |
@@ -588,6 +589,7 @@ python3 tools/decode_xlog.py tlog2_main_20260814.xlog main.log
 | 包名 | `com.hpbr.bosszhipin2` |
 | 原始包名 | `com.hpbr.bosszhipin` |
 | 架构 | arm64-v8a (仅 64 位) |
+| minSdkVersion / targetSdkVersion | 22 / 33 |
 | DEX 文件数 | 9 |
 | 修改过的 DEX | classes3, classes8, classes9 |
 | Native 库数 | 53 (+ libyzwg.so) |
@@ -600,6 +602,9 @@ python3 tools/decode_xlog.py tlog2_main_20260814.xlog main.log
 
 ### 安装时提示"该安装包与您的系统不兼容"
 
+> 底层错误通常是 `INSTALL_FAILED_NO_MATCHING_ABIS`：系统在 APK 中找不到与设备 CPU 架构匹配的 native 库。
+> 本 APK 是**纯 arm64-v8a 单架构**包，`AndroidManifest.xml` 中声明 `native-code: arm64-v8a` 且包含 53 个 arm64 .so。
+
 | 可能原因 | 解决方案 |
 |----------|---------|
 | 在 x86/x86_64 模拟器上安装 | 换用真机或 arm64 模拟器。APK 仅包含 arm64-v8a native 库 |
@@ -607,6 +612,40 @@ python3 tools/decode_xlog.py tlog2_main_20260814.xlog main.log
 | APK 文件不完整或损坏 | 检查 APK 大小是否约 144MB，运行 `python3 scripts/verify.py` 验证 |
 | 构建时缺少基础 APK | 确保有 boss2_v1.apk 基础 APK，见 [前提条件](#前提条件-必读) |
 | 构建时缺少 apksigner/zipalign | 安装 Android Build Tools r34，见 [前提条件](#3-工具依赖) |
+| **重打包时破坏了 ABI 结构（最隐蔽）** | 见下方"构建层面的根因" |
+
+#### 快速诊断
+
+用 Android Build Tools 的 `aapt2` 检查 APK 声明的架构信息：
+
+```bash
+aapt2 dump badging boss2_v5.apk | grep -E "sdkVersion|targetSdkVersion|native-code"
+aapt2 dump xmltree boss2_v5.apk --file AndroidManifest.xml | grep -E "minSdkVersion|targetSdkVersion"
+unzip -l boss2_v5.apk | grep -c "lib/arm64-v8a/.*\.so"   # 应为 53
+```
+
+正确构建的 APK 应输出：
+
+```
+sdkVersion:'22'
+targetSdkVersion:'33'
+native-code: 'arm64-v8a'
+```
+
+- 若 `native-code` 丢失或出现多个架构（如 `arm64-v8a` 与 `armeabi-v7a` 混合）→ 重打包过程破坏了 ABI 结构
+- 若 `lib/arm64-v8a/*.so` 数量少于 53 → native 库在重打包时丢失
+
+#### 构建层面的根因
+
+"与系统不兼容"在构建脚本本身正确运行的情况下，几乎都源于**重打包方式破坏了 ABI 结构**，而不是补丁逻辑错误。对照下表检查你的构建方式：
+
+| 构建方式 | 对 ABI 结构的影响 | 结果 |
+|----------|------------------|------|
+| 本仓库 `scripts/build.py`：仅解包→替换 classes3/8/9 + 添加 libyzwg.so→重打包 | 不解码/重编译 `AndroidManifest.xml` 和 `resources.arsc`，52 个原生 .so 原样复制，架构声明原封不动 | 兼容性保持 |
+| apktool 全量反编译后重打包 | `AndroidManifest.xml` 被解码再重编译，`native-code` 属性可能丢失；`lib/` 下的 .so 可能在解包/重打包时被遗漏或改变压缩方式 | 高概率出现"不兼容" |
+| 自行写脚本逐文件复制（未保留目录结构 / 压缩方式） | `.so` 文件路径变化或 `extractNativeLibs` 语义改变 | 高概率出现"不兼容" |
+
+**核心原则：对 `AndroidManifest.xml`、`resources.arsc` 和 `lib/arm64-v8a/` 下的 53 个 .so 只做"原样搬运"，不做任何解码、重编译或再压缩。** 本仓库的 `build.py` 严格遵循该原则：它是 zip 级别的最小化改动，替换的只有 3 个 DEX 和新增的 1 个 libyzwg.so。
 
 ### 构建脚本报错
 
