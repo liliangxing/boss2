@@ -4,7 +4,8 @@ classes9.dex Smali 补丁脚本
 
 应用两个补丁:
 1. cg0/b.smali: 安全检测 a() 方法返回 false (const/4 v0, 0x1 → 0x0)
-2. com/twl/signer/YZWG$a.smali: native 库加载器，加载 yzwg 并返回成功
+   注意: v1 基础 APK 中可能已经返回 false，此时跳过
+2. com/twl/signer/YZWG$a.smali: native 库加载器，加载 yzwg 并设置 a=true
 
 用法:
     python3 patch_classes9.py <smali_classes9_dir>
@@ -26,16 +27,39 @@ def patch_cg0_b(smali_dir):
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # 检查是否已经修补过
-    # 原始代码: const/4 v0, 0x1 (在 a() 方法中返回 true)
-    # 补丁代码: const/4 v0, 0x0 (返回 false)
-
-    # 找到 a() 方法中的 const/4 v0, 0x1 并改为 0x0
-    # 注意: 只修改 a() 方法中的，不影响其他方法
+    # 检查是否已经修补过 (a() 方法中 const/4 v0, 0x0)
+    # 找到 a() 方法
     lines = content.split('\n')
     in_method_a = False
-    patched = False
+    already_patched = False
+    needs_patch = False
 
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith('.method') and 'a()' in stripped:
+            in_method_a = True
+        elif stripped.startswith('.end method') and in_method_a:
+            in_method_a = False
+
+        if in_method_a:
+            if 'const/4 v0, 0x0' in stripped:
+                already_patched = True
+            elif 'const/4 v0, 0x1' in stripped:
+                needs_patch = True
+
+    if already_patched and not needs_patch:
+        print(f"  [跳过] cg0/b.smali 已经修补过 (a() 返回 false)")
+        return True
+
+    if not needs_patch:
+        # 可能 a() 方法结构不同，尝试更宽松的匹配
+        print(f"  [警告] cg0/b.smali 中未找到 a() 方法的 const/4 v0, 0x1")
+        print(f"         可能已经修补过或结构不同，跳过")
+        return True
+
+    # 修改 a() 方法中的 const/4 v0, 0x1 → 0x0
+    in_method_a = False
+    patched = False
     for i, line in enumerate(lines):
         stripped = line.strip()
         if stripped.startswith('.method') and 'a()' in stripped:
@@ -49,16 +73,9 @@ def patch_cg0_b(smali_dir):
             print(f"  [补丁] cg0/b.smali: a() 方法 const/4 v0, 0x1 → 0x0 (返回 false)")
             break
 
-    if not patched:
-        # 检查是否已经是 0x0
-        if in_method_a or 'const/4 v0, 0x0' in content:
-            print(f"  [跳过] cg0/b.smali 已经修补过 (a() 返回 false)")
-            return True
-        print(f"  [错误] cg0/b.smali 中未找到 a() 方法的 const/4 v0, 0x1")
-        return False
-
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(lines))
+    if patched:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(lines))
 
     return True
 
@@ -79,49 +96,59 @@ def patch_yzwg_a(smali_dir):
         print(f"  [跳过] YZWG$a.smali 已经修补过 (包含 SoLoader.loadLibrary)")
         return True
 
-    # 原始代码: static {} 方法中 const/4 v0, 0x0; return v0
-    # 补丁代码: 加载 yzwg native 库，返回 1
-
-    # 找到 static {} 方法并替换
-    # 原始:
+    # v1 原始代码:
     #   .method static constructor <clinit>()V
     #       .registers 1
+    #
     #       const/4 v0, 0x0
-    #       return v0
+    #
+    #       sput-boolean v0, Lcom/twl/signer/YZWG$a;->a:Z
+    #
+    #       return-void
     #   .end method
-
-    # 替换为:
+    #
+    # 补丁后代码:
     #   .method static constructor <clinit>()V
     #       .registers 1
+    #
     #       :try_start_0
     #       const-string v0, "yzwg"
+    #
     #       invoke-static {v0}, Lcom/facebook/soloader/SoLoader;->loadLibrary(Ljava/lang/String;)Z
+    #
     #       const/4 v0, 0x1
+    #
+    #       sput-boolean v0, Lcom/twl/signer/YZWG$a;->a:Z
     #       :try_end_8
     #       .catchall {:try_start_0 .. :try_end_8} :catchall_9
+    #
     #       goto :goto_d
+    #
     #       :catchall_9
     #       move-exception v0
+    #
     #       invoke-static {v0}, Lcom/tencent/bugly/crashreport/CrashReport;->postCatchedException(Ljava/lang/Throwable;)V
+    #
     #       :goto_d
-    #       return v0
+    #       return-void
     #   .end method
 
+    # 匹配模式: 从 .method static constructor <clinit> 到 .end method
     old_pattern = re.compile(
         r'(\.method\s+static\s+constructor\s+<clinit>\(\)V\s*\n'
         r'\s*\.registers\s+1\s*\n)'
-        r'(\s*const/4\s+v0,\s*0x0\s*\n)'
-        r'(\s*return\s+v0\s*\n)'
-        r'(\s*\.end\s+method)',
+        r'[\s\S]*?'
+        r'(\.end\s+method)',
         re.MULTILINE
     )
 
     replacement = (
-        '\\1'
+        '\\1\n'
         '    :try_start_0\n'
         '    const-string v0, "yzwg"\n\n'
         '    invoke-static {v0}, Lcom/facebook/soloader/SoLoader;->loadLibrary(Ljava/lang/String;)Z\n\n'
         '    const/4 v0, 0x1\n\n'
+        '    sput-boolean v0, Lcom/twl/signer/YZWG$a;->a:Z\n'
         '    :try_end_8\n'
         '    .catchall {:try_start_0 .. :try_end_8} :catchall_9\n\n'
         '    goto :goto_d\n\n'
@@ -129,8 +156,8 @@ def patch_yzwg_a(smali_dir):
         '    move-exception v0\n\n'
         '    invoke-static {v0}, Lcom/tencent/bugly/crashreport/CrashReport;->postCatchedException(Ljava/lang/Throwable;)V\n\n'
         '    :goto_d\n'
-        '\\3'
-        '\\4'
+        '    return-void\n'
+        '\\2'
     )
 
     new_content, count = old_pattern.subn(replacement, content)
@@ -138,7 +165,7 @@ def patch_yzwg_a(smali_dir):
     if count > 0:
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
-        print(f"  [补丁] YZWG$a.smali: <clinit> 添加 SoLoader.loadLibrary(\"yzwg\") + 返回 1")
+        print(f'  [补丁] YZWG$a.smali: <clinit> 添加 SoLoader.loadLibrary("yzwg") + a=true')
         return True
     else:
         print(f"  [错误] YZWG$a.smali 匹配失败，请手动修改")

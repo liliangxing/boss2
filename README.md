@@ -4,7 +4,60 @@
 
 对 BOSS直聘 APK 进行 native library 补丁和 Smali 代码修改，绕过安全检测和签名验证，使重打包后的 APK 能正常运行。
 
-> **重要**: 本文档面向后续功能开发者。请务必先阅读 [禁止操作](#禁止操作) 章节，避免破坏已有补丁导致闪退、卡死、无效版本或签名缺失。
+> **重要**: 本文档面向后续功能开发者。请务必先阅读 [前提条件](#前提条件) 和 [禁止操作](#禁止操作) 章节，避免构建失败或破坏已有补丁。
+
+---
+
+## 前提条件 (必读)
+
+### 1. 基础 APK (boss2_v1.apk) — 必须自行准备
+
+**本仓库不包含基础 APK 文件** (`.gitignore` 排除了 `*.apk`)。构建脚本需要一个 v1 基础 APK 作为输入。
+
+v1 基础 APK 的特征:
+- 包名: `com.hpbr.bosszhipin2` (已重打包)
+- 已包含 PMS hook (PmsHookHelper + PmsProxyHandler + App.smali hook 调用)
+- **不包含** `libyzwg.so` (构建时从仓库 `lib/` 目录添加)
+- minSdkVersion: 22, targetSdkVersion: 33
+- 版本名: 14.140, 版本号: 1414010
+- 仅包含 `arm64-v8a` 架构的 native 库 (53 个 .so 文件)
+
+如果没有 v1 基础 APK，**无法构建**。你需要从原始 BOSS直聘 APK 开始，先完成重打包和 PMS hook 安装，再使用本仓库的脚本进行后续补丁。
+
+### 2. 设备要求
+
+构建出的 APK **仅支持 arm64-v8a 架构**:
+- 支持: 真机 (绝大多数现代手机都是 arm64)
+- **不支持: x86/x86_64 模拟器** (如 Android Studio Emulator、BlueStacks 等)
+- **不支持: 32 位 ARM 设备** (armeabi-v7a)
+
+如果安装时提示"该安装包与您的系统不兼容"，请检查:
+1. 是否在 x86 模拟器上安装 — 换用真机或 arm64 模拟器
+2. 设备 Android 版本是否 >= 5.1 (API 22)
+3. APK 是否完整 (大小约 144MB，如果远小于此说明构建有问题)
+
+### 3. 工具依赖
+
+| 工具 | 仓库内是否包含 | 说明 |
+|------|---------------|------|
+| Python 3.8+ | 否 | 系统自带或 pyenv 安装 |
+| Java 8+ | 否 | `apt install default-jre` |
+| baksmali.jar | **是** (`tools/baksmali.jar`) | DEX → smali 反编译 |
+| smali.jar | **是** (`tools/smali.jar`) | smali → DEX 编译 |
+| apksigner | 否 | Android Build Tools r34 |
+| zipalign | 否 | Android Build Tools r34 |
+| debug.keystore | **是** (`debug.keystore`) | 签名密钥 |
+
+安装 apksigner 和 zipalign:
+```bash
+# 方式一: 下载 Android Build Tools r34
+curl -L -o build-tools.zip "https://dl.google.com/android/repository/build-tools_r34-linux.zip"
+unzip build-tools.zip -d build-tools
+export PATH="$PWD/build-tools/android-14:$PATH"
+
+# 方式二: 使用 SDK Manager
+sdkmanager "build-tools;34.0.0"
+```
 
 ---
 
@@ -24,8 +77,8 @@ boss2/
 │   └── verify.py                      # APK 验证脚本
 ├── tools/
 │   ├── decode_xlog.py                 # Mars XLog 解码器
-│   ├── baksmali.jar                   # DEX 反编译工具 (需自行下载)
-│   └── smali.jar                      # DEX 编译工具 (需自行下载)
+│   ├── baksmali.jar                   # DEX 反编译工具 (已包含)
+│   └── smali.jar                      # DEX 编译工具 (已包含)
 ├── lib/
 │   └── libyzwg_patched.so             # 补丁后的 libyzwg.so (4,470,936 bytes)
 └── smali/                             # 修改过的 smali 参考文件
@@ -45,31 +98,34 @@ boss2/
 
 ## 快速开始
 
-### 1. 安装工具
+### 1. 准备工作
 
 ```bash
-# Python 3.8+ 和 Java 8+ 是前置条件
+# 克隆仓库
+git clone https://github.com/liliangxing/boss2.git
+cd boss2
 
-# smali/baksmali (DEX 反编译/编译工具)
-mkdir -p tools
-curl -L -o tools/baksmali.jar https://bitbucket.org/JesusFreke/smali/downloads/baksmali-2.5.2.jar
-curl -L -o tools/smali.jar https://bitbucket.org/JesusFreke/smali/downloads/smali-2.5.2.jar
+# baksmali.jar 和 smali.jar 已包含在 tools/ 目录中，无需额外下载
 
-# Android Build Tools (apksigner + zipalign)
-# 方式一: 从 Google 下载 build-tools r34
-#   https://developer.android.com/tools/releases/build-tools
-# 方式二: 使用 SDK Manager
-#   sdkmanager "build-tools;34.0.0"
-# 确保 apksigner 和 zipalign 在 PATH 中
+# 安装 apksigner 和 zipalign (仅需 apksigner 和 zipalign)
+curl -L -o build-tools.zip "https://dl.google.com/android/repository/build-tools_r34-linux.zip"
+unzip build-tools.zip -d build-tools
+export PATH="$PWD/build-tools/android-14:$PATH"
+
+# 确认工具可用
+apksigner --version
+zipalign 2>&1 | head -1
+java -version
+python3 --version
 ```
 
 ### 2. 构建 APK
 
 ```bash
-# 从 v1 基础 APK 构建
+# 确保 boss2_v1.apk 在当前目录 (基础 APK，需自行准备，见前提条件)
 python3 scripts/build.py --input boss2_v1.apk --output boss2_v5.apk
 
-# 验证构建结果
+# 验证构建结果 (11 项检查)
 python3 scripts/verify.py boss2_v5.apk
 ```
 
@@ -303,14 +359,9 @@ PmsHookHelper 中硬编码了两个原始 BOSS直聘签名证书 (DER 编码):
 
 ### 工具要求
 
-| 工具 | 版本 | 用途 | 安装方式 |
-|------|------|------|---------|
-| Python | 3.8+ | 构建脚本 | 系统自带或 pyenv |
-| Java | 8+ | smali/baksmali 运行 | `apt install default-jre` |
-| baksmali | 2.5.2 | DEX → smali 反编译 | `curl -L -o tools/baksmali.jar https://bitbucket.org/JesusFreke/smali/downloads/baksmali-2.5.2.jar` |
-| smali | 2.5.2 | smali → DEX 编译 | `curl -L -o tools/smali.jar https://bitbucket.org/JesusFreke/smali/downloads/smali-2.5.2.jar` |
-| apksigner | r34 | V1+V2 签名 | Android Build Tools r34 |
-| zipalign | r34 | 4 字节对齐 | Android Build Tools r34 |
+见 [前提条件 - 工具依赖](#3-工具依赖)。
+
+baksmali.jar 和 smali.jar 已包含在仓库 `tools/` 目录中。仅需额外安装 apksigner 和 zipalign (Android Build Tools r34)。
 
 ### 签名密钥
 
@@ -542,3 +593,51 @@ python3 tools/decode_xlog.py tlog2_main_20260814.xlog main.log
 | Native 库数 | 53 (+ libyzwg.so) |
 | libyzwg.so 大小 | 4,470,936 bytes |
 | APK 大小 | ~144 MB |
+
+---
+
+## 故障排除
+
+### 安装时提示"该安装包与您的系统不兼容"
+
+| 可能原因 | 解决方案 |
+|----------|---------|
+| 在 x86/x86_64 模拟器上安装 | 换用真机或 arm64 模拟器。APK 仅包含 arm64-v8a native 库 |
+| 设备 Android 版本 < 5.1 (API 22) | 更换更高版本的设备。minSdkVersion=22 |
+| APK 文件不完整或损坏 | 检查 APK 大小是否约 144MB，运行 `python3 scripts/verify.py` 验证 |
+| 构建时缺少基础 APK | 确保有 boss2_v1.apk 基础 APK，见 [前提条件](#前提条件-必读) |
+| 构建时缺少 apksigner/zipalign | 安装 Android Build Tools r34，见 [前提条件](#3-工具依赖) |
+
+### 构建脚本报错
+
+| 错误信息 | 原因 | 解决方案 |
+|----------|------|---------|
+| `FileNotFoundError: baksmali.jar` | baksmali.jar 不在 tools/ 目录 | 仓库已包含，检查 `git clone` 是否完整 |
+| `命令失败: apksigner` | apksigner 不在 PATH 中 | `export PATH="$PWD/build-tools/android-14:$PATH"` |
+| `命令失败: zipalign` | zipalign 不在 PATH 中 | 同上 |
+| `KeyError: 'classes3.dex'` | 输入 APK 不正确 | 确保使用 v1 基础 APK，包含 9 个 DEX 文件 |
+| `YZWG$a.smali 匹配失败` | smali 代码结构与预期不符 | 检查输入 APK 是否为正确的 v1 基础 APK |
+
+### 运行时问题
+
+| 问题 | 排查方法 |
+|------|---------|
+| 闪退 | 检查 libyzwg.so 补丁是否正确 (verify.py)，检查 PMS hook 是否存在 |
+| 卡死/ANR | 检查比较补丁 0x1E9B0=0x6B00001F，检查 abort/_exit GOT 是否置零 |
+| "packageInfo is null" | 检查 V2 签名是否存在 (APK Sig Block 42) |
+| "无效的版本" | 检查 BuildConfig 修复 (classes8.dex 包含 com.hpbr.bosszhipin.BuildConfig) |
+| "Lack Sig" | 检查 PMS hook 是否正确安装 (classes3.dex 包含 PmsHookHelper + FakeSign) |
+| "参数格式异常" | 检查比较补丁和 YZWG 加载器是否正确 |
+
+### 如何抓取日志
+
+```bash
+# 从设备拉取 XLog 日志
+adb pull /sdcard/Android/data/com.hpbr.bosszhipin2/files/xlog/ ./xlog/
+
+# 解码日志
+python3 tools/decode_xlog.py xlog/tlog2_main_20260814.xlog main.log
+
+# 搜索关键错误信息
+grep -i "code.*9\|invalid\|null\|Lack Sig\|参数格式" main.log
+```
