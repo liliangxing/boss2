@@ -1,0 +1,83 @@
+.class public Lnet/bosszhipin/api/InterviewMediaStatusRequest;
+.super Lnet/bosszhipin/base/BaseApiRequest;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "Lnet/bosszhipin/base/BaseApiRequest<",
+        "Lnet/bosszhipin/api/SuccessResponse;",
+        ">;"
+    }
+.end annotation
+
+
+# static fields
+.field public static final BUSY:Ljava/lang/String; = "6"
+
+.field public static final HANG_UP:Ljava/lang/String; = "5"
+
+.field public static final REJECT:Ljava/lang/String; = "4"
+
+.field public static final TIME_OUT:Ljava/lang/String; = "2"
+
+.field public static final VIDEOING:Ljava/lang/String; = "7"
+
+
+# instance fields
+.field public inviteId:Ljava/lang/String;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+.field public mediaRoomId:Ljava/lang/String;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+.field public nebulaId:Ljava/lang/String;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+.field public status:Ljava/lang/String;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+
+# direct methods
+.method public constructor <init>(Lcom/twl/http/callback/a;)V
+    .registers 2
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/twl/http/callback/a<",
+            "Lnet/bosszhipin/api/SuccessResponse;",
+            ">;)V"
+        }
+    .end annotation
+
+    invoke-direct {p0, p1}, Lnet/bosszhipin/base/BaseApiRequest;-><init>(Lcom/twl/http/callback/a;)V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public getMethod()Lcom/twl/http/config/RequestMethod;
+    .registers 2
+
+    sget-object v0, Lcom/twl/http/config/RequestMethod;->GET:Lcom/twl/http/config/RequestMethod;
+
+    return-object v0
+.end method
+
+.method public getUrl()Ljava/lang/String;
+    .registers 2
+
+    sget-object v0, Lso/n;->H3:Ljava/lang/String;
+
+    return-object v0
+.end method

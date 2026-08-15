@@ -1,0 +1,722 @@
+.class public Lcom/mobile/auth/c/c;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# static fields
+.field private static a:Ljava/lang/String; = "c"
+
+.field private static b:[C
+
+.field private static c:[B
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .registers 1
+
+    const/16 v0, 0x40
+
+    new-array v0, v0, [C
+
+    fill-array-data v0, :array_14
+
+    sput-object v0, Lcom/mobile/auth/c/c;->b:[C
+
+    const/16 v0, 0x80
+
+    new-array v0, v0, [B
+
+    fill-array-data v0, :array_58
+
+    sput-object v0, Lcom/mobile/auth/c/c;->c:[B
+
+    return-void
+
+    nop
+
+    :array_14
+    .array-data 2
+        0x41s
+        0x42s
+        0x43s
+        0x44s
+        0x45s
+        0x46s
+        0x47s
+        0x48s
+        0x49s
+        0x4as
+        0x4bs
+        0x4cs
+        0x4ds
+        0x4es
+        0x4fs
+        0x50s
+        0x51s
+        0x52s
+        0x53s
+        0x54s
+        0x55s
+        0x56s
+        0x57s
+        0x58s
+        0x59s
+        0x5as
+        0x61s
+        0x62s
+        0x63s
+        0x64s
+        0x65s
+        0x66s
+        0x67s
+        0x68s
+        0x69s
+        0x6as
+        0x6bs
+        0x6cs
+        0x6ds
+        0x6es
+        0x6fs
+        0x70s
+        0x71s
+        0x72s
+        0x73s
+        0x74s
+        0x75s
+        0x76s
+        0x77s
+        0x78s
+        0x79s
+        0x7as
+        0x30s
+        0x31s
+        0x32s
+        0x33s
+        0x34s
+        0x35s
+        0x36s
+        0x37s
+        0x38s
+        0x39s
+        0x2bs
+        0x2fs
+    .end array-data
+
+    :array_58
+    .array-data 1
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        0x3et
+        -0x1t
+        -0x1t
+        -0x1t
+        0x3ft
+        0x34t
+        0x35t
+        0x36t
+        0x37t
+        0x38t
+        0x39t
+        0x3at
+        0x3bt
+        0x3ct
+        0x3dt
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        0x0t
+        0x1t
+        0x2t
+        0x3t
+        0x4t
+        0x5t
+        0x6t
+        0x7t
+        0x8t
+        0x9t
+        0xat
+        0xbt
+        0xct
+        0xdt
+        0xet
+        0xft
+        0x10t
+        0x11t
+        0x12t
+        0x13t
+        0x14t
+        0x15t
+        0x16t
+        0x17t
+        0x18t
+        0x19t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        0x1at
+        0x1bt
+        0x1ct
+        0x1dt
+        0x1et
+        0x1ft
+        0x20t
+        0x21t
+        0x22t
+        0x23t
+        0x24t
+        0x25t
+        0x26t
+        0x27t
+        0x28t
+        0x29t
+        0x2at
+        0x2bt
+        0x2ct
+        0x2dt
+        0x2et
+        0x2ft
+        0x30t
+        0x31t
+        0x32t
+        0x33t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+        -0x1t
+    .end array-data
+.end method
+
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+.method public static a([B)Ljava/lang/String;
+    .registers 9
+
+    :try_start_0
+    new-instance v0, Ljava/lang/StringBuffer;
+
+    invoke-direct {v0}, Ljava/lang/StringBuffer;-><init>()V
+
+    array-length v1, p0
+
+    const/4 v2, 0x0
+
+    :goto_7
+    if-ge v2, v1, :cond_95
+
+    add-int/lit8 v3, v2, 0x1
+
+    aget-byte v2, p0, v2
+
+    and-int/lit16 v2, v2, 0xff
+
+    if-ne v3, v1, :cond_2b
+
+    sget-object p0, Lcom/mobile/auth/c/c;->b:[C
+
+    ushr-int/lit8 v1, v2, 0x2
+
+    aget-char p0, p0, v1
+
+    invoke-virtual {v0, p0}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    sget-object p0, Lcom/mobile/auth/c/c;->b:[C
+
+    and-int/lit8 v1, v2, 0x3
+
+    shl-int/lit8 v1, v1, 0x4
+
+    aget-char p0, p0, v1
+
+    invoke-virtual {v0, p0}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    const-string p0, "=="
+
+    :goto_27
+    invoke-virtual {v0, p0}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    goto :goto_95
+
+    :cond_2b
+    add-int/lit8 v4, v3, 0x1
+
+    aget-byte v3, p0, v3
+
+    and-int/lit16 v3, v3, 0xff
+
+    if-ne v4, v1, :cond_5a
+
+    sget-object p0, Lcom/mobile/auth/c/c;->b:[C
+
+    ushr-int/lit8 v1, v2, 0x2
+
+    aget-char p0, p0, v1
+
+    invoke-virtual {v0, p0}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    sget-object p0, Lcom/mobile/auth/c/c;->b:[C
+
+    and-int/lit8 v1, v2, 0x3
+
+    shl-int/lit8 v1, v1, 0x4
+
+    and-int/lit16 v2, v3, 0xf0
+
+    ushr-int/lit8 v2, v2, 0x4
+
+    or-int/2addr v1, v2
+
+    aget-char p0, p0, v1
+
+    invoke-virtual {v0, p0}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    sget-object p0, Lcom/mobile/auth/c/c;->b:[C
+
+    and-int/lit8 v1, v3, 0xf
+
+    shl-int/lit8 v1, v1, 0x2
+
+    aget-char p0, p0, v1
+
+    invoke-virtual {v0, p0}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    const-string p0, "="
+
+    goto :goto_27
+
+    :cond_5a
+    add-int/lit8 v5, v4, 0x1
+
+    aget-byte v4, p0, v4
+
+    and-int/lit16 v4, v4, 0xff
+
+    sget-object v6, Lcom/mobile/auth/c/c;->b:[C
+
+    ushr-int/lit8 v7, v2, 0x2
+
+    aget-char v6, v6, v7
+
+    invoke-virtual {v0, v6}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    sget-object v6, Lcom/mobile/auth/c/c;->b:[C
+
+    and-int/lit8 v2, v2, 0x3
+
+    shl-int/lit8 v2, v2, 0x4
+
+    and-int/lit16 v7, v3, 0xf0
+
+    ushr-int/lit8 v7, v7, 0x4
+
+    or-int/2addr v2, v7
+
+    aget-char v2, v6, v2
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    sget-object v2, Lcom/mobile/auth/c/c;->b:[C
+
+    and-int/lit8 v3, v3, 0xf
+
+    shl-int/lit8 v3, v3, 0x2
+
+    and-int/lit16 v6, v4, 0xc0
+
+    ushr-int/lit8 v6, v6, 0x6
+
+    or-int/2addr v3, v6
+
+    aget-char v2, v2, v3
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    sget-object v2, Lcom/mobile/auth/c/c;->b:[C
+
+    and-int/lit8 v3, v4, 0x3f
+
+    aget-char v2, v2, v3
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    move v2, v5
+
+    goto/16 :goto_7
+
+    :cond_95
+    :goto_95
+    invoke-virtual {v0}, Ljava/lang/StringBuffer;->toString()Ljava/lang/String;
+
+    move-result-object p0
+    :try_end_99
+    .catchall {:try_start_0 .. :try_end_99} :catchall_9a
+
+    return-object p0
+
+    :catchall_9a
+    move-exception p0
+
+    const/4 v0, 0x0
+
+    :try_start_9c
+    invoke-static {p0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+    :try_end_9f
+    .catchall {:try_start_9c .. :try_end_9f} :catchall_a0
+
+    return-object v0
+
+    :catchall_a0
+    move-exception p0
+
+    invoke-static {p0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+
+    return-object v0
+.end method
+
+.method public static a(Ljava/lang/String;)[B
+    .registers 3
+
+    :try_start_0
+    invoke-static {p0}, Lcom/mobile/auth/c/c;->b(Ljava/lang/String;)[B
+
+    move-result-object p0
+    :try_end_4
+    .catchall {:try_start_0 .. :try_end_4} :catchall_5
+
+    return-object p0
+
+    :catchall_5
+    move-exception p0
+
+    :try_start_6
+    sget-object v0, Lcom/mobile/auth/c/c;->a:Ljava/lang/String;
+
+    const-string v1, "When decode() ,throws exception"
+
+    invoke-static {v0, v1, p0}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    const/4 p0, 0x0
+
+    new-array p0, p0, [B
+    :try_end_10
+    .catchall {:try_start_6 .. :try_end_10} :catchall_11
+
+    return-object p0
+
+    :catchall_11
+    move-exception p0
+
+    const/4 v0, 0x0
+
+    :try_start_13
+    invoke-static {p0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+    :try_end_16
+    .catchall {:try_start_13 .. :try_end_16} :catchall_17
+
+    return-object v0
+
+    :catchall_17
+    move-exception p0
+
+    invoke-static {p0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+
+    return-object v0
+.end method
+
+.method private static b(Ljava/lang/String;)[B
+    .registers 10
+    .annotation system Ldalvik/annotation/Throws;
+        value = {
+            Ljava/lang/Throwable;
+        }
+    .end annotation
+
+    :try_start_0
+    new-instance v0, Ljava/lang/StringBuffer;
+
+    invoke-direct {v0}, Ljava/lang/StringBuffer;-><init>()V
+
+    const-string v1, "US-ASCII"
+
+    invoke-virtual {p0, v1}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
+
+    move-result-object p0
+
+    array-length v1, p0
+    :try_end_c
+    .catchall {:try_start_0 .. :try_end_c} :catchall_a0
+
+    const/4 v2, 0x0
+
+    :goto_d
+    const-string v3, "iso8859-1"
+
+    if-ge v2, v1, :cond_97
+
+    :goto_11
+    :try_start_11
+    sget-object v4, Lcom/mobile/auth/c/c;->c:[B
+
+    add-int/lit8 v5, v2, 0x1
+
+    aget-byte v2, p0, v2
+
+    aget-byte v2, v4, v2
+
+    const/4 v4, -0x1
+
+    if-ge v5, v1, :cond_21
+
+    if-eq v2, v4, :cond_1f
+
+    goto :goto_21
+
+    :cond_1f
+    move v2, v5
+
+    goto :goto_11
+
+    :cond_21
+    :goto_21
+    if-ne v2, v4, :cond_25
+
+    goto/16 :goto_97
+
+    :cond_25
+    :goto_25
+    sget-object v6, Lcom/mobile/auth/c/c;->c:[B
+
+    add-int/lit8 v7, v5, 0x1
+
+    aget-byte v5, p0, v5
+
+    aget-byte v5, v6, v5
+
+    if-ge v7, v1, :cond_34
+
+    if-eq v5, v4, :cond_32
+
+    goto :goto_34
+
+    :cond_32
+    move v5, v7
+
+    goto :goto_25
+
+    :cond_34
+    :goto_34
+    if-ne v5, v4, :cond_37
+
+    goto :goto_97
+
+    :cond_37
+    shl-int/lit8 v2, v2, 0x2
+
+    and-int/lit8 v6, v5, 0x30
+
+    ushr-int/lit8 v6, v6, 0x4
+
+    or-int/2addr v2, v6
+
+    int-to-char v2, v2
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    :goto_42
+    add-int/lit8 v2, v7, 0x1
+
+    aget-byte v6, p0, v7
+
+    const/16 v7, 0x3d
+
+    if-ne v6, v7, :cond_53
+
+    invoke-virtual {v0}, Ljava/lang/StringBuffer;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-virtual {p0, v3}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
+
+    move-result-object p0
+
+    return-object p0
+
+    :cond_53
+    sget-object v8, Lcom/mobile/auth/c/c;->c:[B
+
+    aget-byte v6, v8, v6
+
+    if-ge v2, v1, :cond_5e
+
+    if-eq v6, v4, :cond_5c
+
+    goto :goto_5e
+
+    :cond_5c
+    move v7, v2
+
+    goto :goto_42
+
+    :cond_5e
+    :goto_5e
+    if-ne v6, v4, :cond_61
+
+    goto :goto_97
+
+    :cond_61
+    and-int/lit8 v5, v5, 0xf
+
+    shl-int/lit8 v5, v5, 0x4
+
+    and-int/lit8 v8, v6, 0x3c
+
+    ushr-int/lit8 v8, v8, 0x2
+
+    or-int/2addr v5, v8
+
+    int-to-char v5, v5
+
+    invoke-virtual {v0, v5}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    :goto_6e
+    add-int/lit8 v5, v2, 0x1
+
+    aget-byte v2, p0, v2
+
+    if-ne v2, v7, :cond_7d
+
+    invoke-virtual {v0}, Ljava/lang/StringBuffer;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-virtual {p0, v3}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
+
+    move-result-object p0
+
+    return-object p0
+
+    :cond_7d
+    sget-object v8, Lcom/mobile/auth/c/c;->c:[B
+
+    aget-byte v2, v8, v2
+
+    if-ge v5, v1, :cond_88
+
+    if-eq v2, v4, :cond_86
+
+    goto :goto_88
+
+    :cond_86
+    move v2, v5
+
+    goto :goto_6e
+
+    :cond_88
+    :goto_88
+    if-ne v2, v4, :cond_8b
+
+    goto :goto_97
+
+    :cond_8b
+    and-int/lit8 v3, v6, 0x3
+
+    shl-int/lit8 v3, v3, 0x6
+
+    or-int/2addr v2, v3
+
+    int-to-char v2, v2
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuffer;->append(C)Ljava/lang/StringBuffer;
+
+    move v2, v5
+
+    goto/16 :goto_d
+
+    :cond_97
+    :goto_97
+    invoke-virtual {v0}, Ljava/lang/StringBuffer;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-virtual {p0, v3}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
+
+    move-result-object p0
+    :try_end_9f
+    .catchall {:try_start_11 .. :try_end_9f} :catchall_a0
+
+    return-object p0
+
+    :catchall_a0
+    move-exception p0
+
+    const/4 v0, 0x0
+
+    :try_start_a2
+    invoke-static {p0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+    :try_end_a5
+    .catchall {:try_start_a2 .. :try_end_a5} :catchall_a6
+
+    return-object v0
+
+    :catchall_a6
+    move-exception p0
+
+    invoke-static {p0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+
+    return-object v0
+.end method

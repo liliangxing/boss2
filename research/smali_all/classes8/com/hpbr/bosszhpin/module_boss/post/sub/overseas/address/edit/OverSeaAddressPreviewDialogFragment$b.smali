@@ -1,0 +1,82 @@
+.class Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$b;
+.super Lcom/hpbr/bosszhipin/views/x0;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;->initView(Landroid/view/View;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;
+
+
+# direct methods
+.method constructor <init>(Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$b;->b:Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;
+
+    invoke-direct {p0}, Lcom/hpbr/bosszhipin/views/x0;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onNoFastClick(Landroid/view/View;)V
+    .registers 2
+
+    .line 1
+    iget-object p1, p0, Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$b;->b:Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;
+
+    .line 2
+    .line 3
+    invoke-virtual {p1}, Landroidx/fragment/app/DialogFragment;->dismiss()V
+
+    .line 4
+    .line 5
+    .line 6
+    iget-object p1, p0, Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$b;->b:Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;
+
+    .line 7
+    .line 8
+    invoke-static {p1}, Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;->gg(Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;)Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$d;
+
+    .line 9
+    .line 10
+    .line 11
+    move-result-object p1
+
+    .line 12
+    if-eqz p1, :cond_16
+
+    .line 13
+    .line 14
+    iget-object p1, p0, Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$b;->b:Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;
+
+    .line 15
+    .line 16
+    invoke-static {p1}, Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;->gg(Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment;)Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$d;
+
+    .line 17
+    .line 18
+    .line 19
+    move-result-object p1
+
+    .line 20
+    invoke-interface {p1}, Lcom/hpbr/bosszhpin/module_boss/post/sub/overseas/address/edit/OverSeaAddressPreviewDialogFragment$d;->b()V
+
+    .line 21
+    .line 22
+    .line 23
+    :cond_16
+    return-void
+.end method

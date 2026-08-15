@@ -1,0 +1,97 @@
+.class public abstract Lm10/a;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "<T:",
+        "Ljava/lang/Object;",
+        "V:",
+        "Lcom/chad/library/adapter/base/BaseViewHolder;",
+        ">",
+        "Ljava/lang/Object;"
+    }
+.end annotation
+
+
+# instance fields
+.field public a:Landroid/content/Context;
+
+.field public b:Ljava/util/List;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/List<",
+            "TT;>;"
+        }
+    .end annotation
+.end field
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public abstract a(Lcom/chad/library/adapter/base/BaseViewHolder;Ljava/lang/Object;I)V
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(TV;TT;I)V"
+        }
+    .end annotation
+.end method
+
+.method public b(Lcom/chad/library/adapter/base/BaseViewHolder;Ljava/lang/Object;ILjava/util/List;)V
+    .registers 5
+    .param p4    # Ljava/util/List;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(TV;TT;I",
+            "Ljava/util/List<",
+            "Ljava/lang/Object;",
+            ">;)V"
+        }
+    .end annotation
+
+    return-void
+.end method
+
+.method public abstract c()I
+.end method
+
+.method public d(Lcom/chad/library/adapter/base/BaseViewHolder;Ljava/lang/Object;I)V
+    .registers 4
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(TV;TT;I)V"
+        }
+    .end annotation
+
+    return-void
+.end method
+
+.method public e(Lcom/chad/library/adapter/base/BaseViewHolder;Ljava/lang/Object;I)Z
+    .registers 4
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(TV;TT;I)Z"
+        }
+    .end annotation
+
+    const/4 p1, 0x0
+
+    return p1
+.end method
+
+.method public abstract f()I
+.end method

@@ -1,0 +1,234 @@
+.class Lws/a$b;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lcom/amap/api/services/geocoder/GeocodeSearch$OnGeocodeSearchListener;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lws/a;->g(Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;Lws/g;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic a:Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;
+
+.field final synthetic b:Lws/g;
+
+.field final synthetic c:Lws/a;
+
+
+# direct methods
+.method constructor <init>(Lws/a;Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;Lws/g;)V
+    .registers 4
+
+    iput-object p1, p0, Lws/a$b;->c:Lws/a;
+
+    iput-object p2, p0, Lws/a$b;->a:Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;
+
+    iput-object p3, p0, Lws/a$b;->b:Lws/g;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onGeocodeSearched(Lcom/amap/api/services/geocoder/GeocodeResult;I)V
+    .registers 6
+
+    .line 1
+    iget-object v0, p0, Lws/a$b;->a:Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;
+
+    .line 2
+    .line 3
+    invoke-static {}, Ljava/lang/System;->currentTimeMillis()J
+
+    .line 4
+    .line 5
+    .line 6
+    move-result-wide v1
+
+    .line 7
+    invoke-virtual {v0, v1, v2}, Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;->setEndTime(J)V
+
+    .line 8
+    .line 9
+    .line 10
+    const/16 v0, 0x3e8
+
+    .line 11
+    .line 12
+    if-eq p2, v0, :cond_39
+
+    .line 13
+    .line 14
+    invoke-static {}, Lcom/hpbr/apm/event/a;->l()Lcom/hpbr/apm/event/a;
+
+    .line 15
+    .line 16
+    .line 17
+    move-result-object v0
+
+    .line 18
+    const-string v1, "action_map_error"
+
+    .line 19
+    .line 20
+    const-string v2, "type_sdk_a_error"
+
+    .line 21
+    .line 22
+    invoke-virtual {v0, v1, v2}, Lcom/hpbr/apm/event/a;->e(Ljava/lang/String;Ljava/lang/String;)Lcom/hpbr/apm/event/a;
+
+    .line 23
+    .line 24
+    .line 25
+    move-result-object v0
+
+    .line 26
+    const-string v1, "GeoCodeResult"
+
+    .line 27
+    .line 28
+    invoke-virtual {v0, v1}, Lcom/hpbr/apm/event/a;->s(Ljava/lang/String;)Lcom/hpbr/apm/event/a;
+
+    .line 29
+    .line 30
+    .line 31
+    move-result-object v0
+
+    .line 32
+    invoke-static {p2}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+
+    .line 33
+    .line 34
+    .line 35
+    move-result-object p2
+
+    .line 36
+    invoke-virtual {v0, p2}, Lcom/hpbr/apm/event/a;->t(Ljava/lang/String;)Lcom/hpbr/apm/event/a;
+
+    .line 37
+    .line 38
+    .line 39
+    move-result-object p2
+
+    .line 40
+    iget-object v0, p0, Lws/a$b;->a:Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;
+
+    .line 41
+    .line 42
+    invoke-static {v0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+
+    .line 43
+    .line 44
+    .line 45
+    move-result-object v0
+
+    .line 46
+    invoke-virtual {p2, v0}, Lcom/hpbr/apm/event/a;->u(Ljava/lang/String;)Lcom/hpbr/apm/event/a;
+
+    .line 47
+    .line 48
+    .line 49
+    move-result-object p2
+
+    .line 50
+    invoke-virtual {p2}, Lcom/hpbr/apm/event/a;->n()Lcom/hpbr/apm/event/a;
+
+    .line 51
+    .line 52
+    .line 53
+    move-result-object p2
+
+    .line 54
+    invoke-virtual {p2}, Lcom/hpbr/apm/event/a;->C()V
+
+    .line 55
+    .line 56
+    .line 57
+    goto :goto_4a
+
+    .line 58
+    :cond_39
+    iget-object p2, p0, Lws/a$b;->c:Lws/a;
+
+    .line 59
+    .line 60
+    invoke-virtual {p2}, Lws/a;->getType()I
+
+    .line 61
+    .line 62
+    .line 63
+    move-result p2
+
+    .line 64
+    iget-object v0, p0, Lws/a$b;->a:Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;
+
+    .line 65
+    .line 66
+    invoke-virtual {v0}, Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;->getTotalTime()J
+
+    .line 67
+    .line 68
+    .line 69
+    move-result-wide v0
+
+    .line 70
+    iget-object v2, p0, Lws/a$b;->a:Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;
+
+    .line 71
+    .line 72
+    invoke-static {p2, v0, v1, v2}, Lzs/d;->f(IJLjava/lang/Object;)V
+
+    .line 73
+    .line 74
+    .line 75
+    :goto_4a
+    iget-object p2, p0, Lws/a$b;->b:Lws/g;
+
+    .line 76
+    .line 77
+    if-eqz p2, :cond_59
+
+    .line 78
+    .line 79
+    iget-object v0, p0, Lws/a$b;->c:Lws/a;
+
+    .line 80
+    .line 81
+    iget-object v1, p0, Lws/a$b;->a:Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;
+
+    .line 82
+    .line 83
+    invoke-static {v0, p1, v1}, Lws/a;->w(Lws/a;Lcom/amap/api/services/geocoder/GeocodeResult;Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeQuery;)Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeResult;
+
+    .line 84
+    .line 85
+    .line 86
+    move-result-object p1
+
+    .line 87
+    invoke-interface {p2, p1}, Lws/g;->i7(Lcom/hpbr/bosszhipin/map/search/geocode/GeocodeResult;)V
+
+    .line 88
+    .line 89
+    .line 90
+    :cond_59
+    return-void
+.end method
+
+.method public onRegeocodeSearched(Lcom/amap/api/services/geocoder/RegeocodeResult;I)V
+    .registers 3
+
+    return-void
+.end method

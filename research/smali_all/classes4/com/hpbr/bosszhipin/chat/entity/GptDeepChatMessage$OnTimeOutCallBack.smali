@@ -1,0 +1,19 @@
+.class public interface abstract Lcom/hpbr/bosszhipin/chat/entity/GptDeepChatMessage$OnTimeOutCallBack;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/hpbr/bosszhipin/chat/entity/GptDeepChatMessage;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "OnTimeOutCallBack"
+.end annotation
+
+
+# virtual methods
+.method public abstract onTimeOutListener()V
+.end method

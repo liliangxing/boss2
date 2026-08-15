@@ -1,0 +1,46 @@
+.class public final synthetic Lcom/hpbr/bosszhipin/chat/single/employerc/e2;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Ljava/lang/Runnable;
+
+
+# instance fields
+.field public final synthetic b:Lcom/hpbr/bosszhipin/chat/single/employerc/EmployerCChatViewModel;
+
+.field public final synthetic c:Z
+
+.field public final synthetic d:Z
+
+
+# direct methods
+.method public synthetic constructor <init>(Lcom/hpbr/bosszhipin/chat/single/employerc/EmployerCChatViewModel;ZZ)V
+    .registers 4
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/chat/single/employerc/e2;->b:Lcom/hpbr/bosszhipin/chat/single/employerc/EmployerCChatViewModel;
+
+    iput-boolean p2, p0, Lcom/hpbr/bosszhipin/chat/single/employerc/e2;->c:Z
+
+    iput-boolean p3, p0, Lcom/hpbr/bosszhipin/chat/single/employerc/e2;->d:Z
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final run()V
+    .registers 4
+
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/chat/single/employerc/e2;->b:Lcom/hpbr/bosszhipin/chat/single/employerc/EmployerCChatViewModel;
+
+    iget-boolean v1, p0, Lcom/hpbr/bosszhipin/chat/single/employerc/e2;->c:Z
+
+    iget-boolean v2, p0, Lcom/hpbr/bosszhipin/chat/single/employerc/e2;->d:Z
+
+    invoke-static {v0, v1, v2}, Lcom/hpbr/bosszhipin/chat/single/employerc/EmployerCChatViewModel;->P(Lcom/hpbr/bosszhipin/chat/single/employerc/EmployerCChatViewModel;ZZ)V
+
+    return-void
+.end method

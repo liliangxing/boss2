@@ -1,0 +1,284 @@
+.class public Lcom/mobile/auth/e/a;
+.super Lcom/mobile/auth/e/e;
+.source "SourceFile"
+
+
+# static fields
+.field private static f:Lcom/mobile/auth/e/a;
+
+
+# instance fields
+.field private g:Lcom/cmic/sso/sdk/view/a;
+
+.field private h:Lcom/cmic/sso/sdk/view/e;
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .registers 0
+
+    return-void
+.end method
+
+.method private constructor <init>(Landroid/content/Context;)V
+    .registers 2
+
+    invoke-direct {p0, p1}, Lcom/mobile/auth/e/e;-><init>(Landroid/content/Context;)V
+
+    const/4 p1, 0x0
+
+    iput-object p1, p0, Lcom/mobile/auth/e/a;->h:Lcom/cmic/sso/sdk/view/e;
+
+    return-void
+.end method
+
+.method public static a(Landroid/content/Context;)Lcom/mobile/auth/e/a;
+    .registers 3
+
+    sget-object v0, Lcom/mobile/auth/e/a;->f:Lcom/mobile/auth/e/a;
+
+    if-nez v0, :cond_17
+
+    const-class v0, Lcom/mobile/auth/e/a;
+
+    monitor-enter v0
+
+    :try_start_7
+    sget-object v1, Lcom/mobile/auth/e/a;->f:Lcom/mobile/auth/e/a;
+
+    if-nez v1, :cond_12
+
+    new-instance v1, Lcom/mobile/auth/e/a;
+
+    invoke-direct {v1, p0}, Lcom/mobile/auth/e/a;-><init>(Landroid/content/Context;)V
+
+    sput-object v1, Lcom/mobile/auth/e/a;->f:Lcom/mobile/auth/e/a;
+
+    :cond_12
+    monitor-exit v0
+
+    goto :goto_17
+
+    :catchall_14
+    move-exception p0
+
+    monitor-exit v0
+    :try_end_16
+    .catchall {:try_start_7 .. :try_end_16} :catchall_14
+
+    throw p0
+
+    :cond_17
+    :goto_17
+    sget-object p0, Lcom/mobile/auth/e/a;->f:Lcom/mobile/auth/e/a;
+
+    return-object p0
+.end method
+
+.method static synthetic a(Landroid/content/Context;Lcom/cmic/sso/sdk/a;)V
+    .registers 2
+
+    invoke-static {p0, p1}, Lcom/mobile/auth/e/a;->b(Landroid/content/Context;Lcom/cmic/sso/sdk/a;)V
+
+    return-void
+.end method
+
+.method static synthetic a(Lcom/mobile/auth/e/a;Lcom/cmic/sso/sdk/a;)V
+    .registers 2
+
+    invoke-super {p0, p1}, Lcom/mobile/auth/e/e;->a(Lcom/cmic/sso/sdk/a;)V
+
+    return-void
+.end method
+
+.method private static b(Landroid/content/Context;Lcom/cmic/sso/sdk/a;)V
+    .registers 5
+
+    const-string v0, "traceId"
+
+    invoke-virtual {p1, v0}, Lcom/cmic/sso/sdk/a;->b(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v1
+
+    new-instance v2, Landroid/content/Intent;
+
+    invoke-direct {v2}, Landroid/content/Intent;-><init>()V
+
+    invoke-virtual {v2, v0, v1}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    invoke-virtual {p1, v0}, Lcom/cmic/sso/sdk/a;->b(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0, p1}, Lcom/mobile/auth/l/e;->a(Ljava/lang/String;Lcom/cmic/sso/sdk/a;)V
+
+    const-string p1, "com.cmic.sso.sdk.view.LoginAuthActivity"
+
+    invoke-virtual {v2, p0, p1}, Landroid/content/Intent;->setClassName(Landroid/content/Context;Ljava/lang/String;)Landroid/content/Intent;
+
+    const/high16 p1, 0x10000000
+
+    invoke-virtual {v2, p1}, Landroid/content/Intent;->setFlags(I)Landroid/content/Intent;
+
+    invoke-virtual {p0, v2}, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public a()Lcom/cmic/sso/sdk/view/a;
+    .registers 2
+
+    iget-object v0, p0, Lcom/mobile/auth/e/a;->g:Lcom/cmic/sso/sdk/view/a;
+
+    if-nez v0, :cond_f
+
+    new-instance v0, Lcom/cmic/sso/sdk/view/a$a;
+
+    invoke-direct {v0}, Lcom/cmic/sso/sdk/view/a$a;-><init>()V
+
+    invoke-virtual {v0}, Lcom/cmic/sso/sdk/view/a$a;->a()Lcom/cmic/sso/sdk/view/a;
+
+    move-result-object v0
+
+    iput-object v0, p0, Lcom/mobile/auth/e/a;->g:Lcom/cmic/sso/sdk/view/a;
+
+    :cond_f
+    iget-object v0, p0, Lcom/mobile/auth/e/a;->g:Lcom/cmic/sso/sdk/view/a;
+
+    return-object v0
+.end method
+
+.method protected a(Lcom/cmic/sso/sdk/a;)V
+    .registers 6
+
+    new-instance v0, Lcom/mobile/auth/e/e$a;
+
+    invoke-direct {v0, p0, p1}, Lcom/mobile/auth/e/e$a;-><init>(Lcom/mobile/auth/e/e;Lcom/cmic/sso/sdk/a;)V
+
+    iget-object v1, p0, Lcom/mobile/auth/e/e;->d:Landroid/os/Handler;
+
+    iget-wide v2, p0, Lcom/mobile/auth/e/e;->c:J
+
+    invoke-virtual {v1, v0, v2, v3}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
+
+    iget-object v1, p0, Lcom/mobile/auth/e/e;->a:Lcom/mobile/auth/e/c;
+
+    new-instance v2, Lcom/mobile/auth/e/a$2;
+
+    invoke-direct {v2, p0, v0}, Lcom/mobile/auth/e/a$2;-><init>(Lcom/mobile/auth/e/a;Lcom/mobile/auth/e/e$a;)V
+
+    invoke-virtual {v1, p1, v2}, Lcom/mobile/auth/e/c;->a(Lcom/cmic/sso/sdk/a;Lcom/mobile/auth/e/d;)V
+
+    return-void
+.end method
+
+.method public a(Ljava/lang/String;Ljava/lang/String;Lcom/mobile/auth/e/b;)V
+    .registers 5
+
+    const/4 v0, -0x1
+
+    invoke-virtual {p0, p1, p2, p3, v0}, Lcom/mobile/auth/e/a;->a(Ljava/lang/String;Ljava/lang/String;Lcom/mobile/auth/e/b;I)V
+
+    return-void
+.end method
+
+.method public a(Ljava/lang/String;Ljava/lang/String;Lcom/mobile/auth/e/b;I)V
+    .registers 13
+
+    invoke-virtual {p0, p3}, Lcom/mobile/auth/e/e;->a(Lcom/mobile/auth/e/b;)Lcom/cmic/sso/sdk/a;
+
+    move-result-object v4
+
+    const-string v0, "SDKRequestCode"
+
+    invoke-virtual {v4, v0, p4}, Lcom/cmic/sso/sdk/a;->a(Ljava/lang/String;I)V
+
+    new-instance p4, Lcom/mobile/auth/e/a$1;
+
+    iget-object v2, p0, Lcom/mobile/auth/e/e;->b:Landroid/content/Context;
+
+    move-object v0, p4
+
+    move-object v1, p0
+
+    move-object v3, v4
+
+    move-object v5, p1
+
+    move-object v6, p2
+
+    move-object v7, p3
+
+    invoke-direct/range {v0 .. v7}, Lcom/mobile/auth/e/a$1;-><init>(Lcom/mobile/auth/e/a;Landroid/content/Context;Lcom/cmic/sso/sdk/a;Lcom/cmic/sso/sdk/a;Ljava/lang/String;Ljava/lang/String;Lcom/mobile/auth/e/b;)V
+
+    invoke-static {p4}, Lcom/mobile/auth/l/n;->a(Lcom/mobile/auth/l/n$a;)V
+
+    return-void
+.end method
+
+.method public a(Ljava/lang/String;Lorg/json/JSONObject;)V
+    .registers 4
+
+    iget-object v0, p0, Lcom/mobile/auth/e/a;->h:Lcom/cmic/sso/sdk/view/e;
+
+    if-eqz v0, :cond_7
+
+    invoke-interface {v0, p1, p2}, Lcom/cmic/sso/sdk/view/e;->a(Ljava/lang/String;Lorg/json/JSONObject;)V
+
+    :cond_7
+    return-void
+.end method
+
+.method public b()V
+    .registers 3
+
+    :try_start_0
+    invoke-static {}, Lcom/cmic/sso/sdk/view/f;->a()Lcom/cmic/sso/sdk/view/f;
+
+    move-result-object v0
+
+    invoke-virtual {v0}, Lcom/cmic/sso/sdk/view/f;->b()Lcom/cmic/sso/sdk/view/f$a;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_21
+
+    invoke-static {}, Lcom/cmic/sso/sdk/view/f;->a()Lcom/cmic/sso/sdk/view/f;
+
+    move-result-object v0
+
+    invoke-virtual {v0}, Lcom/cmic/sso/sdk/view/f;->b()Lcom/cmic/sso/sdk/view/f$a;
+
+    move-result-object v0
+
+    invoke-interface {v0}, Lcom/cmic/sso/sdk/view/f$a;->a()V
+    :try_end_15
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_15} :catch_16
+
+    goto :goto_21
+
+    :catch_16
+    move-exception v0
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->printStackTrace()V
+
+    const-string v0, "AuthnHelper"
+
+    const-string v1, "\u5173\u95ed\u6388\u6743\u9875\u5931\u8d25"
+
+    invoke-static {v0, v1}, Lcom/mobile/auth/l/c;->a(Ljava/lang/String;Ljava/lang/String;)V
+
+    :cond_21
+    :goto_21
+    return-void
+.end method
+
+.method public c()J
+    .registers 3
+
+    iget-wide v0, p0, Lcom/mobile/auth/e/e;->c:J
+
+    return-wide v0
+.end method

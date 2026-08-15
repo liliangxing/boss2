@@ -1,0 +1,34 @@
+.class public final synthetic Lcom/hpbr/bosszhipin/module/position/adapter/m;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lcom/twl/ui/ExpandableTextView$OnTextExpandListener;
+
+
+# instance fields
+.field public final synthetic a:Lcom/hpbr/bosszhipin/module/position/adapter/MyJobAdapter;
+
+
+# direct methods
+.method public synthetic constructor <init>(Lcom/hpbr/bosszhipin/module/position/adapter/MyJobAdapter;)V
+    .registers 2
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/module/position/adapter/m;->a:Lcom/hpbr/bosszhipin/module/position/adapter/MyJobAdapter;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final onTextExpand()V
+    .registers 2
+
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/module/position/adapter/m;->a:Lcom/hpbr/bosszhipin/module/position/adapter/MyJobAdapter;
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/module/position/adapter/MyJobAdapter;->g(Lcom/hpbr/bosszhipin/module/position/adapter/MyJobAdapter;)V
+
+    return-void
+.end method

@@ -1,0 +1,22 @@
+.class public interface abstract Lcom/hpbr/bosszhipin/module/my/activity/geek/adapter/GeekSelectLocationByMapAdapter$b;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/hpbr/bosszhipin/module/my/activity/geek/adapter/GeekSelectLocationByMapAdapter;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "b"
+.end annotation
+
+
+# virtual methods
+.method public abstract a()V
+.end method
+
+.method public abstract b(ILcom/hpbr/bosszhipin/module/my/activity/geek/location/entity/PoiMultipleItemBean;)V
+.end method

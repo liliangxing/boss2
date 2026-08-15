@@ -1,0 +1,23 @@
+.class public Lcg0/c;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# static fields
+.field public static final a:Ljava/lang/String;
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .registers 1
+
+    const-string v0, "AAIQDQwNawJFAQMQ"
+
+    invoke-static {v0}, Lt/a/m;->a(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    sput-object v0, Lcg0/c;->a:Ljava/lang/String;
+
+    return-void
+.end method

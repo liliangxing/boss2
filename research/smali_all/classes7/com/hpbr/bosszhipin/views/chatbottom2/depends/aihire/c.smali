@@ -1,0 +1,36 @@
+.class public final synthetic Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/c;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lcom/hpbr/bosszhipin/views/chatbottom2/IconContainerBean$a;
+
+
+# instance fields
+.field public final synthetic b:Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/AgentBotChatLayout2;
+
+
+# direct methods
+.method public synthetic constructor <init>(Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/AgentBotChatLayout2;)V
+    .registers 2
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/c;->b:Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/AgentBotChatLayout2;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final h8()Z
+    .registers 2
+
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/c;->b:Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/AgentBotChatLayout2;
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/AgentBotChatLayout2;->S(Lcom/hpbr/bosszhipin/views/chatbottom2/depends/aihire/AgentBotChatLayout2;)Z
+
+    move-result v0
+
+    return v0
+.end method

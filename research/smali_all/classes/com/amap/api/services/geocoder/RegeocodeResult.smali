@@ -1,0 +1,65 @@
+.class public Lcom/amap/api/services/geocoder/RegeocodeResult;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# instance fields
+.field private a:Lcom/amap/api/services/geocoder/RegeocodeQuery;
+
+.field private b:Lcom/amap/api/services/geocoder/RegeocodeAddress;
+
+
+# direct methods
+.method public constructor <init>(Lcom/amap/api/services/geocoder/RegeocodeQuery;Lcom/amap/api/services/geocoder/RegeocodeAddress;)V
+    .registers 3
+
+    .line 1
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 2
+    .line 3
+    .line 4
+    iput-object p1, p0, Lcom/amap/api/services/geocoder/RegeocodeResult;->a:Lcom/amap/api/services/geocoder/RegeocodeQuery;
+
+    .line 5
+    .line 6
+    iput-object p2, p0, Lcom/amap/api/services/geocoder/RegeocodeResult;->b:Lcom/amap/api/services/geocoder/RegeocodeAddress;
+
+    .line 7
+    .line 8
+    return-void
+.end method
+
+
+# virtual methods
+.method public getRegeocodeAddress()Lcom/amap/api/services/geocoder/RegeocodeAddress;
+    .registers 2
+
+    iget-object v0, p0, Lcom/amap/api/services/geocoder/RegeocodeResult;->b:Lcom/amap/api/services/geocoder/RegeocodeAddress;
+
+    return-object v0
+.end method
+
+.method public getRegeocodeQuery()Lcom/amap/api/services/geocoder/RegeocodeQuery;
+    .registers 2
+
+    iget-object v0, p0, Lcom/amap/api/services/geocoder/RegeocodeResult;->a:Lcom/amap/api/services/geocoder/RegeocodeQuery;
+
+    return-object v0
+.end method
+
+.method public setRegeocodeAddress(Lcom/amap/api/services/geocoder/RegeocodeAddress;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/amap/api/services/geocoder/RegeocodeResult;->b:Lcom/amap/api/services/geocoder/RegeocodeAddress;
+
+    return-void
+.end method
+
+.method public setRegeocodeQuery(Lcom/amap/api/services/geocoder/RegeocodeQuery;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/amap/api/services/geocoder/RegeocodeResult;->a:Lcom/amap/api/services/geocoder/RegeocodeQuery;
+
+    return-void
+.end method

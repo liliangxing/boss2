@@ -1,0 +1,154 @@
+.class Lcom/google/android/material/internal/TextDrawableHelper$1;
+.super Lcom/google/android/material/resources/TextAppearanceFontCallback;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/google/android/material/internal/TextDrawableHelper;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic this$0:Lcom/google/android/material/internal/TextDrawableHelper;
+
+
+# direct methods
+.method constructor <init>(Lcom/google/android/material/internal/TextDrawableHelper;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/google/android/material/internal/TextDrawableHelper$1;->this$0:Lcom/google/android/material/internal/TextDrawableHelper;
+
+    invoke-direct {p0}, Lcom/google/android/material/resources/TextAppearanceFontCallback;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onFontRetrievalFailed(I)V
+    .registers 3
+
+    .line 1
+    iget-object p1, p0, Lcom/google/android/material/internal/TextDrawableHelper$1;->this$0:Lcom/google/android/material/internal/TextDrawableHelper;
+
+    .line 2
+    .line 3
+    const/4 v0, 0x1
+
+    .line 4
+    # setter for: Lcom/google/android/material/internal/TextDrawableHelper;->textWidthDirty:Z
+    invoke-static {p1, v0}, Lcom/google/android/material/internal/TextDrawableHelper;->access$002(Lcom/google/android/material/internal/TextDrawableHelper;Z)Z
+
+    .line 5
+    .line 6
+    .line 7
+    iget-object p1, p0, Lcom/google/android/material/internal/TextDrawableHelper$1;->this$0:Lcom/google/android/material/internal/TextDrawableHelper;
+
+    .line 8
+    .line 9
+    # getter for: Lcom/google/android/material/internal/TextDrawableHelper;->delegate:Ljava/lang/ref/WeakReference;
+    invoke-static {p1}, Lcom/google/android/material/internal/TextDrawableHelper;->access$100(Lcom/google/android/material/internal/TextDrawableHelper;)Ljava/lang/ref/WeakReference;
+
+    .line 10
+    .line 11
+    .line 12
+    move-result-object p1
+
+    .line 13
+    invoke-virtual {p1}, Ljava/lang/ref/Reference;->get()Ljava/lang/Object;
+
+    .line 14
+    .line 15
+    .line 16
+    move-result-object p1
+
+    .line 17
+    check-cast p1, Lcom/google/android/material/internal/TextDrawableHelper$TextDrawableDelegate;
+
+    .line 18
+    .line 19
+    if-eqz p1, :cond_17
+
+    .line 20
+    .line 21
+    invoke-interface {p1}, Lcom/google/android/material/internal/TextDrawableHelper$TextDrawableDelegate;->onTextSizeChange()V
+
+    .line 22
+    .line 23
+    .line 24
+    :cond_17
+    return-void
+.end method
+
+.method public onFontRetrieved(Landroid/graphics/Typeface;Z)V
+    .registers 3
+    .param p1    # Landroid/graphics/Typeface;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+
+    .line 1
+    if-eqz p2, :cond_3
+
+    .line 2
+    .line 3
+    return-void
+
+    .line 4
+    :cond_3
+    iget-object p1, p0, Lcom/google/android/material/internal/TextDrawableHelper$1;->this$0:Lcom/google/android/material/internal/TextDrawableHelper;
+
+    .line 5
+    .line 6
+    const/4 p2, 0x1
+
+    .line 7
+    # setter for: Lcom/google/android/material/internal/TextDrawableHelper;->textWidthDirty:Z
+    invoke-static {p1, p2}, Lcom/google/android/material/internal/TextDrawableHelper;->access$002(Lcom/google/android/material/internal/TextDrawableHelper;Z)Z
+
+    .line 8
+    .line 9
+    .line 10
+    iget-object p1, p0, Lcom/google/android/material/internal/TextDrawableHelper$1;->this$0:Lcom/google/android/material/internal/TextDrawableHelper;
+
+    .line 11
+    .line 12
+    # getter for: Lcom/google/android/material/internal/TextDrawableHelper;->delegate:Ljava/lang/ref/WeakReference;
+    invoke-static {p1}, Lcom/google/android/material/internal/TextDrawableHelper;->access$100(Lcom/google/android/material/internal/TextDrawableHelper;)Ljava/lang/ref/WeakReference;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object p1
+
+    .line 16
+    invoke-virtual {p1}, Ljava/lang/ref/Reference;->get()Ljava/lang/Object;
+
+    .line 17
+    .line 18
+    .line 19
+    move-result-object p1
+
+    .line 20
+    check-cast p1, Lcom/google/android/material/internal/TextDrawableHelper$TextDrawableDelegate;
+
+    .line 21
+    .line 22
+    if-eqz p1, :cond_1a
+
+    .line 23
+    .line 24
+    invoke-interface {p1}, Lcom/google/android/material/internal/TextDrawableHelper$TextDrawableDelegate;->onTextSizeChange()V
+
+    .line 25
+    .line 26
+    .line 27
+    :cond_1a
+    return-void
+.end method

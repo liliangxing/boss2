@@ -1,0 +1,41 @@
+.class public Lnet/bosszhipin/api/bean/ColleagueJobInfoBean;
+.super Lnet/bosszhipin/api/bean/BaseServerBean;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/MemberClasses;
+    value = {
+        Lnet/bosszhipin/api/bean/ColleagueJobInfoBean$ItemInfoBean;
+    }
+.end annotation
+
+
+# static fields
+.field private static final serialVersionUID:J = -0x23c8965934d1b7e3L
+
+
+# instance fields
+.field public jobDetailList:Ljava/util/List;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/List<",
+            "Lnet/bosszhipin/api/bean/ColleagueJobInfoBean$ItemInfoBean;",
+            ">;"
+        }
+    .end annotation
+.end field
+
+.field public show:Z
+
+.field public title:Ljava/lang/String;
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Lnet/bosszhipin/api/bean/BaseServerBean;-><init>()V
+
+    return-void
+.end method

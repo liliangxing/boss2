@@ -1,0 +1,49 @@
+.class Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter$b;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroid/view/View$OnClickListener;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter;->v(Lcom/hpbr/bosszhipin/module/pay/entity/PayResult;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Lcom/hpbr/bosszhipin/base/BaseActivity;
+
+.field final synthetic c:Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter;
+
+
+# direct methods
+.method constructor <init>(Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter;Lcom/hpbr/bosszhipin/base/BaseActivity;)V
+    .registers 3
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter$b;->c:Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter;
+
+    iput-object p2, p0, Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter$b;->b:Lcom/hpbr/bosszhipin/base/BaseActivity;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onClick(Landroid/view/View;)V
+    .registers 2
+
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/business/paydialog/module/sms/ZPSMSDetailPresenter$b;->b:Lcom/hpbr/bosszhipin/base/BaseActivity;
+
+    invoke-static {p1}, Loh/g;->c(Landroid/content/Context;)V
+
+    return-void
+.end method

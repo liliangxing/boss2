@@ -1,0 +1,23 @@
+.class public interface abstract Lcom/hpbr/bosszhpin/module_boss/component/f1/views/F1FilterSubjectView$c;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/hpbr/bosszhpin/module_boss/component/f1/views/F1FilterSubjectView;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "c"
+.end annotation
+
+
+# virtual methods
+.method public abstract a(Lnet/bosszhipin/api/bean/ServerF1SubjectTagBean;)V
+    .param p1    # Lnet/bosszhipin/api/bean/ServerF1SubjectTagBean;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+.end method

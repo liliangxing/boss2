@@ -1,0 +1,21 @@
+.class public Lnet/bosszhipin/api/GetAiChatHelperAdvancedFeatureResponse;
+.super Lnet/bosszhipin/base/HttpResponse;
+.source "SourceFile"
+
+
+# static fields
+.field private static final serialVersionUID:J = -0x3aaf3c27256a7d1fL
+
+
+# instance fields
+.field public advancedFeature:Z
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Lnet/bosszhipin/base/HttpResponse;-><init>()V
+
+    return-void
+.end method

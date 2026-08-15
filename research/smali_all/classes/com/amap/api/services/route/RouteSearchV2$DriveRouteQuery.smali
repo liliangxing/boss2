@@ -1,0 +1,1638 @@
+.class public Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroid/os/Parcelable;
+.implements Ljava/lang/Cloneable;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/amap/api/services/route/RouteSearchV2;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x9
+    name = "DriveRouteQuery"
+.end annotation
+
+
+# static fields
+.field public static final CREATOR:Landroid/os/Parcelable$Creator;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Landroid/os/Parcelable$Creator<",
+            "Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;",
+            ">;"
+        }
+    .end annotation
+.end field
+
+
+# instance fields
+.field private a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+.field private b:Lcom/amap/api/services/route/RouteSearchV2$NewEnergy;
+
+.field private c:I
+
+.field private d:Ljava/util/List;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/List<",
+            "Lcom/amap/api/services/core/LatLonPoint;",
+            ">;"
+        }
+    .end annotation
+.end field
+
+.field private e:Ljava/util/List;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/List<",
+            "Ljava/util/List<",
+            "Lcom/amap/api/services/core/LatLonPoint;",
+            ">;>;"
+        }
+    .end annotation
+.end field
+
+.field private f:Ljava/lang/String;
+
+.field private g:Z
+
+.field private h:I
+
+.field private i:Ljava/lang/String;
+
+.field private j:I
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .registers 1
+
+    new-instance v0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery$1;
+
+    invoke-direct {v0}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery$1;-><init>()V
+
+    sput-object v0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->CREATOR:Landroid/os/Parcelable$Creator;
+
+    return-void
+.end method
+
+.method public constructor <init>()V
+    .registers 3
+
+    .line 30
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 31
+    sget-object v0, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->DEFAULT:Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;
+
+    invoke-virtual {v0}, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->getValue()I
+
+    move-result v0
+
+    iput v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    const/4 v0, 0x1
+
+    .line 32
+    iput-boolean v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    const/4 v1, 0x0
+
+    .line 33
+    iput v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    const/4 v1, 0x0
+
+    .line 34
+    iput-object v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    .line 35
+    iput v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    return-void
+.end method
+
+.method public constructor <init>(Landroid/os/Parcel;)V
+    .registers 8
+
+    .line 12
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 13
+    sget-object v0, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->DEFAULT:Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;
+
+    invoke-virtual {v0}, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->getValue()I
+
+    move-result v0
+
+    iput v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    const/4 v0, 0x1
+
+    .line 14
+    iput-boolean v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    const/4 v1, 0x0
+
+    .line 15
+    iput v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    const/4 v2, 0x0
+
+    .line 16
+    iput-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    .line 17
+    iput v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    .line 18
+    const-class v3, Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    invoke-virtual {v3}, Ljava/lang/Class;->getClassLoader()Ljava/lang/ClassLoader;
+
+    move-result-object v3
+
+    invoke-virtual {p1, v3}, Landroid/os/Parcel;->readParcelable(Ljava/lang/ClassLoader;)Landroid/os/Parcelable;
+
+    move-result-object v3
+
+    check-cast v3, Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    iput-object v3, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    .line 19
+    invoke-virtual {p1}, Landroid/os/Parcel;->readInt()I
+
+    move-result v3
+
+    iput v3, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    .line 20
+    sget-object v3, Lcom/amap/api/services/core/LatLonPoint;->CREATOR:Landroid/os/Parcelable$Creator;
+
+    invoke-virtual {p1, v3}, Landroid/os/Parcel;->createTypedArrayList(Landroid/os/Parcelable$Creator;)Ljava/util/ArrayList;
+
+    move-result-object v3
+
+    iput-object v3, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 21
+    invoke-virtual {p1}, Landroid/os/Parcel;->readInt()I
+
+    move-result v3
+
+    if-nez v3, :cond_3b
+
+    .line 22
+    iput-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    goto :goto_42
+
+    .line 23
+    :cond_3b
+    new-instance v2, Ljava/util/ArrayList;
+
+    invoke-direct {v2}, Ljava/util/ArrayList;-><init>()V
+
+    iput-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    :goto_42
+    const/4 v2, 0x0
+
+    :goto_43
+    if-ge v2, v3, :cond_53
+
+    .line 24
+    iget-object v4, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    sget-object v5, Lcom/amap/api/services/core/LatLonPoint;->CREATOR:Landroid/os/Parcelable$Creator;
+
+    invoke-virtual {p1, v5}, Landroid/os/Parcel;->createTypedArrayList(Landroid/os/Parcelable$Creator;)Ljava/util/ArrayList;
+
+    move-result-object v5
+
+    invoke-interface {v4, v5}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    add-int/lit8 v2, v2, 0x1
+
+    goto :goto_43
+
+    .line 25
+    :cond_53
+    invoke-virtual {p1}, Landroid/os/Parcel;->readString()Ljava/lang/String;
+
+    move-result-object v2
+
+    iput-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    .line 26
+    invoke-virtual {p1}, Landroid/os/Parcel;->readInt()I
+
+    move-result v2
+
+    if-ne v2, v0, :cond_60
+
+    goto :goto_61
+
+    :cond_60
+    const/4 v0, 0x0
+
+    :goto_61
+    iput-boolean v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    .line 27
+    invoke-virtual {p1}, Landroid/os/Parcel;->readInt()I
+
+    move-result v0
+
+    iput v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    .line 28
+    invoke-virtual {p1}, Landroid/os/Parcel;->readString()Ljava/lang/String;
+
+    move-result-object v0
+
+    iput-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    .line 29
+    invoke-virtual {p1}, Landroid/os/Parcel;->readInt()I
+
+    move-result p1
+
+    iput p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    return-void
+.end method
+
+.method public constructor <init>(Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;Ljava/util/List;Ljava/util/List;Ljava/lang/String;)V
+    .registers 8
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;",
+            "Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;",
+            "Ljava/util/List<",
+            "Lcom/amap/api/services/core/LatLonPoint;",
+            ">;",
+            "Ljava/util/List<",
+            "Ljava/util/List<",
+            "Lcom/amap/api/services/core/LatLonPoint;",
+            ">;>;",
+            "Ljava/lang/String;",
+            ")V"
+        }
+    .end annotation
+
+    .line 1
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 2
+    sget-object v0, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->DEFAULT:Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;
+
+    invoke-virtual {v0}, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->getValue()I
+
+    move-result v0
+
+    iput v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    const/4 v0, 0x1
+
+    .line 3
+    iput-boolean v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    const/4 v1, 0x0
+
+    .line 4
+    iput v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    const/4 v1, 0x0
+
+    .line 5
+    iput-object v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    .line 6
+    iput v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    .line 7
+    iput-object p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    .line 8
+    invoke-virtual {p2}, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->getValue()I
+
+    move-result p1
+
+    iput p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    .line 9
+    iput-object p3, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 10
+    iput-object p4, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 11
+    iput-object p5, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public clone()Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;
+    .registers 10
+
+    .line 2
+    :try_start_0
+    invoke-super {p0}, Ljava/lang/Object;->clone()Ljava/lang/Object;
+    :try_end_3
+    .catch Ljava/lang/CloneNotSupportedException; {:try_start_0 .. :try_end_3} :catch_4
+
+    goto :goto_c
+
+    :catch_4
+    move-exception v0
+
+    const-string v1, "RouteSearchV2"
+
+    const-string v2, "DriveRouteQueryclone"
+
+    .line 3
+    invoke-static {v0, v1, v2}, Lcom/amap/api/col/3sl/t4;->i(Ljava/lang/Throwable;Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 4
+    :goto_c
+    new-instance v0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;
+
+    iget-object v4, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    iget v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    invoke-static {v1}, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->fromValue(I)Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;
+
+    move-result-object v5
+
+    iget-object v6, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    iget-object v7, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    iget-object v8, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    move-object v3, v0
+
+    invoke-direct/range {v3 .. v8}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;-><init>(Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;Ljava/util/List;Ljava/util/List;Ljava/lang/String;)V
+
+    .line 5
+    iget-boolean v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    invoke-virtual {v0, v1}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->setUseFerry(Z)V
+
+    .line 6
+    iget v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    invoke-virtual {v0, v1}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->setCarType(I)V
+
+    .line 7
+    iget-object v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    invoke-virtual {v0, v1}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->setExclude(Ljava/lang/String;)V
+
+    .line 8
+    iget v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    invoke-virtual {v0, v1}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->setShowFields(I)V
+
+    .line 9
+    iget-object v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->b:Lcom/amap/api/services/route/RouteSearchV2$NewEnergy;
+
+    invoke-virtual {v0, v1}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->setNewEnergy(Lcom/amap/api/services/route/RouteSearchV2$NewEnergy;)V
+
+    return-object v0
+.end method
+
+.method public bridge synthetic clone()Ljava/lang/Object;
+    .registers 2
+    .annotation system Ldalvik/annotation/Throws;
+        value = {
+            Ljava/lang/CloneNotSupportedException;
+        }
+    .end annotation
+
+    .line 1
+    invoke-virtual {p0}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->clone()Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;
+
+    move-result-object v0
+
+    return-object v0
+.end method
+
+.method public describeContents()I
+    .registers 2
+
+    const/4 v0, 0x0
+
+    return v0
+.end method
+
+.method public equals(Ljava/lang/Object;)Z
+    .registers 6
+
+    .line 1
+    const/4 v0, 0x1
+
+    .line 2
+    if-ne p0, p1, :cond_4
+
+    .line 3
+    .line 4
+    return v0
+
+    .line 5
+    :cond_4
+    const/4 v1, 0x0
+
+    .line 6
+    if-nez p1, :cond_8
+
+    .line 7
+    .line 8
+    return v1
+
+    .line 9
+    :cond_8
+    invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    .line 10
+    .line 11
+    .line 12
+    move-result-object v2
+
+    .line 13
+    invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    .line 14
+    .line 15
+    .line 16
+    move-result-object v3
+
+    .line 17
+    if-eq v2, v3, :cond_13
+
+    .line 18
+    .line 19
+    return v1
+
+    .line 20
+    :cond_13
+    check-cast p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;
+
+    .line 21
+    .line 22
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    .line 23
+    .line 24
+    if-nez v2, :cond_1e
+
+    .line 25
+    .line 26
+    iget-object v2, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    .line 27
+    .line 28
+    if-eqz v2, :cond_27
+
+    .line 29
+    .line 30
+    return v1
+
+    .line 31
+    :cond_1e
+    iget-object v3, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    .line 32
+    .line 33
+    invoke-virtual {v2, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    .line 34
+    .line 35
+    .line 36
+    move-result v2
+
+    .line 37
+    if-nez v2, :cond_27
+
+    .line 38
+    .line 39
+    return v1
+
+    .line 40
+    :cond_27
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 41
+    .line 42
+    if-nez v2, :cond_30
+
+    .line 43
+    .line 44
+    iget-object v2, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 45
+    .line 46
+    if-eqz v2, :cond_39
+
+    .line 47
+    .line 48
+    return v1
+
+    .line 49
+    :cond_30
+    iget-object v3, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 50
+    .line 51
+    invoke-interface {v2, v3}, Ljava/util/List;->equals(Ljava/lang/Object;)Z
+
+    .line 52
+    .line 53
+    .line 54
+    move-result v2
+
+    .line 55
+    if-nez v2, :cond_39
+
+    .line 56
+    .line 57
+    return v1
+
+    .line 58
+    :cond_39
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    .line 59
+    .line 60
+    if-nez v2, :cond_42
+
+    .line 61
+    .line 62
+    iget-object v2, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    .line 63
+    .line 64
+    if-eqz v2, :cond_4b
+
+    .line 65
+    .line 66
+    return v1
+
+    .line 67
+    :cond_42
+    iget-object v3, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    .line 68
+    .line 69
+    invoke-virtual {v2, v3}, Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;->equals(Ljava/lang/Object;)Z
+
+    .line 70
+    .line 71
+    .line 72
+    move-result v2
+
+    .line 73
+    if-nez v2, :cond_4b
+
+    .line 74
+    .line 75
+    return v1
+
+    .line 76
+    :cond_4b
+    iget v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    .line 77
+    .line 78
+    iget v3, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    .line 79
+    .line 80
+    if-eq v2, v3, :cond_52
+
+    .line 81
+    .line 82
+    return v1
+
+    .line 83
+    :cond_52
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 84
+    .line 85
+    if-nez v2, :cond_5b
+
+    .line 86
+    .line 87
+    iget-object p1, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 88
+    .line 89
+    if-eqz p1, :cond_7b
+
+    .line 90
+    .line 91
+    return v1
+
+    .line 92
+    :cond_5b
+    iget-object v3, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 93
+    .line 94
+    invoke-interface {v2, v3}, Ljava/util/List;->equals(Ljava/lang/Object;)Z
+
+    .line 95
+    .line 96
+    .line 97
+    move-result v2
+
+    .line 98
+    if-nez v2, :cond_64
+
+    .line 99
+    .line 100
+    return v1
+
+    .line 101
+    :cond_64
+    iget-boolean v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    .line 102
+    .line 103
+    invoke-virtual {p1}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->isUseFerry()Z
+
+    .line 104
+    .line 105
+    .line 106
+    move-result v3
+
+    .line 107
+    if-eq v2, v3, :cond_6d
+
+    .line 108
+    .line 109
+    return v1
+
+    .line 110
+    :cond_6d
+    iget v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    .line 111
+    .line 112
+    iget v3, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    .line 113
+    .line 114
+    if-eq v2, v3, :cond_74
+
+    .line 115
+    .line 116
+    return v1
+
+    .line 117
+    :cond_74
+    iget v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    .line 118
+    .line 119
+    iget p1, p1, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    .line 120
+    .line 121
+    if-eq v2, p1, :cond_7b
+
+    .line 122
+    .line 123
+    return v1
+
+    .line 124
+    :cond_7b
+    return v0
+.end method
+
+.method public getAvoidRoad()Ljava/lang/String;
+    .registers 2
+
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    return-object v0
+.end method
+
+.method public getAvoidpolygons()Ljava/util/List;
+    .registers 2
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "()",
+            "Ljava/util/List<",
+            "Ljava/util/List<",
+            "Lcom/amap/api/services/core/LatLonPoint;",
+            ">;>;"
+        }
+    .end annotation
+
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    return-object v0
+.end method
+
+.method public getAvoidpolygonsStr()Ljava/lang/String;
+    .registers 9
+
+    .line 1
+    new-instance v0, Ljava/lang/StringBuffer;
+
+    .line 2
+    .line 3
+    invoke-direct {v0}, Ljava/lang/StringBuffer;-><init>()V
+
+    .line 4
+    .line 5
+    .line 6
+    iget-object v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 7
+    .line 8
+    if-eqz v1, :cond_69
+
+    .line 9
+    .line 10
+    invoke-interface {v1}, Ljava/util/List;->size()I
+
+    .line 11
+    .line 12
+    .line 13
+    move-result v1
+
+    .line 14
+    if-nez v1, :cond_10
+
+    .line 15
+    .line 16
+    goto :goto_69
+
+    .line 17
+    :cond_10
+    const/4 v1, 0x0
+
+    .line 18
+    const/4 v2, 0x0
+
+    .line 19
+    :goto_12
+    iget-object v3, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 20
+    .line 21
+    invoke-interface {v3}, Ljava/util/List;->size()I
+
+    .line 22
+    .line 23
+    .line 24
+    move-result v3
+
+    .line 25
+    if-ge v2, v3, :cond_64
+
+    .line 26
+    .line 27
+    iget-object v3, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 28
+    .line 29
+    invoke-interface {v3, v2}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 30
+    .line 31
+    .line 32
+    move-result-object v3
+
+    .line 33
+    check-cast v3, Ljava/util/List;
+
+    .line 34
+    .line 35
+    const/4 v4, 0x0
+
+    .line 36
+    :goto_23
+    invoke-interface {v3}, Ljava/util/List;->size()I
+
+    .line 37
+    .line 38
+    .line 39
+    move-result v5
+
+    .line 40
+    if-ge v4, v5, :cond_52
+
+    .line 41
+    .line 42
+    invoke-interface {v3, v4}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 43
+    .line 44
+    .line 45
+    move-result-object v5
+
+    .line 46
+    check-cast v5, Lcom/amap/api/services/core/LatLonPoint;
+
+    .line 47
+    .line 48
+    invoke-virtual {v5}, Lcom/amap/api/services/core/LatLonPoint;->getLongitude()D
+
+    .line 49
+    .line 50
+    .line 51
+    move-result-wide v6
+
+    .line 52
+    invoke-virtual {v0, v6, v7}, Ljava/lang/StringBuffer;->append(D)Ljava/lang/StringBuffer;
+
+    .line 53
+    .line 54
+    .line 55
+    const-string v6, ","
+
+    .line 56
+    .line 57
+    invoke-virtual {v0, v6}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    .line 58
+    .line 59
+    .line 60
+    invoke-virtual {v5}, Lcom/amap/api/services/core/LatLonPoint;->getLatitude()D
+
+    .line 61
+    .line 62
+    .line 63
+    move-result-wide v5
+
+    .line 64
+    invoke-virtual {v0, v5, v6}, Ljava/lang/StringBuffer;->append(D)Ljava/lang/StringBuffer;
+
+    .line 65
+    .line 66
+    .line 67
+    invoke-interface {v3}, Ljava/util/List;->size()I
+
+    .line 68
+    .line 69
+    .line 70
+    move-result v5
+
+    .line 71
+    add-int/lit8 v5, v5, -0x1
+
+    .line 72
+    .line 73
+    if-ge v4, v5, :cond_4f
+
+    .line 74
+    .line 75
+    const-string v5, ";"
+
+    .line 76
+    .line 77
+    invoke-virtual {v0, v5}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    .line 78
+    .line 79
+    .line 80
+    :cond_4f
+    add-int/lit8 v4, v4, 0x1
+
+    .line 81
+    .line 82
+    goto :goto_23
+
+    .line 83
+    :cond_52
+    iget-object v3, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 84
+    .line 85
+    invoke-interface {v3}, Ljava/util/List;->size()I
+
+    .line 86
+    .line 87
+    .line 88
+    move-result v3
+
+    .line 89
+    add-int/lit8 v3, v3, -0x1
+
+    .line 90
+    .line 91
+    if-ge v2, v3, :cond_61
+
+    .line 92
+    .line 93
+    const-string v3, "|"
+
+    .line 94
+    .line 95
+    invoke-virtual {v0, v3}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    .line 96
+    .line 97
+    .line 98
+    :cond_61
+    add-int/lit8 v2, v2, 0x1
+
+    .line 99
+    .line 100
+    goto :goto_12
+
+    .line 101
+    :cond_64
+    invoke-virtual {v0}, Ljava/lang/StringBuffer;->toString()Ljava/lang/String;
+
+    .line 102
+    .line 103
+    .line 104
+    move-result-object v0
+
+    .line 105
+    return-object v0
+
+    .line 106
+    :cond_69
+    :goto_69
+    const/4 v0, 0x0
+
+    .line 107
+    return-object v0
+.end method
+
+.method public getCarType()I
+    .registers 2
+
+    iget v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    return v0
+.end method
+
+.method public getExclude()Ljava/lang/String;
+    .registers 2
+
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    return-object v0
+.end method
+
+.method public getFromAndTo()Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+    .registers 2
+
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    return-object v0
+.end method
+
+.method public getMode()Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;
+    .registers 2
+
+    iget v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    invoke-static {v0}, Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;->fromValue(I)Lcom/amap/api/services/route/RouteSearchV2$DrivingStrategy;
+
+    move-result-object v0
+
+    return-object v0
+.end method
+
+.method public getNewEnergy()Lcom/amap/api/services/route/RouteSearchV2$NewEnergy;
+    .registers 2
+
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->b:Lcom/amap/api/services/route/RouteSearchV2$NewEnergy;
+
+    return-object v0
+.end method
+
+.method public getPassedByPoints()Ljava/util/List;
+    .registers 2
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "()",
+            "Ljava/util/List<",
+            "Lcom/amap/api/services/core/LatLonPoint;",
+            ">;"
+        }
+    .end annotation
+
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    return-object v0
+.end method
+
+.method public getPassedPointStr()Ljava/lang/String;
+    .registers 6
+
+    .line 1
+    new-instance v0, Ljava/lang/StringBuffer;
+
+    .line 2
+    .line 3
+    invoke-direct {v0}, Ljava/lang/StringBuffer;-><init>()V
+
+    .line 4
+    .line 5
+    .line 6
+    iget-object v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 7
+    .line 8
+    if-eqz v1, :cond_4b
+
+    .line 9
+    .line 10
+    invoke-interface {v1}, Ljava/util/List;->size()I
+
+    .line 11
+    .line 12
+    .line 13
+    move-result v1
+
+    .line 14
+    if-nez v1, :cond_10
+
+    .line 15
+    .line 16
+    goto :goto_4b
+
+    .line 17
+    :cond_10
+    const/4 v1, 0x0
+
+    .line 18
+    :goto_11
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 19
+    .line 20
+    invoke-interface {v2}, Ljava/util/List;->size()I
+
+    .line 21
+    .line 22
+    .line 23
+    move-result v2
+
+    .line 24
+    if-ge v1, v2, :cond_46
+
+    .line 25
+    .line 26
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 27
+    .line 28
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 29
+    .line 30
+    .line 31
+    move-result-object v2
+
+    .line 32
+    check-cast v2, Lcom/amap/api/services/core/LatLonPoint;
+
+    .line 33
+    .line 34
+    invoke-virtual {v2}, Lcom/amap/api/services/core/LatLonPoint;->getLongitude()D
+
+    .line 35
+    .line 36
+    .line 37
+    move-result-wide v3
+
+    .line 38
+    invoke-virtual {v0, v3, v4}, Ljava/lang/StringBuffer;->append(D)Ljava/lang/StringBuffer;
+
+    .line 39
+    .line 40
+    .line 41
+    const-string v3, ","
+
+    .line 42
+    .line 43
+    invoke-virtual {v0, v3}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    .line 44
+    .line 45
+    .line 46
+    invoke-virtual {v2}, Lcom/amap/api/services/core/LatLonPoint;->getLatitude()D
+
+    .line 47
+    .line 48
+    .line 49
+    move-result-wide v2
+
+    .line 50
+    invoke-virtual {v0, v2, v3}, Ljava/lang/StringBuffer;->append(D)Ljava/lang/StringBuffer;
+
+    .line 51
+    .line 52
+    .line 53
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 54
+    .line 55
+    invoke-interface {v2}, Ljava/util/List;->size()I
+
+    .line 56
+    .line 57
+    .line 58
+    move-result v2
+
+    .line 59
+    add-int/lit8 v2, v2, -0x1
+
+    .line 60
+    .line 61
+    if-ge v1, v2, :cond_43
+
+    .line 62
+    .line 63
+    const-string v2, ";"
+
+    .line 64
+    .line 65
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuffer;->append(Ljava/lang/String;)Ljava/lang/StringBuffer;
+
+    .line 66
+    .line 67
+    .line 68
+    :cond_43
+    add-int/lit8 v1, v1, 0x1
+
+    .line 69
+    .line 70
+    goto :goto_11
+
+    .line 71
+    :cond_46
+    invoke-virtual {v0}, Ljava/lang/StringBuffer;->toString()Ljava/lang/String;
+
+    .line 72
+    .line 73
+    .line 74
+    move-result-object v0
+
+    .line 75
+    return-object v0
+
+    .line 76
+    :cond_4b
+    :goto_4b
+    const/4 v0, 0x0
+
+    .line 77
+    return-object v0
+.end method
+
+.method public getShowFields()I
+    .registers 2
+
+    iget v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    return v0
+.end method
+
+.method public hasAvoidRoad()Z
+    .registers 2
+
+    invoke-virtual {p0}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->getAvoidRoad()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/amap/api/col/3sl/t4;->j(Ljava/lang/String;)Z
+
+    move-result v0
+
+    if-eqz v0, :cond_c
+
+    const/4 v0, 0x0
+
+    return v0
+
+    :cond_c
+    const/4 v0, 0x1
+
+    return v0
+.end method
+
+.method public hasAvoidpolygons()Z
+    .registers 2
+
+    invoke-virtual {p0}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->getAvoidpolygonsStr()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/amap/api/col/3sl/t4;->j(Ljava/lang/String;)Z
+
+    move-result v0
+
+    if-eqz v0, :cond_c
+
+    const/4 v0, 0x0
+
+    return v0
+
+    :cond_c
+    const/4 v0, 0x1
+
+    return v0
+.end method
+
+.method public hasPassPoint()Z
+    .registers 2
+
+    invoke-virtual {p0}, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->getPassedPointStr()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/amap/api/col/3sl/t4;->j(Ljava/lang/String;)Z
+
+    move-result v0
+
+    if-eqz v0, :cond_c
+
+    const/4 v0, 0x0
+
+    return v0
+
+    :cond_c
+    const/4 v0, 0x1
+
+    return v0
+.end method
+
+.method public hashCode()I
+    .registers 4
+
+    .line 1
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    .line 2
+    .line 3
+    const/4 v1, 0x0
+
+    .line 4
+    if-nez v0, :cond_7
+
+    .line 5
+    .line 6
+    const/4 v0, 0x0
+
+    .line 7
+    goto :goto_b
+
+    .line 8
+    :cond_7
+    invoke-virtual {v0}, Ljava/lang/String;->hashCode()I
+
+    .line 9
+    .line 10
+    .line 11
+    move-result v0
+
+    .line 12
+    :goto_b
+    add-int/lit8 v0, v0, 0x1f
+
+    .line 13
+    .line 14
+    mul-int/lit8 v0, v0, 0x1f
+
+    .line 15
+    .line 16
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 17
+    .line 18
+    if-nez v2, :cond_15
+
+    .line 19
+    .line 20
+    const/4 v2, 0x0
+
+    .line 21
+    goto :goto_19
+
+    .line 22
+    :cond_15
+    invoke-interface {v2}, Ljava/util/List;->hashCode()I
+
+    .line 23
+    .line 24
+    .line 25
+    move-result v2
+
+    .line 26
+    :goto_19
+    add-int/2addr v0, v2
+
+    .line 27
+    mul-int/lit8 v0, v0, 0x1f
+
+    .line 28
+    .line 29
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    .line 30
+    .line 31
+    if-nez v2, :cond_22
+
+    .line 32
+    .line 33
+    const/4 v2, 0x0
+
+    .line 34
+    goto :goto_26
+
+    .line 35
+    :cond_22
+    invoke-virtual {v2}, Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;->hashCode()I
+
+    .line 36
+    .line 37
+    .line 38
+    move-result v2
+
+    .line 39
+    :goto_26
+    add-int/2addr v0, v2
+
+    .line 40
+    mul-int/lit8 v0, v0, 0x1f
+
+    .line 41
+    .line 42
+    iget v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    .line 43
+    .line 44
+    add-int/2addr v0, v2
+
+    .line 45
+    mul-int/lit8 v0, v0, 0x1f
+
+    .line 46
+    .line 47
+    iget-object v2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 48
+    .line 49
+    if-nez v2, :cond_33
+
+    .line 50
+    .line 51
+    goto :goto_37
+
+    .line 52
+    :cond_33
+    invoke-interface {v2}, Ljava/util/List;->hashCode()I
+
+    .line 53
+    .line 54
+    .line 55
+    move-result v1
+
+    .line 56
+    :goto_37
+    add-int/2addr v0, v1
+
+    .line 57
+    mul-int/lit8 v0, v0, 0x1f
+
+    .line 58
+    .line 59
+    iget v1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    .line 60
+    .line 61
+    add-int/2addr v0, v1
+
+    .line 62
+    return v0
+.end method
+
+.method public isUseFerry()Z
+    .registers 2
+
+    iget-boolean v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    return v0
+.end method
+
+.method public setCarType(I)V
+    .registers 2
+
+    iput p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    return-void
+.end method
+
+.method public setExclude(Ljava/lang/String;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    return-void
+.end method
+
+.method public setNewEnergy(Lcom/amap/api/services/route/RouteSearchV2$NewEnergy;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->b:Lcom/amap/api/services/route/RouteSearchV2$NewEnergy;
+
+    return-void
+.end method
+
+.method public setShowFields(I)V
+    .registers 2
+
+    iput p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    return-void
+.end method
+
+.method public setUseFerry(Z)V
+    .registers 2
+
+    iput-boolean p1, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    return-void
+.end method
+
+.method public writeToParcel(Landroid/os/Parcel;I)V
+    .registers 4
+
+    .line 1
+    iget-object v0, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->a:Lcom/amap/api/services/route/RouteSearchV2$FromAndTo;
+
+    .line 2
+    .line 3
+    invoke-virtual {p1, v0, p2}, Landroid/os/Parcel;->writeParcelable(Landroid/os/Parcelable;I)V
+
+    .line 4
+    .line 5
+    .line 6
+    iget p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->c:I
+
+    .line 7
+    .line 8
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeInt(I)V
+
+    .line 9
+    .line 10
+    .line 11
+    iget-object p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->d:Ljava/util/List;
+
+    .line 12
+    .line 13
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeTypedList(Ljava/util/List;)V
+
+    .line 14
+    .line 15
+    .line 16
+    iget-object p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 17
+    .line 18
+    if-nez p2, :cond_18
+
+    .line 19
+    .line 20
+    const/4 p2, 0x0
+
+    .line 21
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeInt(I)V
+
+    .line 22
+    .line 23
+    .line 24
+    goto :goto_35
+
+    .line 25
+    :cond_18
+    invoke-interface {p2}, Ljava/util/List;->size()I
+
+    .line 26
+    .line 27
+    .line 28
+    move-result p2
+
+    .line 29
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeInt(I)V
+
+    .line 30
+    .line 31
+    .line 32
+    iget-object p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->e:Ljava/util/List;
+
+    .line 33
+    .line 34
+    invoke-interface {p2}, Ljava/util/List;->iterator()Ljava/util/Iterator;
+
+    .line 35
+    .line 36
+    .line 37
+    move-result-object p2
+
+    .line 38
+    :goto_25
+    invoke-interface {p2}, Ljava/util/Iterator;->hasNext()Z
+
+    .line 39
+    .line 40
+    .line 41
+    move-result v0
+
+    .line 42
+    if-eqz v0, :cond_35
+
+    .line 43
+    .line 44
+    invoke-interface {p2}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+
+    .line 45
+    .line 46
+    .line 47
+    move-result-object v0
+
+    .line 48
+    check-cast v0, Ljava/util/List;
+
+    .line 49
+    .line 50
+    invoke-virtual {p1, v0}, Landroid/os/Parcel;->writeTypedList(Ljava/util/List;)V
+
+    .line 51
+    .line 52
+    .line 53
+    goto :goto_25
+
+    .line 54
+    :cond_35
+    :goto_35
+    iget-object p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->f:Ljava/lang/String;
+
+    .line 55
+    .line 56
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeString(Ljava/lang/String;)V
+
+    .line 57
+    .line 58
+    .line 59
+    iget-boolean p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->g:Z
+
+    .line 60
+    .line 61
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeInt(I)V
+
+    .line 62
+    .line 63
+    .line 64
+    iget p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->h:I
+
+    .line 65
+    .line 66
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeInt(I)V
+
+    .line 67
+    .line 68
+    .line 69
+    iget-object p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->i:Ljava/lang/String;
+
+    .line 70
+    .line 71
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeString(Ljava/lang/String;)V
+
+    .line 72
+    .line 73
+    .line 74
+    iget p2, p0, Lcom/amap/api/services/route/RouteSearchV2$DriveRouteQuery;->j:I
+
+    .line 75
+    .line 76
+    invoke-virtual {p1, p2}, Landroid/os/Parcel;->writeInt(I)V
+
+    .line 77
+    .line 78
+    .line 79
+    return-void
+.end method

@@ -1,0 +1,19 @@
+.class public interface abstract Lcom/amap/api/col/3sl/n7$b;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/amap/api/col/3sl/n7;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "b"
+.end annotation
+
+
+# virtual methods
+.method public abstract a(Lcom/amap/api/col/3sl/n7$c;)V
+.end method

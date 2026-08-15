@@ -1,0 +1,179 @@
+.class Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$b;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroid/view/View$OnClickListener;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;->initViews(Landroid/view/View;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;
+
+
+# direct methods
+.method constructor <init>(Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$b;->b:Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onClick(Landroid/view/View;)V
+    .registers 5
+
+    .line 1
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$b;->b:Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;
+
+    .line 2
+    .line 3
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;->Zf(Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;)Landroidx/recyclerview/widget/RecyclerView;
+
+    .line 4
+    .line 5
+    .line 6
+    move-result-object p1
+
+    .line 7
+    invoke-virtual {p1}, Landroidx/recyclerview/widget/RecyclerView;->getAdapter()Landroidx/recyclerview/widget/RecyclerView$Adapter;
+
+    .line 8
+    .line 9
+    .line 10
+    move-result-object p1
+
+    .line 11
+    check-cast p1, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$ColleagueAdapter;
+
+    .line 12
+    .line 13
+    invoke-virtual {p1}, Lcom/hpbr/bosszhipin/group/adapter/MemberAdapter;->k()Ljava/util/List;
+
+    .line 14
+    .line 15
+    .line 16
+    move-result-object p1
+
+    .line 17
+    invoke-static {p1}, Lcom/monch/lbase/util/LList;->isEmpty(Ljava/util/List;)Z
+
+    .line 18
+    .line 19
+    .line 20
+    move-result p1
+
+    .line 21
+    if-eqz p1, :cond_17
+
+    .line 22
+    .line 23
+    return-void
+
+    .line 24
+    :cond_17
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$b;->b:Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;
+
+    .line 25
+    .line 26
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;->bg(Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;)Landroid/app/Activity;
+
+    .line 27
+    .line 28
+    .line 29
+    move-result-object p1
+
+    .line 30
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$b;->b:Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;
+
+    .line 31
+    .line 32
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;->cg(Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;)J
+
+    .line 33
+    .line 34
+    .line 35
+    move-result-wide v0
+
+    .line 36
+    const/4 v2, 0x0
+
+    .line 37
+    invoke-static {p1, v0, v1, v2}, Lcom/hpbr/bosszhipin/group/activity/SearchColleagueActivity;->ff(Landroid/content/Context;JLjava/util/List;)Landroid/content/Intent;
+
+    .line 38
+    .line 39
+    .line 40
+    move-result-object p1
+
+    .line 41
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$b;->b:Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;
+
+    .line 42
+    .line 43
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;->dg(Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;)Ljava/util/List;
+
+    .line 44
+    .line 45
+    .line 46
+    move-result-object v0
+
+    .line 47
+    sput-object v0, Lcom/hpbr/bosszhipin/group/activity/SearchColleagueActivity;->i:Ljava/util/List;
+
+    .line 48
+    .line 49
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment$b;->b:Lcom/hpbr/bosszhipin/group/fragment/ColleagueFragment;
+
+    .line 50
+    .line 51
+    const/16 v1, 0x65
+
+    .line 52
+    .line 53
+    invoke-virtual {v0, p1, v1}, Landroidx/fragment/app/Fragment;->startActivityForResult(Landroid/content/Intent;I)V
+
+    .line 54
+    .line 55
+    .line 56
+    invoke-static {}, Luk/a;->j()Luk/a;
+
+    .line 57
+    .line 58
+    .line 59
+    move-result-object p1
+
+    .line 60
+    const-string v0, "group-invite-search-click"
+
+    .line 61
+    .line 62
+    invoke-virtual {p1, v0}, Luk/a;->a(Ljava/lang/String;)Luk/a;
+
+    .line 63
+    .line 64
+    .line 65
+    move-result-object p1
+
+    .line 66
+    invoke-virtual {p1}, Luk/a;->g()V
+
+    .line 67
+    .line 68
+    .line 69
+    return-void
+.end method

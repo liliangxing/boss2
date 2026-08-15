@@ -1,0 +1,15 @@
+.class public final synthetic Lcom/tencent/thumbplayer/utils/s;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# direct methods
+.method public static bridge synthetic a(Landroid/telephony/TelephonyManager;)Landroid/telephony/ServiceState;
+    .registers 1
+
+    invoke-virtual {p0}, Landroid/telephony/TelephonyManager;->getServiceState()Landroid/telephony/ServiceState;
+
+    move-result-object p0
+
+    return-object p0
+.end method

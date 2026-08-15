@@ -1,0 +1,34 @@
+.class public final synthetic Lcom/hpbr/bosszhipin/company/module/position/h;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lcom/hpbr/bosszhipin/company/module/position/view/ConditionSelectorLayout$j;
+
+
+# instance fields
+.field public final synthetic a:Lcom/hpbr/bosszhipin/company/module/position/SearchHotHireFragment;
+
+
+# direct methods
+.method public synthetic constructor <init>(Lcom/hpbr/bosszhipin/company/module/position/SearchHotHireFragment;)V
+    .registers 2
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/company/module/position/h;->a:Lcom/hpbr/bosszhipin/company/module/position/SearchHotHireFragment;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final a(ZLyu/d;)V
+    .registers 4
+
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/company/module/position/h;->a:Lcom/hpbr/bosszhipin/company/module/position/SearchHotHireFragment;
+
+    invoke-static {v0, p1, p2}, Lcom/hpbr/bosszhipin/company/module/position/SearchHotHireFragment;->Xf(Lcom/hpbr/bosszhipin/company/module/position/SearchHotHireFragment;ZLyu/d;)V
+
+    return-void
+.end method

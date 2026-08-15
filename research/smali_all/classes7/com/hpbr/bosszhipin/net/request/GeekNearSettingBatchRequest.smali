@@ -1,0 +1,71 @@
+.class public Lcom/hpbr/bosszhipin/net/request/GeekNearSettingBatchRequest;
+.super Lnet/bosszhipin/base/BaseBatchApiRequest;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "Lnet/bosszhipin/base/BaseBatchApiRequest<",
+        "Lcom/hpbr/bosszhipin/net/response/GeekNearSettingBatchResponse;",
+        ">;"
+    }
+.end annotation
+
+
+# instance fields
+.field public mGeekAddressRequest:Lnet/bosszhipin/api/HomeAndExpectAddressRequest;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+.field public mGeekBusinessRequest:Lcom/hpbr/bosszhipin/net/request/GeekBusinessRequest;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+.field public mGeekNearDistanceFilterRequest:Lcom/hpbr/bosszhipin/net/request/GeekNearDistanceFilterRequest;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+.field public mGeekNearJobTabRequest:Lcom/hpbr/bosszhipin/net/request/GeekNearJobTabRequest;
+    .annotation runtime Lb8/a;
+    .end annotation
+.end field
+
+
+# direct methods
+.method public constructor <init>(Lcom/twl/http/callback/a;)V
+    .registers 2
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/twl/http/callback/a<",
+            "Lcom/hpbr/bosszhipin/net/response/GeekNearSettingBatchResponse;",
+            ">;)V"
+        }
+    .end annotation
+
+    invoke-direct {p0, p1}, Lnet/bosszhipin/base/BaseBatchApiRequest;-><init>(Lcom/twl/http/callback/a;)V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public getMethod()Lcom/twl/http/config/RequestMethod;
+    .registers 2
+
+    sget-object v0, Lcom/twl/http/config/RequestMethod;->GET:Lcom/twl/http/config/RequestMethod;
+
+    return-object v0
+.end method
+
+.method public getUrl()Ljava/lang/String;
+    .registers 2
+
+    sget-object v0, Lcom/hpbr/bosszhipin/config/m;->C0:Ljava/lang/String;
+
+    return-object v0
+.end method

@@ -1,0 +1,28 @@
+.class public interface abstract Lf50/a$a;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lf50/a;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "a"
+.end annotation
+
+
+# virtual methods
+.method public abstract C7()V
+.end method
+
+.method public abstract Fb()V
+.end method
+
+.method public abstract G4()V
+.end method
+
+.method public abstract Z4()V
+.end method

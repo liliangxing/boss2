@@ -1,0 +1,19 @@
+.class interface abstract Lcom/hpbr/bosszhipin/chat/dialog/y2$d;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/hpbr/bosszhipin/chat/dialog/y2;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x60a
+    name = "d"
+.end annotation
+
+
+# virtual methods
+.method public abstract a()V
+.end method

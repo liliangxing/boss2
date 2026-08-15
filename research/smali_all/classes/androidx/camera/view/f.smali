@@ -1,0 +1,40 @@
+.class public final synthetic Landroidx/camera/view/f;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroidx/camera/core/SurfaceRequest$TransformationInfoListener;
+
+
+# instance fields
+.field public final synthetic a:Landroidx/camera/view/PreviewView$2;
+
+.field public final synthetic b:Landroidx/camera/core/SurfaceRequest;
+
+
+# direct methods
+.method public synthetic constructor <init>(Landroidx/camera/view/PreviewView$2;Landroidx/camera/core/SurfaceRequest;)V
+    .registers 3
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Landroidx/camera/view/f;->a:Landroidx/camera/view/PreviewView$2;
+
+    iput-object p2, p0, Landroidx/camera/view/f;->b:Landroidx/camera/core/SurfaceRequest;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final onTransformationInfoUpdate(Landroidx/camera/core/SurfaceRequest$TransformationInfo;)V
+    .registers 4
+
+    iget-object v0, p0, Landroidx/camera/view/f;->a:Landroidx/camera/view/PreviewView$2;
+
+    iget-object v1, p0, Landroidx/camera/view/f;->b:Landroidx/camera/core/SurfaceRequest;
+
+    invoke-static {v0, v1, p1}, Landroidx/camera/view/PreviewView$2;->a(Landroidx/camera/view/PreviewView$2;Landroidx/camera/core/SurfaceRequest;Landroidx/camera/core/SurfaceRequest$TransformationInfo;)V
+
+    return-void
+.end method

@@ -1,0 +1,17 @@
+.class public final Lkotlinx/coroutines/flow/o;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lkotlinx/coroutines/flow/b;
+
+
+# annotations
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "Ljava/lang/Object;",
+        "Lkotlinx/coroutines/flow/b<",
+        "Ljava/lang/Object;",
+        ">;"
+    }
+.end annotation

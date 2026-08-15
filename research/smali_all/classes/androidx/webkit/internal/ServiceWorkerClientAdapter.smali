@@ -1,0 +1,73 @@
+.class public Landroidx/webkit/internal/ServiceWorkerClientAdapter;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lorg/chromium/support_lib_boundary/ServiceWorkerClientBoundaryInterface;
+
+
+# instance fields
+.field private final mClient:Landroidx/webkit/ServiceWorkerClientCompat;
+
+
+# direct methods
+.method public constructor <init>(Landroidx/webkit/ServiceWorkerClientCompat;)V
+    .registers 2
+    .param p1    # Landroidx/webkit/ServiceWorkerClientCompat;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+
+    .line 1
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 2
+    .line 3
+    .line 4
+    iput-object p1, p0, Landroidx/webkit/internal/ServiceWorkerClientAdapter;->mClient:Landroidx/webkit/ServiceWorkerClientCompat;
+
+    .line 5
+    .line 6
+    return-void
+.end method
+
+
+# virtual methods
+.method public getSupportedFeatures()[Ljava/lang/String;
+    .registers 2
+    .annotation build Landroidx/annotation/NonNull;
+    .end annotation
+
+    .line 1
+    const-string v0, "SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST"
+
+    .line 2
+    .line 3
+    filled-new-array {v0}, [Ljava/lang/String;
+
+    .line 4
+    .line 5
+    .line 6
+    move-result-object v0
+
+    .line 7
+    return-object v0
+.end method
+
+.method public shouldInterceptRequest(Landroid/webkit/WebResourceRequest;)Landroid/webkit/WebResourceResponse;
+    .registers 3
+    .param p1    # Landroid/webkit/WebResourceRequest;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+    .annotation build Landroidx/annotation/Nullable;
+    .end annotation
+
+    iget-object v0, p0, Landroidx/webkit/internal/ServiceWorkerClientAdapter;->mClient:Landroidx/webkit/ServiceWorkerClientCompat;
+
+    invoke-virtual {v0, p1}, Landroidx/webkit/ServiceWorkerClientCompat;->shouldInterceptRequest(Landroid/webkit/WebResourceRequest;)Landroid/webkit/WebResourceResponse;
+
+    move-result-object p1
+
+    return-object p1
+.end method

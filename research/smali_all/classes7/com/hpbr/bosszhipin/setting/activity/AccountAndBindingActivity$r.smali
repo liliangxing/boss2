@@ -1,0 +1,113 @@
+.class Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity$r;
+.super Lcom/hpbr/bosszhipin/views/x0;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity;->onItemClick(Lcom/chad/library/adapter/base/BaseQuickAdapter;Landroid/view/View;I)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity;
+
+
+# direct methods
+.method constructor <init>(Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity$r;->b:Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity;
+
+    invoke-direct {p0}, Lcom/hpbr/bosszhipin/views/x0;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onNoFastClick(Landroid/view/View;)V
+    .registers 5
+
+    .line 1
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity$r;->b:Lcom/hpbr/bosszhipin/setting/activity/AccountAndBindingActivity;
+
+    .line 2
+    .line 3
+    const-string v0, "0"
+
+    .line 4
+    .line 5
+    const-string v1, ""
+
+    .line 6
+    .line 7
+    const-string v2, "5"
+
+    .line 8
+    .line 9
+    invoke-virtual {p1, v2, v0, v1}, Lcom/hpbr/bosszhipin/login/activity/AbsAuthCodeActivity;->v7(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 10
+    .line 11
+    .line 12
+    invoke-static {}, Luk/a;->j()Luk/a;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object p1
+
+    .line 16
+    const-string v0, "regist-LoginOut-tie_untie-click"
+
+    .line 17
+    .line 18
+    invoke-virtual {p1, v0}, Luk/a;->a(Ljava/lang/String;)Luk/a;
+
+    .line 19
+    .line 20
+    .line 21
+    move-result-object p1
+
+    .line 22
+    const-string v0, "p"
+
+    .line 23
+    .line 24
+    const-string v1, "1"
+
+    .line 25
+    .line 26
+    invoke-virtual {p1, v0, v1}, Luk/a;->p(Ljava/lang/String;Ljava/lang/String;)Luk/a;
+
+    .line 27
+    .line 28
+    .line 29
+    move-result-object p1
+
+    .line 30
+    const-string v0, "p2"
+
+    .line 31
+    .line 32
+    invoke-virtual {p1, v0, v1}, Luk/a;->p(Ljava/lang/String;Ljava/lang/String;)Luk/a;
+
+    .line 33
+    .line 34
+    .line 35
+    move-result-object p1
+
+    .line 36
+    invoke-virtual {p1}, Luk/a;->g()V
+
+    .line 37
+    .line 38
+    .line 39
+    return-void
+.end method

@@ -1,0 +1,288 @@
+.class Landroidx/room/RoomTrackingLiveData;
+.super Landroidx/lifecycle/LiveData;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "<T:",
+        "Ljava/lang/Object;",
+        ">",
+        "Landroidx/lifecycle/LiveData<",
+        "TT;>;"
+    }
+.end annotation
+
+
+# instance fields
+.field final mComputeFunction:Ljava/util/concurrent/Callable;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/concurrent/Callable<",
+            "TT;>;"
+        }
+    .end annotation
+.end field
+
+.field final mComputing:Ljava/util/concurrent/atomic/AtomicBoolean;
+
+.field private final mContainer:Landroidx/room/InvalidationLiveDataContainer;
+
+.field final mDatabase:Landroidx/room/RoomDatabase;
+
+.field final mInTransaction:Z
+
+.field final mInvalid:Ljava/util/concurrent/atomic/AtomicBoolean;
+
+.field final mInvalidationRunnable:Ljava/lang/Runnable;
+
+.field final mObserver:Landroidx/room/InvalidationTracker$Observer;
+
+.field final mRefreshRunnable:Ljava/lang/Runnable;
+
+.field final mRegisteredObserver:Ljava/util/concurrent/atomic/AtomicBoolean;
+
+
+# direct methods
+.method constructor <init>(Landroidx/room/RoomDatabase;Landroidx/room/InvalidationLiveDataContainer;ZLjava/util/concurrent/Callable;[Ljava/lang/String;)V
+    .registers 8
+    .annotation build Landroid/annotation/SuppressLint;
+        value = {
+            "RestrictedApi"
+        }
+    .end annotation
+
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Landroidx/room/RoomDatabase;",
+            "Landroidx/room/InvalidationLiveDataContainer;",
+            "Z",
+            "Ljava/util/concurrent/Callable<",
+            "TT;>;[",
+            "Ljava/lang/String;",
+            ")V"
+        }
+    .end annotation
+
+    .line 1
+    invoke-direct {p0}, Landroidx/lifecycle/LiveData;-><init>()V
+
+    .line 2
+    .line 3
+    .line 4
+    new-instance v0, Ljava/util/concurrent/atomic/AtomicBoolean;
+
+    .line 5
+    .line 6
+    const/4 v1, 0x1
+
+    .line 7
+    invoke-direct {v0, v1}, Ljava/util/concurrent/atomic/AtomicBoolean;-><init>(Z)V
+
+    .line 8
+    .line 9
+    .line 10
+    iput-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mInvalid:Ljava/util/concurrent/atomic/AtomicBoolean;
+
+    .line 11
+    .line 12
+    new-instance v0, Ljava/util/concurrent/atomic/AtomicBoolean;
+
+    .line 13
+    .line 14
+    const/4 v1, 0x0
+
+    .line 15
+    invoke-direct {v0, v1}, Ljava/util/concurrent/atomic/AtomicBoolean;-><init>(Z)V
+
+    .line 16
+    .line 17
+    .line 18
+    iput-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mComputing:Ljava/util/concurrent/atomic/AtomicBoolean;
+
+    .line 19
+    .line 20
+    new-instance v0, Ljava/util/concurrent/atomic/AtomicBoolean;
+
+    .line 21
+    .line 22
+    invoke-direct {v0, v1}, Ljava/util/concurrent/atomic/AtomicBoolean;-><init>(Z)V
+
+    .line 23
+    .line 24
+    .line 25
+    iput-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mRegisteredObserver:Ljava/util/concurrent/atomic/AtomicBoolean;
+
+    .line 26
+    .line 27
+    new-instance v0, Landroidx/room/RoomTrackingLiveData$1;
+
+    .line 28
+    .line 29
+    invoke-direct {v0, p0}, Landroidx/room/RoomTrackingLiveData$1;-><init>(Landroidx/room/RoomTrackingLiveData;)V
+
+    .line 30
+    .line 31
+    .line 32
+    iput-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mRefreshRunnable:Ljava/lang/Runnable;
+
+    .line 33
+    .line 34
+    new-instance v0, Landroidx/room/RoomTrackingLiveData$2;
+
+    .line 35
+    .line 36
+    invoke-direct {v0, p0}, Landroidx/room/RoomTrackingLiveData$2;-><init>(Landroidx/room/RoomTrackingLiveData;)V
+
+    .line 37
+    .line 38
+    .line 39
+    iput-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mInvalidationRunnable:Ljava/lang/Runnable;
+
+    .line 40
+    .line 41
+    iput-object p1, p0, Landroidx/room/RoomTrackingLiveData;->mDatabase:Landroidx/room/RoomDatabase;
+
+    .line 42
+    .line 43
+    iput-boolean p3, p0, Landroidx/room/RoomTrackingLiveData;->mInTransaction:Z
+
+    .line 44
+    .line 45
+    iput-object p4, p0, Landroidx/room/RoomTrackingLiveData;->mComputeFunction:Ljava/util/concurrent/Callable;
+
+    .line 46
+    .line 47
+    iput-object p2, p0, Landroidx/room/RoomTrackingLiveData;->mContainer:Landroidx/room/InvalidationLiveDataContainer;
+
+    .line 48
+    .line 49
+    new-instance p1, Landroidx/room/RoomTrackingLiveData$3;
+
+    .line 50
+    .line 51
+    invoke-direct {p1, p0, p5}, Landroidx/room/RoomTrackingLiveData$3;-><init>(Landroidx/room/RoomTrackingLiveData;[Ljava/lang/String;)V
+
+    .line 52
+    .line 53
+    .line 54
+    iput-object p1, p0, Landroidx/room/RoomTrackingLiveData;->mObserver:Landroidx/room/InvalidationTracker$Observer;
+
+    .line 55
+    .line 56
+    return-void
+.end method
+
+.method static synthetic access$000(Landroidx/room/RoomTrackingLiveData;Ljava/lang/Object;)V
+    .registers 2
+
+    invoke-virtual {p0, p1}, Landroidx/lifecycle/LiveData;->postValue(Ljava/lang/Object;)V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method getQueryExecutor()Ljava/util/concurrent/Executor;
+    .registers 2
+
+    .line 1
+    iget-boolean v0, p0, Landroidx/room/RoomTrackingLiveData;->mInTransaction:Z
+
+    .line 2
+    .line 3
+    if-eqz v0, :cond_b
+
+    .line 4
+    .line 5
+    iget-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mDatabase:Landroidx/room/RoomDatabase;
+
+    .line 6
+    .line 7
+    invoke-virtual {v0}, Landroidx/room/RoomDatabase;->getTransactionExecutor()Ljava/util/concurrent/Executor;
+
+    .line 8
+    .line 9
+    .line 10
+    move-result-object v0
+
+    .line 11
+    return-object v0
+
+    .line 12
+    :cond_b
+    iget-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mDatabase:Landroidx/room/RoomDatabase;
+
+    .line 13
+    .line 14
+    invoke-virtual {v0}, Landroidx/room/RoomDatabase;->getQueryExecutor()Ljava/util/concurrent/Executor;
+
+    .line 15
+    .line 16
+    .line 17
+    move-result-object v0
+
+    .line 18
+    return-object v0
+.end method
+
+.method protected onActive()V
+    .registers 3
+
+    .line 1
+    invoke-super {p0}, Landroidx/lifecycle/LiveData;->onActive()V
+
+    .line 2
+    .line 3
+    .line 4
+    iget-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mContainer:Landroidx/room/InvalidationLiveDataContainer;
+
+    .line 5
+    .line 6
+    invoke-virtual {v0, p0}, Landroidx/room/InvalidationLiveDataContainer;->onActive(Landroidx/lifecycle/LiveData;)V
+
+    .line 7
+    .line 8
+    .line 9
+    invoke-virtual {p0}, Landroidx/room/RoomTrackingLiveData;->getQueryExecutor()Ljava/util/concurrent/Executor;
+
+    .line 10
+    .line 11
+    .line 12
+    move-result-object v0
+
+    .line 13
+    iget-object v1, p0, Landroidx/room/RoomTrackingLiveData;->mRefreshRunnable:Ljava/lang/Runnable;
+
+    .line 14
+    .line 15
+    invoke-interface {v0, v1}, Ljava/util/concurrent/Executor;->execute(Ljava/lang/Runnable;)V
+
+    .line 16
+    .line 17
+    .line 18
+    return-void
+.end method
+
+.method protected onInactive()V
+    .registers 2
+
+    .line 1
+    invoke-super {p0}, Landroidx/lifecycle/LiveData;->onInactive()V
+
+    .line 2
+    .line 3
+    .line 4
+    iget-object v0, p0, Landroidx/room/RoomTrackingLiveData;->mContainer:Landroidx/room/InvalidationLiveDataContainer;
+
+    .line 5
+    .line 6
+    invoke-virtual {v0, p0}, Landroidx/room/InvalidationLiveDataContainer;->onInactive(Landroidx/lifecycle/LiveData;)V
+
+    .line 7
+    .line 8
+    .line 9
+    return-void
+.end method

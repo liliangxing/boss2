@@ -1,0 +1,23 @@
+.class public interface abstract Lcom/hpbr/bosszhipin/revision/get/postvideo/view/GetJobFilterView$d;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/hpbr/bosszhipin/revision/get/postvideo/view/GetJobFilterView;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "d"
+.end annotation
+
+
+# virtual methods
+.method public abstract J6(Lcom/hpbr/bosszhipin/revision/get/postvideo/view/GetJobFilterView$Filter;Z)V
+    .param p1    # Lcom/hpbr/bosszhipin/revision/get/postvideo/view/GetJobFilterView$Filter;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+.end method

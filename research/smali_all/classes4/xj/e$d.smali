@@ -1,0 +1,22 @@
+.class public interface abstract Lxj/e$d;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lxj/e;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "d"
+.end annotation
+
+
+# virtual methods
+.method public abstract a(Landroid/graphics/Bitmap;Ljava/lang/String;)V
+.end method
+
+.method public abstract b(Ljava/lang/String;Ljava/lang/String;)V
+.end method

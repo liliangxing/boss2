@@ -1,0 +1,250 @@
+.class Lzpui/lib/ui/span/ZPUISpanTextView$h;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroid/animation/ValueAnimator$AnimatorUpdateListener;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lzpui/lib/ui/span/ZPUISpanTextView;->x(Lzpui/lib/ui/span/internal/StateType;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Z
+
+.field final synthetic c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+
+# direct methods
+.method constructor <init>(Lzpui/lib/ui/span/ZPUISpanTextView;Z)V
+    .registers 3
+
+    iput-object p1, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    iput-boolean p2, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->b:Z
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onAnimationUpdate(Landroid/animation/ValueAnimator;)V
+    .registers 6
+
+    .line 1
+    invoke-virtual {p1}, Landroid/animation/ValueAnimator;->getAnimatedValue()Ljava/lang/Object;
+
+    .line 2
+    .line 3
+    .line 4
+    move-result-object p1
+
+    .line 5
+    check-cast p1, Ljava/lang/Float;
+
+    .line 6
+    .line 7
+    iget-boolean v0, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->b:Z
+
+    .line 8
+    .line 9
+    if-eqz v0, :cond_2a
+
+    .line 10
+    .line 11
+    iget-object v0, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 12
+    .line 13
+    invoke-static {v0}, Lzpui/lib/ui/span/ZPUISpanTextView;->k(Lzpui/lib/ui/span/ZPUISpanTextView;)I
+
+    .line 14
+    .line 15
+    .line 16
+    move-result v1
+
+    .line 17
+    iget-object v2, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 18
+    .line 19
+    invoke-static {v2}, Lzpui/lib/ui/span/ZPUISpanTextView;->l(Lzpui/lib/ui/span/ZPUISpanTextView;)I
+
+    .line 20
+    .line 21
+    .line 22
+    move-result v2
+
+    .line 23
+    iget-object v3, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 24
+    .line 25
+    invoke-static {v3}, Lzpui/lib/ui/span/ZPUISpanTextView;->k(Lzpui/lib/ui/span/ZPUISpanTextView;)I
+
+    .line 26
+    .line 27
+    .line 28
+    move-result v3
+
+    .line 29
+    sub-int/2addr v2, v3
+
+    .line 30
+    int-to-float v2, v2
+
+    .line 31
+    invoke-virtual {p1}, Ljava/lang/Float;->floatValue()F
+
+    .line 32
+    .line 33
+    .line 34
+    move-result p1
+
+    .line 35
+    mul-float v2, v2, p1
+
+    .line 36
+    .line 37
+    float-to-int p1, v2
+
+    .line 38
+    add-int/2addr v1, p1
+
+    .line 39
+    invoke-static {v0, v1}, Lzpui/lib/ui/span/ZPUISpanTextView;->j(Lzpui/lib/ui/span/ZPUISpanTextView;I)I
+
+    .line 40
+    .line 41
+    .line 42
+    goto :goto_54
+
+    .line 43
+    :cond_2a
+    iget-object v0, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 44
+    .line 45
+    invoke-static {v0}, Lzpui/lib/ui/span/ZPUISpanTextView;->m(Lzpui/lib/ui/span/ZPUISpanTextView;)Z
+
+    .line 46
+    .line 47
+    .line 48
+    move-result v0
+
+    .line 49
+    if-eqz v0, :cond_54
+
+    .line 50
+    .line 51
+    iget-object v0, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 52
+    .line 53
+    invoke-static {v0}, Lzpui/lib/ui/span/ZPUISpanTextView;->k(Lzpui/lib/ui/span/ZPUISpanTextView;)I
+
+    .line 54
+    .line 55
+    .line 56
+    move-result v1
+
+    .line 57
+    iget-object v2, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 58
+    .line 59
+    invoke-static {v2}, Lzpui/lib/ui/span/ZPUISpanTextView;->l(Lzpui/lib/ui/span/ZPUISpanTextView;)I
+
+    .line 60
+    .line 61
+    .line 62
+    move-result v2
+
+    .line 63
+    iget-object v3, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 64
+    .line 65
+    invoke-static {v3}, Lzpui/lib/ui/span/ZPUISpanTextView;->k(Lzpui/lib/ui/span/ZPUISpanTextView;)I
+
+    .line 66
+    .line 67
+    .line 68
+    move-result v3
+
+    .line 69
+    sub-int/2addr v2, v3
+
+    .line 70
+    int-to-float v2, v2
+
+    .line 71
+    const/high16 v3, 0x3f800000    # 1.0f
+
+    .line 72
+    .line 73
+    invoke-virtual {p1}, Ljava/lang/Float;->floatValue()F
+
+    .line 74
+    .line 75
+    .line 76
+    move-result p1
+
+    .line 77
+    sub-float/2addr v3, p1
+
+    .line 78
+    mul-float v2, v2, v3
+
+    .line 79
+    .line 80
+    float-to-int p1, v2
+
+    .line 81
+    add-int/2addr v1, p1
+
+    .line 82
+    invoke-static {v0, v1}, Lzpui/lib/ui/span/ZPUISpanTextView;->j(Lzpui/lib/ui/span/ZPUISpanTextView;I)I
+
+    .line 83
+    .line 84
+    .line 85
+    :cond_54
+    :goto_54
+    iget-object p1, p0, Lzpui/lib/ui/span/ZPUISpanTextView$h;->c:Lzpui/lib/ui/span/ZPUISpanTextView;
+
+    .line 86
+    .line 87
+    invoke-static {p1}, Lzpui/lib/ui/span/ZPUISpanTextView;->p(Lzpui/lib/ui/span/ZPUISpanTextView;)Ljava/lang/CharSequence;
+
+    .line 88
+    .line 89
+    .line 90
+    move-result-object v0
+
+    .line 91
+    invoke-static {p1, v0}, Lzpui/lib/ui/span/ZPUISpanTextView;->n(Lzpui/lib/ui/span/ZPUISpanTextView;Ljava/lang/CharSequence;)Landroid/text/SpannableStringBuilder;
+
+    .line 92
+    .line 93
+    .line 94
+    move-result-object v0
+
+    .line 95
+    invoke-virtual {p1, v0}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
+
+    .line 96
+    .line 97
+    .line 98
+    return-void
+.end method

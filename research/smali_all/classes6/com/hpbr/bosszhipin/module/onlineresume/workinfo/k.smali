@@ -1,0 +1,46 @@
+.class public final synthetic Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/k;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroid/view/View$OnClickListener;
+
+
+# instance fields
+.field public final synthetic b:Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/WorkInfoFragment;
+
+.field public final synthetic c:Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;
+
+.field public final synthetic d:Lcom/twl/ui/popup/ZPUIPopup;
+
+
+# direct methods
+.method public synthetic constructor <init>(Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/WorkInfoFragment;Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;Lcom/twl/ui/popup/ZPUIPopup;)V
+    .registers 4
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/k;->b:Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/WorkInfoFragment;
+
+    iput-object p2, p0, Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/k;->c:Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;
+
+    iput-object p3, p0, Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/k;->d:Lcom/twl/ui/popup/ZPUIPopup;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final onClick(Landroid/view/View;)V
+    .registers 5
+
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/k;->b:Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/WorkInfoFragment;
+
+    iget-object v1, p0, Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/k;->c:Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;
+
+    iget-object v2, p0, Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/k;->d:Lcom/twl/ui/popup/ZPUIPopup;
+
+    invoke-static {v0, v1, v2, p1}, Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/WorkInfoFragment;->ig(Lcom/hpbr/bosszhipin/module/onlineresume/workinfo/WorkInfoFragment;Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;Lcom/twl/ui/popup/ZPUIPopup;Landroid/view/View;)V
+
+    return-void
+.end method

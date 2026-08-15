@@ -1,0 +1,43 @@
+.class public Lcom/hpbr/bosszhpin/module_boss/component/position/post/edit/entity/JobDataGraduateBean;
+.super Lcom/hpbr/bosszhpin/module_boss/component/position/post/edit/entity/JobCompleteBaseBean;
+.source "SourceFile"
+
+
+# static fields
+.field private static final serialVersionUID:J = -0x12bf10797a054cd8L
+
+
+# instance fields
+.field public jobDataGraduate:Ljava/lang/String;
+
+
+# direct methods
+.method public constructor <init>(Ljava/lang/String;)V
+    .registers 3
+
+    .line 1
+    const/16 v0, 0xf
+
+    .line 2
+    .line 3
+    invoke-direct {p0, v0}, Lcom/hpbr/bosszhpin/module_boss/component/position/post/edit/entity/JobCompleteBaseBean;-><init>(I)V
+
+    .line 4
+    .line 5
+    .line 6
+    iput-object p1, p0, Lcom/hpbr/bosszhpin/module_boss/component/position/post/edit/entity/JobDataGraduateBean;->jobDataGraduate:Ljava/lang/String;
+
+    .line 7
+    .line 8
+    return-void
+.end method
+
+
+# virtual methods
+.method public getItemType()I
+    .registers 2
+
+    const/16 v0, 0xf
+
+    return v0
+.end method

@@ -1,0 +1,29 @@
+.class public Lnet/bosszhipin/api/bean/ServerAdSearchBrandInfoBean;
+.super Lnet/bosszhipin/api/bean/BaseServerBean;
+.source "SourceFile"
+
+
+# static fields
+.field private static final serialVersionUID:J = -0x2f98dc6693d4b8L
+
+
+# instance fields
+.field public industry:Ljava/lang/String;
+
+.field public logo:Ljava/lang/String;
+
+.field public name:Ljava/lang/String;
+
+.field public scaleName:Ljava/lang/String;
+
+.field public stageName:Ljava/lang/String;
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Lnet/bosszhipin/api/bean/BaseServerBean;-><init>()V
+
+    return-void
+.end method

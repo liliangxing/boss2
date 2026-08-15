@@ -1,0 +1,23 @@
+.class public Lnet/bosszhipin/api/bean/ServerResumeExtendBean;
+.super Lnet/bosszhipin/api/bean/BaseServerBean;
+.source "SourceFile"
+
+
+# static fields
+.field private static final serialVersionUID:J = -0x1b0ca3d8a4105c90L
+
+
+# instance fields
+.field public content:Ljava/lang/String;
+
+.field public expId:J
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Lnet/bosszhipin/api/bean/BaseServerBean;-><init>()V
+
+    return-void
+.end method

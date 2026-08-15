@@ -1,0 +1,48 @@
+.class public interface abstract Lcom/facebook/imagepipeline/memory/PoolStatsTracker;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation build Lcom/facebook/infer/annotation/Nullsafe;
+    value = .enum Lcom/facebook/infer/annotation/Nullsafe$Mode;->STRICT:Lcom/facebook/infer/annotation/Nullsafe$Mode;
+.end annotation
+
+
+# static fields
+.field public static final BUCKETS_USED_PREFIX:Ljava/lang/String; = "buckets_used_"
+
+.field public static final FREE_BYTES:Ljava/lang/String; = "free_bytes"
+
+.field public static final FREE_COUNT:Ljava/lang/String; = "free_count"
+
+.field public static final HARD_CAP:Ljava/lang/String; = "hard_cap"
+
+.field public static final SOFT_CAP:Ljava/lang/String; = "soft_cap"
+
+.field public static final USED_BYTES:Ljava/lang/String; = "used_bytes"
+
+.field public static final USED_COUNT:Ljava/lang/String; = "used_count"
+
+
+# virtual methods
+.method public abstract onAlloc(I)V
+.end method
+
+.method public abstract onFree(I)V
+.end method
+
+.method public abstract onHardCapReached()V
+.end method
+
+.method public abstract onSoftCapReached()V
+.end method
+
+.method public abstract onValueRelease(I)V
+.end method
+
+.method public abstract onValueReuse(I)V
+.end method
+
+.method public abstract setBasePool(Lcom/facebook/imagepipeline/memory/BasePool;)V
+.end method

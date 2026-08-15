@@ -1,0 +1,34 @@
+.class public final synthetic Ld30/e;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lcom/hpbr/bosszhipin/views/wheelview/c$c;
+
+
+# instance fields
+.field public final synthetic a:Lcom/hpbr/bosszhipin/module_geek/component/simplified/GeekWorkExpCompletionActivity;
+
+
+# direct methods
+.method public synthetic constructor <init>(Lcom/hpbr/bosszhipin/module_geek/component/simplified/GeekWorkExpCompletionActivity;)V
+    .registers 2
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Ld30/e;->a:Lcom/hpbr/bosszhipin/module_geek/component/simplified/GeekWorkExpCompletionActivity;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final a(Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;)V
+    .registers 4
+
+    iget-object v0, p0, Ld30/e;->a:Lcom/hpbr/bosszhipin/module_geek/component/simplified/GeekWorkExpCompletionActivity;
+
+    invoke-static {v0, p1, p2}, Lcom/hpbr/bosszhipin/module_geek/component/simplified/GeekWorkExpCompletionActivity;->ff(Lcom/hpbr/bosszhipin/module_geek/component/simplified/GeekWorkExpCompletionActivity;Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;Lcom/hpbr/bosszhipin/module/my/entity/LevelBean;)V
+
+    return-void
+.end method

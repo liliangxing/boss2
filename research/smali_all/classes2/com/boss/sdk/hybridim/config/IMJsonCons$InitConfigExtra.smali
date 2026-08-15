@@ -1,0 +1,32 @@
+.class public Lcom/boss/sdk/hybridim/config/IMJsonCons$InitConfigExtra;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/boss/sdk/hybridim/config/IMJsonCons;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x9
+    name = "InitConfigExtra"
+.end annotation
+
+
+# static fields
+.field public static final KEY_APP_NAME:Ljava/lang/String; = "appName"
+
+.field public static final KEY_NEBULA_ID:Ljava/lang/String; = "nebulaID"
+
+.field public static final KEY_USER_ID:Ljava/lang/String; = "userID"
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method

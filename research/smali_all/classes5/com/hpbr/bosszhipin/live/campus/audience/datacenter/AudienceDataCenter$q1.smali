@@ -1,0 +1,135 @@
+.class Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter$q1;
+.super Lnet/bosszhipin/base/p;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;->K1(Ljava/lang/String;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "Lnet/bosszhipin/base/p<",
+        "Lcom/hpbr/bosszhipin/live/net/response/LiveExplainListResponse;",
+        ">;"
+    }
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;
+
+
+# direct methods
+.method constructor <init>(Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter$q1;->b:Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;
+
+    invoke-direct {p0}, Lnet/bosszhipin/base/p;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onFailed(Lcom/twl/http/error/a;)V
+    .registers 3
+
+    .line 1
+    invoke-super {p0, p1}, Lnet/bosszhipin/base/p;->onFailed(Lcom/twl/http/error/a;)V
+
+    .line 2
+    .line 3
+    .line 4
+    invoke-virtual {p1}, Lcom/twl/http/error/a;->b()Ljava/lang/String;
+
+    .line 5
+    .line 6
+    .line 7
+    move-result-object v0
+
+    .line 8
+    if-eqz v0, :cond_10
+
+    .line 9
+    .line 10
+    invoke-virtual {p1}, Lcom/twl/http/error/a;->b()Ljava/lang/String;
+
+    .line 11
+    .line 12
+    .line 13
+    move-result-object p1
+
+    .line 14
+    invoke-static {p1}, Lcom/twl/ui/ToastUtils;->showText(Ljava/lang/CharSequence;)V
+
+    .line 15
+    .line 16
+    .line 17
+    :cond_10
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter$q1;->b:Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;
+
+    .line 18
+    .line 19
+    iget-object p1, p1, Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;->O0:Landroidx/lifecycle/MutableLiveData;
+
+    .line 20
+    .line 21
+    const/4 v0, 0x0
+
+    .line 22
+    invoke-virtual {p1, v0}, Landroidx/lifecycle/MutableLiveData;->postValue(Ljava/lang/Object;)V
+
+    .line 23
+    .line 24
+    .line 25
+    return-void
+.end method
+
+.method public onSuccess(Lhg0/a;)V
+    .registers 3
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lhg0/a<",
+            "Lcom/hpbr/bosszhipin/live/net/response/LiveExplainListResponse;",
+            ">;)V"
+        }
+    .end annotation
+
+    .line 1
+    invoke-super {p0, p1}, Lnet/bosszhipin/base/p;->onSuccess(Lhg0/a;)V
+
+    .line 2
+    .line 3
+    .line 4
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter$q1;->b:Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;
+
+    .line 5
+    .line 6
+    iget-object v0, v0, Lcom/hpbr/bosszhipin/live/campus/audience/datacenter/AudienceDataCenter;->O0:Landroidx/lifecycle/MutableLiveData;
+
+    .line 7
+    .line 8
+    iget-object p1, p1, Lhg0/a;->a:Ljava/lang/Object;
+
+    .line 9
+    .line 10
+    check-cast p1, Lcom/hpbr/bosszhipin/live/net/response/LiveExplainListResponse;
+
+    .line 11
+    .line 12
+    invoke-virtual {v0, p1}, Landroidx/lifecycle/MutableLiveData;->postValue(Ljava/lang/Object;)V
+
+    .line 13
+    .line 14
+    .line 15
+    return-void
+.end method

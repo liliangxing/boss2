@@ -1,0 +1,1023 @@
+.class public Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+
+# annotations
+.annotation build Lcom/facebook/infer/annotation/Nullsafe;
+    value = .enum Lcom/facebook/infer/annotation/Nullsafe$Mode;->STRICT:Lcom/facebook/infer/annotation/Nullsafe$Mode;
+.end annotation
+
+
+# static fields
+.field private static final TAG:Ljava/lang/String; = "ForwardingRequestListener2"
+
+
+# instance fields
+.field private final mRequestListeners:Ljava/util/List;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/List<",
+            "Lcom/facebook/imagepipeline/listener/RequestListener2;",
+            ">;"
+        }
+    .end annotation
+.end field
+
+
+# direct methods
+.method public constructor <init>(Ljava/util/Set;)V
+    .registers 4
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Ljava/util/Set<",
+            "Lcom/facebook/imagepipeline/listener/RequestListener2;",
+            ">;)V"
+        }
+    .end annotation
+
+    .line 1
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 2
+    new-instance v0, Ljava/util/ArrayList;
+
+    invoke-interface {p1}, Ljava/util/Set;->size()I
+
+    move-result v1
+
+    invoke-direct {v0, v1}, Ljava/util/ArrayList;-><init>(I)V
+
+    iput-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 3
+    invoke-interface {p1}, Ljava/util/Set;->iterator()Ljava/util/Iterator;
+
+    move-result-object p1
+
+    :cond_12
+    :goto_12
+    invoke-interface {p1}, Ljava/util/Iterator;->hasNext()Z
+
+    move-result v0
+
+    if-eqz v0, :cond_26
+
+    invoke-interface {p1}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+
+    move-result-object v0
+
+    check-cast v0, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    if-eqz v0, :cond_12
+
+    .line 4
+    iget-object v1, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    goto :goto_12
+
+    :cond_26
+    return-void
+.end method
+
+.method public varargs constructor <init>([Lcom/facebook/imagepipeline/listener/RequestListener2;)V
+    .registers 6
+
+    .line 5
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 6
+    new-instance v0, Ljava/util/ArrayList;
+
+    array-length v1, p1
+
+    invoke-direct {v0, v1}, Ljava/util/ArrayList;-><init>(I)V
+
+    iput-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 7
+    array-length v0, p1
+
+    const/4 v1, 0x0
+
+    :goto_d
+    if-ge v1, v0, :cond_1b
+
+    aget-object v2, p1, v1
+
+    if-eqz v2, :cond_18
+
+    .line 8
+    iget-object v3, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    invoke-interface {v3, v2}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    :cond_18
+    add-int/lit8 v1, v1, 0x1
+
+    goto :goto_d
+
+    :cond_1b
+    return-void
+.end method
+
+.method private onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+    .registers 4
+
+    .line 1
+    const-string v0, "ForwardingRequestListener2"
+
+    .line 2
+    .line 3
+    invoke-static {v0, p1, p2}, Lcom/facebook/common/logging/FLog;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 4
+    .line 5
+    .line 6
+    return-void
+.end method
+
+
+# virtual methods
+.method public addRequestListener(Lcom/facebook/imagepipeline/listener/RequestListener2;)V
+    .registers 3
+
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    invoke-interface {v0, p1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    return-void
+.end method
+
+.method public onProducerEvent(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/lang/String;)V
+    .registers 8
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1, p2, p3}, Lcom/facebook/imagepipeline/producers/ProducerListener2;->onProducerEvent(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/lang/String;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onIntermediateChunkStart"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onProducerFinishWithCancellation(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/util/Map;)V
+    .registers 8
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/facebook/imagepipeline/producers/ProducerContext;",
+            "Ljava/lang/String;",
+            "Ljava/util/Map<",
+            "Ljava/lang/String;",
+            "Ljava/lang/String;",
+            ">;)V"
+        }
+    .end annotation
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1, p2, p3}, Lcom/facebook/imagepipeline/producers/ProducerListener2;->onProducerFinishWithCancellation(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/util/Map;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onProducerFinishWithCancellation"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onProducerFinishWithFailure(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+    .registers 9
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/facebook/imagepipeline/producers/ProducerContext;",
+            "Ljava/lang/String;",
+            "Ljava/lang/Throwable;",
+            "Ljava/util/Map<",
+            "Ljava/lang/String;",
+            "Ljava/lang/String;",
+            ">;)V"
+        }
+    .end annotation
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1, p2, p3, p4}, Lcom/facebook/imagepipeline/producers/ProducerListener2;->onProducerFinishWithFailure(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onProducerFinishWithFailure"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onProducerFinishWithSuccess(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/util/Map;)V
+    .registers 8
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Lcom/facebook/imagepipeline/producers/ProducerContext;",
+            "Ljava/lang/String;",
+            "Ljava/util/Map<",
+            "Ljava/lang/String;",
+            "Ljava/lang/String;",
+            ">;)V"
+        }
+    .end annotation
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1, p2, p3}, Lcom/facebook/imagepipeline/producers/ProducerListener2;->onProducerFinishWithSuccess(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Ljava/util/Map;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onProducerFinishWithSuccess"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onProducerStart(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;)V
+    .registers 7
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1, p2}, Lcom/facebook/imagepipeline/producers/ProducerListener2;->onProducerStart(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onProducerStart"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onRequestCancellation(Lcom/facebook/imagepipeline/producers/ProducerContext;)V
+    .registers 6
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1}, Lcom/facebook/imagepipeline/listener/RequestListener2;->onRequestCancellation(Lcom/facebook/imagepipeline/producers/ProducerContext;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onRequestCancellation"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onRequestFailure(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/Throwable;)V
+    .registers 7
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1, p2}, Lcom/facebook/imagepipeline/listener/RequestListener2;->onRequestFailure(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/Throwable;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onRequestFailure"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onRequestStart(Lcom/facebook/imagepipeline/producers/ProducerContext;)V
+    .registers 6
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1}, Lcom/facebook/imagepipeline/listener/RequestListener2;->onRequestStart(Lcom/facebook/imagepipeline/producers/ProducerContext;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onRequestStart"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onRequestSuccess(Lcom/facebook/imagepipeline/producers/ProducerContext;)V
+    .registers 6
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1}, Lcom/facebook/imagepipeline/listener/RequestListener2;->onRequestSuccess(Lcom/facebook/imagepipeline/producers/ProducerContext;)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onRequestSuccess"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public onUltimateProducerReached(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Z)V
+    .registers 8
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    :goto_7
+    if-ge v1, v0, :cond_1e
+
+    .line 9
+    .line 10
+    iget-object v2, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 11
+    .line 12
+    invoke-interface {v2, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 13
+    .line 14
+    .line 15
+    move-result-object v2
+
+    .line 16
+    check-cast v2, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 17
+    .line 18
+    :try_start_11
+    invoke-interface {v2, p1, p2, p3}, Lcom/facebook/imagepipeline/producers/ProducerListener2;->onUltimateProducerReached(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;Z)V
+    :try_end_14
+    .catch Ljava/lang/Exception; {:try_start_11 .. :try_end_14} :catch_15
+
+    .line 19
+    .line 20
+    .line 21
+    goto :goto_1b
+
+    .line 22
+    :catch_15
+    move-exception v2
+
+    .line 23
+    const-string v3, "InternalListener exception in onProducerFinishWithSuccess"
+
+    .line 24
+    .line 25
+    invoke-direct {p0, v3, v2}, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->onException(Ljava/lang/String;Ljava/lang/Throwable;)V
+
+    .line 26
+    .line 27
+    .line 28
+    :goto_1b
+    add-int/lit8 v1, v1, 0x1
+
+    .line 29
+    .line 30
+    goto :goto_7
+
+    .line 31
+    :cond_1e
+    return-void
+.end method
+
+.method public requiresExtraMap(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;)Z
+    .registers 7
+
+    .line 1
+    iget-object v0, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 2
+    .line 3
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v0
+
+    .line 7
+    const/4 v1, 0x0
+
+    .line 8
+    const/4 v2, 0x0
+
+    .line 9
+    :goto_8
+    if-ge v2, v0, :cond_1d
+
+    .line 10
+    .line 11
+    iget-object v3, p0, Lcom/facebook/imagepipeline/listener/ForwardingRequestListener2;->mRequestListeners:Ljava/util/List;
+
+    .line 12
+    .line 13
+    invoke-interface {v3, v2}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    .line 14
+    .line 15
+    .line 16
+    move-result-object v3
+
+    .line 17
+    check-cast v3, Lcom/facebook/imagepipeline/listener/RequestListener2;
+
+    .line 18
+    .line 19
+    invoke-interface {v3, p1, p2}, Lcom/facebook/imagepipeline/producers/ProducerListener2;->requiresExtraMap(Lcom/facebook/imagepipeline/producers/ProducerContext;Ljava/lang/String;)Z
+
+    .line 20
+    .line 21
+    .line 22
+    move-result v3
+
+    .line 23
+    if-eqz v3, :cond_1a
+
+    .line 24
+    .line 25
+    const/4 p1, 0x1
+
+    .line 26
+    return p1
+
+    .line 27
+    :cond_1a
+    add-int/lit8 v2, v2, 0x1
+
+    .line 28
+    .line 29
+    goto :goto_8
+
+    .line 30
+    :cond_1d
+    return v1
+.end method

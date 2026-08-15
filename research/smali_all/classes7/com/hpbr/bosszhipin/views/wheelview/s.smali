@@ -1,0 +1,28 @@
+.class public final synthetic Lcom/hpbr/bosszhipin/views/wheelview/s;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lcom/hpbr/bosszhipin/views/wheelview/SalaryWheelView2$d;
+
+
+# direct methods
+.method public synthetic constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final generateHighSalary(I)Ljava/util/List;
+    .registers 2
+
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/views/wheelview/SalaryWheelView2$LevelSalary;->c(I)Ljava/util/List;
+
+    move-result-object p1
+
+    return-object p1
+.end method

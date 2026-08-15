@@ -1,0 +1,92 @@
+.class Lso/o$a;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroid/view/View$OnClickListener;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lso/o;->x(Landroid/content/Context;Lcom/hpbr/bosszhipin/module/interview/entity/InterviewCreateIntentBean;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Landroid/content/Context;
+
+
+# direct methods
+.method constructor <init>(Landroid/content/Context;)V
+    .registers 2
+
+    iput-object p1, p0, Lso/o$a;->b:Landroid/content/Context;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onClick(Landroid/view/View;)V
+    .registers 4
+
+    .line 1
+    invoke-static {}, Luk/a;->j()Luk/a;
+
+    .line 2
+    .line 3
+    .line 4
+    move-result-object p1
+
+    .line 5
+    const-string v0, "interview-alert-click"
+
+    .line 6
+    .line 7
+    invoke-virtual {p1, v0}, Luk/a;->a(Ljava/lang/String;)Luk/a;
+
+    .line 8
+    .line 9
+    .line 10
+    move-result-object p1
+
+    .line 11
+    const-string v0, "p"
+
+    .line 12
+    .line 13
+    const-string v1, "2"
+
+    .line 14
+    .line 15
+    invoke-virtual {p1, v0, v1}, Luk/a;->p(Ljava/lang/String;Ljava/lang/String;)Luk/a;
+
+    .line 16
+    .line 17
+    .line 18
+    move-result-object p1
+
+    .line 19
+    invoke-virtual {p1}, Luk/a;->g()V
+
+    .line 20
+    .line 21
+    .line 22
+    iget-object p1, p0, Lso/o$a;->b:Landroid/content/Context;
+
+    .line 23
+    .line 24
+    invoke-static {p1}, Li10/j;->x0(Landroid/content/Context;)V
+
+    .line 25
+    .line 26
+    .line 27
+    return-void
+.end method

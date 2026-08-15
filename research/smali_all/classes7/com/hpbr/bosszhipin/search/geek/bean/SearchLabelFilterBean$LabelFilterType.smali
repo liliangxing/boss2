@@ -1,0 +1,21 @@
+.class public interface abstract annotation Lcom/hpbr/bosszhipin/search/geek/bean/SearchLabelFilterBean$LabelFilterType;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Ljava/lang/annotation/Annotation;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/hpbr/bosszhipin/search/geek/bean/SearchLabelFilterBean;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x2609
+    name = "LabelFilterType"
+.end annotation
+
+
+# static fields
+.field public static final TYPE_LABEL_FILTER:I = 0x2

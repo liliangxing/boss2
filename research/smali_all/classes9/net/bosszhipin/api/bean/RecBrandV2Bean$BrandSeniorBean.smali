@@ -1,0 +1,42 @@
+.class public Lnet/bosszhipin/api/bean/RecBrandV2Bean$BrandSeniorBean;
+.super Lnet/bosszhipin/api/bean/BaseServerBean;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lnet/bosszhipin/api/bean/RecBrandV2Bean;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x9
+    name = "BrandSeniorBean"
+.end annotation
+
+
+# static fields
+.field private static final serialVersionUID:J = -0x1859d4e574131abdL
+
+
+# instance fields
+.field public avatar:Ljava/lang/String;
+
+.field public introduce:Ljava/lang/String;
+
+.field public name:Ljava/lang/String;
+
+.field public securityId:Ljava/lang/String;
+
+.field public seniorId:J
+
+.field public title:Ljava/lang/String;
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Lnet/bosszhipin/api/bean/BaseServerBean;-><init>()V
+
+    return-void
+.end method

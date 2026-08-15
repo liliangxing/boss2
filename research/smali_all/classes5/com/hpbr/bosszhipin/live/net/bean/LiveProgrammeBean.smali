@@ -1,0 +1,31 @@
+.class public Lcom/hpbr/bosszhipin/live/net/bean/LiveProgrammeBean;
+.super Lnet/bosszhipin/api/bean/BaseServerBean;
+.source "SourceFile"
+
+
+# static fields
+.field private static final serialVersionUID:J = 0x6d07b68ab59f29c6L
+
+
+# instance fields
+.field public liveProgrammeChapters:Ljava/util/List;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/List<",
+            "Lcom/hpbr/bosszhipin/live/net/bean/LiveProgrammeChapterBean;",
+            ">;"
+        }
+    .end annotation
+.end field
+
+.field public name:Ljava/lang/String;
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Lnet/bosszhipin/api/bean/BaseServerBean;-><init>()V
+
+    return-void
+.end method

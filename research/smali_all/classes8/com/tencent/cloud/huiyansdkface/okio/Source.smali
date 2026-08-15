@@ -1,0 +1,27 @@
+.class public interface abstract Lcom/tencent/cloud/huiyansdkface/okio/Source;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Ljava/io/Closeable;
+
+
+# virtual methods
+.method public abstract close()V
+    .annotation system Ldalvik/annotation/Throws;
+        value = {
+            Ljava/io/IOException;
+        }
+    .end annotation
+.end method
+
+.method public abstract read(Lcom/tencent/cloud/huiyansdkface/okio/Buffer;J)J
+    .annotation system Ldalvik/annotation/Throws;
+        value = {
+            Ljava/io/IOException;
+        }
+    .end annotation
+.end method
+
+.method public abstract timeout()Lcom/tencent/cloud/huiyansdkface/okio/Timeout;
+.end method

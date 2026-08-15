@@ -1,0 +1,94 @@
+.class Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager$10;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Ljava/lang/Runnable;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;->a(Lcom/mobile/auth/gatewayauth/manager/base/CacheKey;Lcom/mobile/auth/gatewayauth/model/LoginPhoneInfo;Ljava/lang/String;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic a:Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;
+
+
+# direct methods
+.method constructor <init>(Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager$10;->a:Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public run()V
+    .registers 4
+
+    :try_start_0
+    iget-object v0, p0, Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager$10;->a:Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;
+
+    invoke-static {v0}, Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;->g(Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;)Lcom/nirvana/tools/cache/CacheHandler;
+
+    move-result-object v0
+
+    iget-object v1, p0, Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager$10;->a:Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;
+
+    invoke-static {v1}, Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;->f(Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;)Lcom/mobile/auth/gatewayauth/manager/SystemManager;
+
+    move-result-object v1
+
+    iget-object v2, p0, Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager$10;->a:Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;
+
+    invoke-static {v2}, Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;->e(Lcom/mobile/auth/gatewayauth/manager/TokenMaskManager;)Lcom/mobile/auth/gatewayauth/manager/base/Cache;
+
+    move-result-object v2
+
+    invoke-virtual {v2}, Lcom/mobile/auth/gatewayauth/manager/base/Cache;->toJson()Lorg/json/JSONObject;
+
+    move-result-object v2
+
+    invoke-virtual {v2}, Lorg/json/JSONObject;->toString()Ljava/lang/String;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Lcom/mobile/auth/gatewayauth/manager/SystemManager;->encryptContent(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v1
+
+    invoke-virtual {v0, v1}, Lcom/nirvana/tools/cache/CacheHandler;->save(Ljava/lang/String;)Z
+    :try_end_21
+    .catchall {:try_start_0 .. :try_end_21} :catchall_22
+
+    goto :goto_2b
+
+    :catchall_22
+    move-exception v0
+
+    :try_start_23
+    invoke-static {v0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+    :try_end_26
+    .catchall {:try_start_23 .. :try_end_26} :catchall_27
+
+    goto :goto_2b
+
+    :catchall_27
+    move-exception v0
+
+    invoke-static {v0}, Lcom/mobile/auth/gatewayauth/ExceptionProcessor;->processException(Ljava/lang/Throwable;)V
+
+    :goto_2b
+    return-void
+.end method

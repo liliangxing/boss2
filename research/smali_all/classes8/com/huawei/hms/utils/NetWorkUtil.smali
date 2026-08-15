@@ -1,0 +1,174 @@
+.class public abstract Lcom/huawei/hms/utils/NetWorkUtil;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/MemberClasses;
+    value = {
+        Lcom/huawei/hms/utils/NetWorkUtil$NetType;
+    }
+.end annotation
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+.method private static a(Landroid/net/NetworkInfo;)I
+    .registers 3
+
+    if-eqz p0, :cond_34
+
+    .line 3
+    invoke-virtual {p0}, Landroid/net/NetworkInfo;->isConnected()Z
+
+    move-result v0
+
+    if-eqz v0, :cond_34
+
+    .line 4
+    invoke-virtual {p0}, Landroid/net/NetworkInfo;->getType()I
+
+    move-result v0
+
+    const/4 v1, 0x1
+
+    if-ne v0, v1, :cond_10
+
+    goto :goto_35
+
+    .line 5
+    :cond_10
+    invoke-virtual {p0}, Landroid/net/NetworkInfo;->getType()I
+
+    move-result v0
+
+    if-nez v0, :cond_2b
+
+    .line 6
+    invoke-virtual {p0}, Landroid/net/NetworkInfo;->getSubtype()I
+
+    move-result p0
+
+    const/16 v0, 0x14
+
+    if-eq p0, v0, :cond_29
+
+    packed-switch p0, :pswitch_data_36
+
+    const/4 v1, 0x6
+
+    goto :goto_35
+
+    :pswitch_23
+    const/4 v1, 0x4
+
+    goto :goto_35
+
+    :pswitch_25
+    const/4 v1, 0x3
+
+    goto :goto_35
+
+    :pswitch_27
+    const/4 v1, 0x2
+
+    goto :goto_35
+
+    :cond_29
+    const/4 v1, 0x5
+
+    goto :goto_35
+
+    .line 7
+    :cond_2b
+    invoke-virtual {p0}, Landroid/net/NetworkInfo;->getType()I
+
+    move-result p0
+
+    const/16 v1, 0x9
+
+    if-ne v1, p0, :cond_34
+
+    goto :goto_35
+
+    :cond_34
+    const/4 v1, 0x0
+
+    :goto_35
+    return v1
+
+    :pswitch_data_36
+    .packed-switch 0x1
+        :pswitch_27
+        :pswitch_27
+        :pswitch_25
+        :pswitch_27
+        :pswitch_25
+        :pswitch_25
+        :pswitch_25
+        :pswitch_25
+        :pswitch_25
+        :pswitch_25
+        :pswitch_25
+        :pswitch_25
+        :pswitch_23
+        :pswitch_23
+        :pswitch_25
+    .end packed-switch
+.end method
+
+.method private static a(Landroid/content/Context;)Landroid/net/NetworkInfo;
+    .registers 2
+
+    const-string v0, "connectivity"
+
+    .line 1
+    invoke-virtual {p0, v0}, Landroid/content/Context;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+
+    move-result-object p0
+
+    check-cast p0, Landroid/net/ConnectivityManager;
+
+    if-eqz p0, :cond_f
+
+    .line 2
+    invoke-virtual {p0}, Landroid/net/ConnectivityManager;->getActiveNetworkInfo()Landroid/net/NetworkInfo;
+
+    move-result-object p0
+
+    goto :goto_10
+
+    :cond_f
+    const/4 p0, 0x0
+
+    :goto_10
+    return-object p0
+.end method
+
+.method public static getNetworkType(Landroid/content/Context;)I
+    .registers 1
+
+    if-nez p0, :cond_4
+
+    const/4 p0, 0x0
+
+    return p0
+
+    :cond_4
+    invoke-static {p0}, Lcom/huawei/hms/utils/NetWorkUtil;->a(Landroid/content/Context;)Landroid/net/NetworkInfo;
+
+    move-result-object p0
+
+    invoke-static {p0}, Lcom/huawei/hms/utils/NetWorkUtil;->a(Landroid/net/NetworkInfo;)I
+
+    move-result p0
+
+    return p0
+.end method

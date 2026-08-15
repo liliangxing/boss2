@@ -1,0 +1,60 @@
+.class Lcom/xiaomi/mipush/sdk/NotificationClickedActivity$1;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Ljava/lang/Runnable;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/xiaomi/mipush/sdk/NotificationClickedActivity;->onCreate(Landroid/os/Bundle;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic a:Lcom/xiaomi/mipush/sdk/NotificationClickedActivity;
+
+
+# direct methods
+.method constructor <init>(Lcom/xiaomi/mipush/sdk/NotificationClickedActivity;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/xiaomi/mipush/sdk/NotificationClickedActivity$1;->a:Lcom/xiaomi/mipush/sdk/NotificationClickedActivity;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public run()V
+    .registers 2
+
+    .line 1
+    const-string v0, "clicked activity finish by timeout."
+
+    .line 2
+    .line 3
+    invoke-static {v0}, Lcom/xiaomi/channel/commonutils/logger/b;->e(Ljava/lang/String;)V
+
+    .line 4
+    .line 5
+    .line 6
+    iget-object v0, p0, Lcom/xiaomi/mipush/sdk/NotificationClickedActivity$1;->a:Lcom/xiaomi/mipush/sdk/NotificationClickedActivity;
+
+    .line 7
+    .line 8
+    invoke-virtual {v0}, Landroid/app/Activity;->finish()V
+
+    .line 9
+    .line 10
+    .line 11
+    return-void
+.end method

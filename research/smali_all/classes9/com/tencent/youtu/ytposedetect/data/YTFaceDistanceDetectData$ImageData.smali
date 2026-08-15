@@ -1,0 +1,36 @@
+.class public Lcom/tencent/youtu/ytposedetect/data/YTFaceDistanceDetectData$ImageData;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/tencent/youtu/ytposedetect/data/YTFaceDistanceDetectData;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x1
+    name = "ImageData"
+.end annotation
+
+
+# instance fields
+.field public height:I
+
+.field public rgb:[B
+
+.field final synthetic this$0:Lcom/tencent/youtu/ytposedetect/data/YTFaceDistanceDetectData;
+
+.field public width:I
+
+
+# direct methods
+.method public constructor <init>(Lcom/tencent/youtu/ytposedetect/data/YTFaceDistanceDetectData;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/tencent/youtu/ytposedetect/data/YTFaceDistanceDetectData$ImageData;->this$0:Lcom/tencent/youtu/ytposedetect/data/YTFaceDistanceDetectData;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method

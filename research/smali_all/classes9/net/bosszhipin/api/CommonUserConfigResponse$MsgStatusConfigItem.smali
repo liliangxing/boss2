@@ -1,0 +1,38 @@
+.class public Lnet/bosszhipin/api/CommonUserConfigResponse$MsgStatusConfigItem;
+.super Lnet/bosszhipin/api/bean/BaseServerBean;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lnet/bosszhipin/api/CommonUserConfigResponse;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x9
+    name = "MsgStatusConfigItem"
+.end annotation
+
+
+# static fields
+.field private static final serialVersionUID:J = 0x7228b9a668b879a0L
+
+
+# instance fields
+.field public chatDetailDisplay:I
+
+.field public chatListDisplay:I
+
+.field public color:Ljava/lang/String;
+
+.field public text:Ljava/lang/String;
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Lnet/bosszhipin/api/bean/BaseServerBean;-><init>()V
+
+    return-void
+.end method

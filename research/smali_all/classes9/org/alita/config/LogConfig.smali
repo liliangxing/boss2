@@ -1,0 +1,29 @@
+.class public Lorg/alita/config/LogConfig;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# static fields
+.field public static final LOG_LEVEL_DEBUG:I = 0x2
+
+.field public static final LOG_LEVEL_ERROR:I = 0x5
+
+.field public static final LOG_LEVEL_INFO:I = 0x3
+
+.field public static final LOG_LEVEL_NONE:I = 0x6
+
+.field public static final LOG_LEVEL_SENSITIVE:I = 0x0
+
+.field public static final LOG_LEVEL_VERBOSE:I = 0x1
+
+.field public static final LOG_LEVEL_WARNNING:I = 0x4
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method

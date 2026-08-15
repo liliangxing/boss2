@@ -1,0 +1,139 @@
+.class Lbf/c$a;
+.super Landroid/text/style/ClickableSpan;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lbf/c;->I(Z)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Ljava/lang/String;
+
+.field final synthetic c:Lbf/c;
+
+
+# direct methods
+.method constructor <init>(Lbf/c;Ljava/lang/String;)V
+    .registers 3
+
+    iput-object p1, p0, Lbf/c$a;->c:Lbf/c;
+
+    iput-object p2, p0, Lbf/c$a;->b:Ljava/lang/String;
+
+    invoke-direct {p0}, Landroid/text/style/ClickableSpan;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onClick(Landroid/view/View;)V
+    .registers 4
+    .param p1    # Landroid/view/View;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+
+    .line 1
+    iget-object p1, p0, Lbf/c$a;->c:Lbf/c;
+
+    .line 2
+    .line 3
+    invoke-static {p1}, Lbf/c;->c(Lbf/c;)V
+
+    .line 4
+    .line 5
+    .line 6
+    new-instance p1, Lps/k0;
+
+    .line 7
+    .line 8
+    iget-object v0, p0, Lbf/c$a;->c:Lbf/c;
+
+    .line 9
+    .line 10
+    invoke-static {v0}, Lbf/c;->d(Lbf/c;)Landroid/app/Activity;
+
+    .line 11
+    .line 12
+    .line 13
+    move-result-object v0
+
+    .line 14
+    iget-object v1, p0, Lbf/c$a;->b:Ljava/lang/String;
+
+    .line 15
+    .line 16
+    invoke-direct {p1, v0, v1}, Lps/k0;-><init>(Landroid/content/Context;Ljava/lang/String;)V
+
+    .line 17
+    .line 18
+    .line 19
+    invoke-virtual {p1}, Lps/k0;->g()V
+
+    .line 20
+    .line 21
+    .line 22
+    return-void
+.end method
+
+.method public updateDrawState(Landroid/text/TextPaint;)V
+    .registers 4
+    .param p1    # Landroid/text/TextPaint;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+
+    .line 1
+    invoke-super {p0, p1}, Landroid/text/style/ClickableSpan;->updateDrawState(Landroid/text/TextPaint;)V
+
+    .line 2
+    .line 3
+    .line 4
+    iget-object v0, p0, Lbf/c$a;->c:Lbf/c;
+
+    .line 5
+    .line 6
+    invoke-static {v0}, Lbf/c;->d(Lbf/c;)Landroid/app/Activity;
+
+    .line 7
+    .line 8
+    .line 9
+    move-result-object v0
+
+    .line 10
+    sget v1, Lcom/hpbr/bosszhipin/chat/l;->a1:I
+
+    .line 11
+    .line 12
+    invoke-static {v0, v1}, Landroidx/core/content/ContextCompat;->getColor(Landroid/content/Context;I)I
+
+    .line 13
+    .line 14
+    .line 15
+    move-result v0
+
+    .line 16
+    invoke-virtual {p1, v0}, Landroid/graphics/Paint;->setColor(I)V
+
+    .line 17
+    .line 18
+    .line 19
+    const/4 v0, 0x0
+
+    .line 20
+    invoke-virtual {p1, v0}, Landroid/graphics/Paint;->setUnderlineText(Z)V
+
+    .line 21
+    .line 22
+    .line 23
+    return-void
+.end method

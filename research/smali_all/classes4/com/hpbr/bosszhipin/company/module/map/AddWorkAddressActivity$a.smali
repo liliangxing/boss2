@@ -1,0 +1,42 @@
+.class Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity$a;
+.super Lcom/hpbr/bosszhipin/views/x0;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity;->Ue()V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity;
+
+
+# direct methods
+.method constructor <init>(Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity$a;->b:Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity;
+
+    invoke-direct {p0}, Lcom/hpbr/bosszhipin/views/x0;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onNoFastClick(Landroid/view/View;)V
+    .registers 2
+
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity$a;->b:Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity;
+
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity;->Oe(Lcom/hpbr/bosszhipin/company/module/map/AddWorkAddressActivity;)V
+
+    return-void
+.end method

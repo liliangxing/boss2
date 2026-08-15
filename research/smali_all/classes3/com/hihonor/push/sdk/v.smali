@@ -1,0 +1,27 @@
+.class public Lcom/hihonor/push/sdk/v;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# instance fields
+.field public a:Landroid/content/Context;
+
+.field public b:Z
+
+
+# direct methods
+.method public constructor <init>()V
+    .registers 1
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+.method public static synthetic a(Lcom/hihonor/push/sdk/v;Z)Z
+    .registers 2
+
+    iput-boolean p1, p0, Lcom/hihonor/push/sdk/v;->b:Z
+
+    return p1
+.end method

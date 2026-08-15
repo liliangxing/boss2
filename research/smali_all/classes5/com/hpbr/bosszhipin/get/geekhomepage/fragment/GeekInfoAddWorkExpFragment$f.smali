@@ -1,0 +1,222 @@
+.class Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Lpu/a$d;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->ug(Ljava/lang/String;)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+
+# direct methods
+.method constructor <init>(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;)V
+    .registers 2
+
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public a(Lcom/twl/http/error/a;)V
+    .registers 3
+
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->jg(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;)Lcom/hpbr/bosszhipin/views/SearchIconTextMatchList;
+
+    move-result-object p1
+
+    const/16 v0, 0x8
+
+    invoke-virtual {p1, v0}, Landroid/view/View;->setVisibility(I)V
+
+    return-void
+.end method
+
+.method public b(Ljava/util/List;)V
+    .registers 4
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Ljava/util/List<",
+            "Lnet/bosszhipin/api/bean/ServerBrandSuggestBean;",
+            ">;)V"
+        }
+    .end annotation
+
+    .line 1
+    invoke-static {p1}, Lcom/monch/lbase/util/LList;->getCount(Ljava/util/List;)I
+
+    .line 2
+    .line 3
+    .line 4
+    move-result v0
+
+    .line 5
+    const/16 v1, 0x8
+
+    .line 6
+    .line 7
+    if-nez v0, :cond_1c
+
+    .line 8
+    .line 9
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    .line 10
+    .line 11
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->jg(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;)Lcom/hpbr/bosszhipin/views/SearchIconTextMatchList;
+
+    .line 12
+    .line 13
+    .line 14
+    move-result-object p1
+
+    .line 15
+    invoke-virtual {p1, v1}, Landroid/view/View;->setVisibility(I)V
+
+    .line 16
+    .line 17
+    .line 18
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    .line 19
+    .line 20
+    new-instance v0, Ljava/util/ArrayList;
+
+    .line 21
+    .line 22
+    invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+
+    .line 23
+    .line 24
+    .line 25
+    invoke-static {p1, v0}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->ig(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;Ljava/util/List;)V
+
+    .line 26
+    .line 27
+    .line 28
+    goto :goto_4f
+
+    .line 29
+    :cond_1c
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    .line 30
+    .line 31
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->cg(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;)Lcom/twl/ui/form/ZPUIFormInputLayout;
+
+    .line 32
+    .line 33
+    .line 34
+    move-result-object v0
+
+    .line 35
+    invoke-virtual {v0}, Lcom/twl/ui/form/ZPUIFormInputLayout;->getContent()Ljava/lang/String;
+
+    .line 36
+    .line 37
+    .line 38
+    move-result-object v0
+
+    .line 39
+    invoke-static {v0}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+
+    .line 40
+    .line 41
+    .line 42
+    move-result v0
+
+    .line 43
+    if-nez v0, :cond_3c
+
+    .line 44
+    .line 45
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    .line 46
+    .line 47
+    invoke-static {v0, p1}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->ig(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;Ljava/util/List;)V
+
+    .line 48
+    .line 49
+    .line 50
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    .line 51
+    .line 52
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->jg(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;)Lcom/hpbr/bosszhipin/views/SearchIconTextMatchList;
+
+    .line 53
+    .line 54
+    .line 55
+    move-result-object p1
+
+    .line 56
+    const/4 v0, 0x0
+
+    .line 57
+    invoke-virtual {p1, v0}, Landroid/view/View;->setVisibility(I)V
+
+    .line 58
+    .line 59
+    .line 60
+    goto :goto_4f
+
+    .line 61
+    :cond_3c
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    .line 62
+    .line 63
+    new-instance v0, Ljava/util/ArrayList;
+
+    .line 64
+    .line 65
+    invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+
+    .line 66
+    .line 67
+    .line 68
+    invoke-static {p1, v0}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->ig(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;Ljava/util/List;)V
+
+    .line 69
+    .line 70
+    .line 71
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment$f;->a:Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;
+
+    .line 72
+    .line 73
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;->jg(Lcom/hpbr/bosszhipin/get/geekhomepage/fragment/GeekInfoAddWorkExpFragment;)Lcom/hpbr/bosszhipin/views/SearchIconTextMatchList;
+
+    .line 74
+    .line 75
+    .line 76
+    move-result-object p1
+
+    .line 77
+    invoke-virtual {p1, v1}, Landroid/view/View;->setVisibility(I)V
+
+    .line 78
+    .line 79
+    .line 80
+    :goto_4f
+    return-void
+.end method

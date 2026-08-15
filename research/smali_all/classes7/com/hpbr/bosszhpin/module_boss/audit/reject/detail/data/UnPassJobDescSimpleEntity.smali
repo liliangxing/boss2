@@ -1,0 +1,49 @@
+.class public Lcom/hpbr/bosszhpin/module_boss/audit/reject/detail/data/UnPassJobDescSimpleEntity;
+.super Lcom/hpbr/bosszhpin/module_boss/component/position/post/adapter/base/PositionBaseEntity;
+.source "SourceFile"
+
+
+# static fields
+.field private static final serialVersionUID:J = 0x2f631312d4358bd8L
+
+
+# instance fields
+.field public listener:Lac0/b;
+
+.field public postDescription:Lnet/bosszhipin/boss/bean/JobUnPassDetailBean$PostDescriptionBean;
+
+.field public submitBean:Lnet/bosszhipin/boss/bean/JobUnPassSubmitBean;
+
+
+# direct methods
+.method public constructor <init>(Lac0/b;Lnet/bosszhipin/boss/bean/JobUnPassSubmitBean;Lnet/bosszhipin/boss/bean/JobUnPassDetailBean$PostDescriptionBean;)V
+    .registers 5
+    .param p3    # Lnet/bosszhipin/boss/bean/JobUnPassDetailBean$PostDescriptionBean;
+        .annotation build Landroidx/annotation/NonNull;
+        .end annotation
+    .end param
+
+    .line 1
+    const/16 v0, 0xd0
+
+    .line 2
+    .line 3
+    invoke-direct {p0, v0}, Lcom/hpbr/bosszhpin/module_boss/component/position/post/adapter/base/PositionBaseEntity;-><init>(I)V
+
+    .line 4
+    .line 5
+    .line 6
+    iput-object p1, p0, Lcom/hpbr/bosszhpin/module_boss/audit/reject/detail/data/UnPassJobDescSimpleEntity;->listener:Lac0/b;
+
+    .line 7
+    .line 8
+    iput-object p2, p0, Lcom/hpbr/bosszhpin/module_boss/audit/reject/detail/data/UnPassJobDescSimpleEntity;->submitBean:Lnet/bosszhipin/boss/bean/JobUnPassSubmitBean;
+
+    .line 9
+    .line 10
+    iput-object p3, p0, Lcom/hpbr/bosszhpin/module_boss/audit/reject/detail/data/UnPassJobDescSimpleEntity;->postDescription:Lnet/bosszhipin/boss/bean/JobUnPassDetailBean$PostDescriptionBean;
+
+    .line 11
+    .line 12
+    return-void
+.end method

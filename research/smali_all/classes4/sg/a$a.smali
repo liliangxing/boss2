@@ -1,0 +1,55 @@
+.class Lsg/a$a;
+.super Lcom/hpbr/bosszhipin/views/x0;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingMethod;
+    value = Lsg/a;->r(Lcom/hpbr/bosszhipin/recycleview/BaseViewHolder;Lmg/a;I)V
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x0
+    name = null
+.end annotation
+
+
+# instance fields
+.field final synthetic b:Lsg/a;
+
+
+# direct methods
+.method constructor <init>(Lsg/a;)V
+    .registers 2
+
+    iput-object p1, p0, Lsg/a$a;->b:Lsg/a;
+
+    invoke-direct {p0}, Lcom/hpbr/bosszhipin/views/x0;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public onNoFastClick(Landroid/view/View;)V
+    .registers 2
+
+    iget-object p1, p0, Lsg/a$a;->b:Lsg/a;
+
+    invoke-static {p1}, Lsg/a;->q(Lsg/a;)Lcom/hpbr/bosszhipin/chat/single/listener/a;
+
+    move-result-object p1
+
+    if-eqz p1, :cond_11
+
+    iget-object p1, p0, Lsg/a$a;->b:Lsg/a;
+
+    invoke-static {p1}, Lsg/a;->q(Lsg/a;)Lcom/hpbr/bosszhipin/chat/single/listener/a;
+
+    move-result-object p1
+
+    invoke-interface {p1}, Lcom/hpbr/bosszhipin/chat/single/listener/a;->g()V
+
+    :cond_11
+    return-void
+.end method

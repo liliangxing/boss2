@@ -1,0 +1,98 @@
+.class final synthetic Lcom/tencent/liteav/videobase/c/k;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Ljava/lang/Runnable;
+
+
+# instance fields
+.field private final a:Lcom/tencent/liteav/videobase/c/j;
+
+
+# direct methods
+.method private constructor <init>(Lcom/tencent/liteav/videobase/c/j;)V
+    .registers 2
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Lcom/tencent/liteav/videobase/c/k;->a:Lcom/tencent/liteav/videobase/c/j;
+
+    return-void
+.end method
+
+.method public static a(Lcom/tencent/liteav/videobase/c/j;)Ljava/lang/Runnable;
+    .registers 2
+
+    new-instance v0, Lcom/tencent/liteav/videobase/c/k;
+
+    invoke-direct {v0, p0}, Lcom/tencent/liteav/videobase/c/k;-><init>(Lcom/tencent/liteav/videobase/c/j;)V
+
+    return-object v0
+.end method
+
+
+# virtual methods
+.method public final run()V
+    .registers 4
+
+    .line 1
+    iget-object v0, p0, Lcom/tencent/liteav/videobase/c/k;->a:Lcom/tencent/liteav/videobase/c/j;
+
+    .line 2
+    .line 3
+    invoke-virtual {v0}, Lcom/tencent/liteav/videobase/a/b;->getProgramId()I
+
+    .line 4
+    .line 5
+    .line 6
+    move-result v1
+
+    .line 7
+    invoke-static {v1}, Landroid/opengl/GLES20;->glUseProgram(I)V
+
+    .line 8
+    .line 9
+    .line 10
+    iget v1, v0, Lcom/tencent/liteav/videobase/c/j;->a:I
+
+    .line 11
+    .line 12
+    iget-object v2, v0, Lcom/tencent/liteav/videobase/a/b;->mOutputSize:Lcom/tencent/liteav/base/util/Size;
+
+    .line 13
+    .line 14
+    iget v2, v2, Lcom/tencent/liteav/base/util/Size;->width:I
+
+    .line 15
+    .line 16
+    int-to-float v2, v2
+
+    .line 17
+    invoke-static {v1, v2}, Landroid/opengl/GLES20;->glUniform1f(IF)V
+
+    .line 18
+    .line 19
+    .line 20
+    iget v1, v0, Lcom/tencent/liteav/videobase/c/j;->b:I
+
+    .line 21
+    .line 22
+    iget-object v0, v0, Lcom/tencent/liteav/videobase/a/b;->mOutputSize:Lcom/tencent/liteav/base/util/Size;
+
+    .line 23
+    .line 24
+    iget v0, v0, Lcom/tencent/liteav/base/util/Size;->height:I
+
+    .line 25
+    .line 26
+    int-to-float v0, v0
+
+    .line 27
+    invoke-static {v1, v0}, Landroid/opengl/GLES20;->glUniform1f(IF)V
+
+    .line 28
+    .line 29
+    .line 30
+    return-void
+.end method

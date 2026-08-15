@@ -1,0 +1,40 @@
+.class public final synthetic Lxe/e;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+# interfaces
+.implements Landroid/view/View$OnClickListener;
+
+
+# instance fields
+.field public final synthetic b:Lxe/h;
+
+.field public final synthetic c:Lcom/hpbr/bosszhipin/chat/dialog/j4$a;
+
+
+# direct methods
+.method public synthetic constructor <init>(Lxe/h;Lcom/hpbr/bosszhipin/chat/dialog/j4$a;)V
+    .registers 3
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    iput-object p1, p0, Lxe/e;->b:Lxe/h;
+
+    iput-object p2, p0, Lxe/e;->c:Lcom/hpbr/bosszhipin/chat/dialog/j4$a;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final onClick(Landroid/view/View;)V
+    .registers 4
+
+    iget-object v0, p0, Lxe/e;->b:Lxe/h;
+
+    iget-object v1, p0, Lxe/e;->c:Lcom/hpbr/bosszhipin/chat/dialog/j4$a;
+
+    invoke-static {v0, v1, p1}, Lxe/h;->e(Lxe/h;Lcom/hpbr/bosszhipin/chat/dialog/j4$a;Landroid/view/View;)V
+
+    return-void
+.end method
