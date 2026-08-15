@@ -7,7 +7,7 @@
 .annotation system Ldalvik/annotation/Signature;
     value = {
         "Lnet/bosszhipin/base/b<",
-        "Lnet/bosszhipin/api/GeekGetBossResponse;",
+        "Lcom/hpbr/bosszhipin/get/net/request/GetDiscoverIndexResponse;",
         ">;"
     }
 .end annotation

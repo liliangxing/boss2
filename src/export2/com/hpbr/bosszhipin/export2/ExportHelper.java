@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 public class ExportHelper {
 
     private static final String TAG = "ExportHelper";
-    private static final int MAX_JOBS = 1000;
+    private static final int MAX_JOBS = 100;
     private static final int MAX_PAGES = 200;
     private static final long REQUEST_TIMEOUT_MS = 30000L;
 
@@ -233,12 +233,13 @@ public class ExportHelper {
         List<Object> jobs = new ArrayList<Object>();
 
         String url = getApiUrl();
-        int page = 1;
+        int offset = 0;
         boolean hasMore = true;
+        int emptyPages = 0;
 
-        while (hasMore && jobs.size() < MAX_JOBS && page <= MAX_PAGES) {
-            log("request page " + page + " url=" + url + " filter=" + sCurrentFilterCode);
-            PageResult pr = requestPage(url, page);
+        while (hasMore && jobs.size() < MAX_JOBS && offset < MAX_PAGES * 20) {
+            log("request offset=" + offset + " url=" + url);
+            PageResult pr = requestPageWithRetry(url, offset);
             if (pr == null) {
                 if (sPageError != null) {
                     return "\u5BFC\u51FA\u5931\u8D25: " + sPageError;
@@ -253,8 +254,24 @@ public class ExportHelper {
                     jobs.add(o);
                 }
             }
+            offset += pr.feedCount;
             hasMore = pr.hasMore;
-            page++;
+            if (pr.cards.isEmpty()) {
+                emptyPages++;
+                if (emptyPages >= 3) {
+                    log("3 consecutive empty pages, stop");
+                    break;
+                }
+            } else {
+                emptyPages = 0;
+            }
+            if (hasMore) {
+                try {
+                    Thread.sleep(300L);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
 
         if (jobs.isEmpty()) {
@@ -274,19 +291,43 @@ public class ExportHelper {
     private static class PageResult {
         Object resp;
         List<Object> cards = new ArrayList<Object>();
+        int feedCount;
         boolean hasMore;
     }
 
     private static String getApiUrl() throws Exception {
-        Class<?> aClass = Class.forName("com.hpbr.bosszhipin.a");
-        Field w6 = aClass.getField("w6");
-        Object v = w6.get(null);
+        Class<?> hClass = Class.forName("com.hpbr.bosszhipin.get.export.h");
+        Field d2 = hClass.getField("D2");
+        Object v = d2.get(null);
         String url = v == null ? "" : v.toString();
-        log("getApiUrl w6=" + url);
+        log("getApiUrl D2=" + url);
         return url;
     }
 
-    private static PageResult requestPage(String url, int page) throws Exception {
+    private static PageResult requestPageWithRetry(String url, int offset) throws Exception {
+        PageResult pr = null;
+        for (int attempt = 0; attempt < 3; attempt++) {
+            if (attempt > 0) {
+                log("retry attempt " + (attempt + 1) + " for offset=" + offset);
+                try {
+                    Thread.sleep(800L);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            pr = requestPage(url, offset);
+            if (pr != null) {
+                return pr;
+            }
+            if (sPageError != null && sPageError.contains("\u7F51\u7EDC\u5F02\u5E38")) {
+                continue;
+            }
+            break;
+        }
+        return pr;
+    }
+
+    private static PageResult requestPage(String url, int offset) throws Exception {
         sPageDone = false;
         sPageOk = false;
         sPageError = null;
@@ -298,8 +339,7 @@ public class ExportHelper {
         Object req = mGet.invoke(null, url);
 
         Method mAdd = reqClass.getMethod("addParam", String.class, Object.class);
-        mAdd.invoke(req, "page", Integer.valueOf(page));
-        mAdd.invoke(req, "filterCode", sCurrentFilterCode);
+        mAdd.invoke(req, "offset", Integer.valueOf(offset));
 
         Class<?> cbClass = Class.forName("com.hpbr.bosszhipin.export2.ExportCallback");
         Object cb = cbClass.newInstance();
@@ -326,19 +366,19 @@ public class ExportHelper {
         try {
             Class<?> respClass = sPageResponse.getClass();
             log("response class=" + respClass.getName());
-            Field cardListF = respClass.getField("cardList");
-            Object cardList = cardListF.get(sPageResponse);
-            if (cardList instanceof List) {
-                log("cardList size=" + ((List<?>) cardList).size());
-                for (Object item : (List<?>) cardList) {
-                    if (item != null && item.getClass().getName().equals("net.bosszhipin.api.bean.ServerJobCardBean")) {
-                        pr.cards.add(item);
-                    } else {
-                        log("card item type=" + (item == null ? "null" : item.getClass().getName()));
+            Field feedListF = respClass.getField("feedCardList");
+            Object feedList = feedListF.get(sPageResponse);
+            if (feedList instanceof List) {
+                pr.feedCount = ((List<?>) feedList).size();
+                log("feedCardList size=" + pr.feedCount);
+                for (Object item : (List<?>) feedList) {
+                    Object job = extractJobFromFeed(item);
+                    if (job != null) {
+                        pr.cards.add(job);
                     }
                 }
             } else {
-                log("cardList not a List: " + (cardList == null ? "null" : cardList.getClass().getName()));
+                log("feedCardList not a List: " + (feedList == null ? "null" : feedList.getClass().getName()));
             }
             Field hasMoreF = respClass.getField("hasMore");
             pr.hasMore = hasMoreF.getBoolean(sPageResponse);
@@ -348,6 +388,47 @@ public class ExportHelper {
             pr.hasMore = false;
         }
         return pr;
+    }
+
+    /**
+     * 从动态流 GetFeed 卡片中提取职位信息。
+     * 优先级: contentJobInfo > bindJobInfoFeedVO > exposuredJobInfo
+     */
+    private static Object extractJobFromFeed(Object feed) {
+        if (feed == null) {
+            return null;
+        }
+        try {
+            Field contentF = feed.getClass().getField("contentJobInfo");
+            Object content = contentF.get(feed);
+            if (content != null) {
+                log("feed job from contentJobInfo: " + content.getClass().getName());
+                return content;
+            }
+        } catch (Throwable t) {
+            log("extract contentJobInfo error: " + t.getMessage());
+        }
+        try {
+            Field bindF = feed.getClass().getField("bindJobInfoFeedVO");
+            Object bind = bindF.get(feed);
+            if (bind != null) {
+                log("feed job from bindJobInfoFeedVO: " + bind.getClass().getName());
+                return bind;
+            }
+        } catch (Throwable t) {
+            log("extract bindJobInfoFeedVO error: " + t.getMessage());
+        }
+        try {
+            Field expF = feed.getClass().getField("exposuredJobInfo");
+            Object exp = expF.get(feed);
+            if (exp != null) {
+                log("feed job from exposuredJobInfo: " + exp.getClass().getName());
+                return exp;
+            }
+        } catch (Throwable t) {
+            log("extract exposuredJobInfo error: " + t.getMessage());
+        }
+        return null;
     }
 
     /* ============ 回调通知 (ExportCallback 调用) ============ */
@@ -392,7 +473,7 @@ public class ExportHelper {
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(new Date());
 
         Object first = jobs.get(0);
-        String firstTitle = readFieldSafe(first, "jobName", "");
+        String firstTitle = readFieldAny(first, "", "jobName");
 
         sb.append("# \u63A8\u8350\u804C\u4F4D\n\n");
         sb.append("> \u5BFC\u51FA\u65F6\u95F4\uFF1A").append(time).append("  \n");
@@ -403,10 +484,10 @@ public class ExportHelper {
         int idx = 1;
         for (Object job : jobs) {
             sb.append("## ").append(idx).append(". ");
-            String name = readFieldSafe(job, "jobName", "");
-            String salary = readFieldSafe(job, "jobSalary", "");
-            String brand = readFieldSafe(job, "brandName", "");
-            String city = readFieldSafe(job, "cityName", "");
+            String name = readFieldAny(job, "", "jobName");
+            String salary = readFieldAny(job, "", "jobSalary", "salaryDesc", "salary");
+            String brand = readFieldAny(job, "", "brandName", "businessName");
+            String city = readFieldAny(job, "", "cityName", "city", "area");
             sb.append(name);
             if (!salary.isEmpty()) {
                 sb.append(" \u3000(").append(salary).append(")");
@@ -579,10 +660,20 @@ public class ExportHelper {
         }
     }
 
+    private static String readFieldAny(Object o, String def, String... names) {
+        for (String name : names) {
+            String v = readFieldSafe(o, name, null);
+            if (v != null && !v.isEmpty()) {
+                return v;
+            }
+        }
+        return def;
+    }
+
     /* ============ 文件写入 ============ */
 
     private static File writeMarkdownFile(Context ctx, List<Object> jobs, String md) {
-        String firstTitle = readFieldSafe(jobs.get(0), "jobName", "\u804C\u4F4D");
+        String firstTitle = readFieldAny(jobs.get(0), "\u804C\u4F4D", "jobName");
         String baseName = sanitize(firstTitle);
         if (baseName.isEmpty()) {
             baseName = "\u804C\u4F4D\u5217\u8868";
