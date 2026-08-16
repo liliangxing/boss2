@@ -3,6 +3,7 @@ package com.hpbr.bosszhipin.export2;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +69,12 @@ public class ExportHelper {
     private static final Handler sMainHandler = new Handler(Looper.getMainLooper());
 
     private static volatile String sCurrentFilterCode = "";
+
+    private static String sSceneId = "";
+    private static String sSourceText = "";
+    private static String sTopContentId = "";
+    private static String sExtendParams = "";
+    private static Object sViewModel = null;
 
     private static final Object sAttachLock = new Object();
     private static volatile boolean sAttached = false;
@@ -231,35 +240,57 @@ public class ExportHelper {
 
     private static String doExport(Activity activity) throws Exception {
         List<Object> jobs = new ArrayList<Object>();
+        Set<String> seen = new HashSet<String>();
+
+        setupScreenConditions(activity);
+
+        List<Object> screenJobs = collectFromScreen(activity);
+        for (Object j : screenJobs) {
+            String k = jobKey(j);
+            if (k != null) {
+                seen.add(k);
+            }
+            jobs.add(j);
+        }
+        log("screen jobs collected=" + jobs.size());
 
         String url = getApiUrl();
-        int offset = 0;
+        int page = 1;
         boolean hasMore = true;
         int emptyPages = 0;
 
-        while (hasMore && jobs.size() < MAX_JOBS && offset < MAX_PAGES * 20) {
-            log("request offset=" + offset + " url=" + url);
-            PageResult pr = requestPageWithRetry(url, offset);
+        while (hasMore && jobs.size() < MAX_JOBS && page <= MAX_PAGES) {
+            log("request page=" + page + " url=" + url);
+            PageResult pr = requestPageWithRetry(url, page);
             if (pr == null) {
                 if (sPageError != null) {
                     return "\u5BFC\u51FA\u5931\u8D25: " + sPageError;
                 }
                 return "\u5BFC\u51FA\u5931\u8D25: \u8BF7\u6C42\u8D85\u65F6";
             }
+            int added = 0;
             if (pr.resp != null) {
                 for (Object o : pr.cards) {
                     if (jobs.size() >= MAX_JOBS) {
                         break;
                     }
+                    String k = jobKey(o);
+                    if (k != null && seen.contains(k)) {
+                        continue;
+                    }
+                    if (k != null) {
+                        seen.add(k);
+                    }
                     jobs.add(o);
+                    added++;
                 }
             }
-            offset += pr.feedCount;
+            page++;
             hasMore = pr.hasMore;
-            if (pr.cards.isEmpty()) {
+            if (pr.cards.isEmpty() || added == 0) {
                 emptyPages++;
                 if (emptyPages >= 3) {
-                    log("3 consecutive empty pages, stop");
+                    log("3 consecutive no-new pages, stop");
                     break;
                 }
             } else {
@@ -286,6 +317,279 @@ public class ExportHelper {
         return "\u5BFC\u51FA\u6210\u529F: \u5171 " + jobs.size() + " \u6761\n" + saved.getAbsolutePath();
     }
 
+    private static String jobKey(Object job) {
+        if (job == null) {
+            return null;
+        }
+        String e = readFieldSafe(job, "encryptJobId", "");
+        if (!e.isEmpty()) {
+            return "e:" + e;
+        }
+        String j = readFieldSafe(job, "jobId", "");
+        if (!j.isEmpty()) {
+            return "j:" + j;
+        }
+        String n = readFieldSafe(job, "jobName", "");
+        String b = readFieldSafe(job, "brandName", "");
+        return "n:" + n + "|" + b;
+    }
+
+    /* ============ 界面条件与界面数据提取 ============ */
+
+    private static void setupScreenConditions(Activity activity) {
+        try {
+            Intent it = activity.getIntent();
+            if (it == null) {
+                return;
+            }
+            sSceneId = nvl(it.getStringExtra("key_scene_id"));
+            sSourceText = nvl(it.getStringExtra("key_source_text"));
+            sTopContentId = nvl(it.getStringExtra("key_top_content_id"));
+            sExtendParams = nvl(it.getStringExtra("key_extend_params"));
+            log("screen conditions sceneId=" + sSceneId + " source=" + sSourceText
+                    + " topContentId=" + sTopContentId + " extendParams=" + sExtendParams);
+        } catch (Throwable t) {
+            log("setupScreenConditions error: " + t.getMessage());
+        }
+    }
+
+    private static String nvl(String s) {
+        return s == null ? "" : s;
+    }
+
+    /**
+     * 从界面当前已加载的数据列表提取职位，保证与界面显示完全一致。
+     * 反射遍历 fragment 树找到 GetDiscoverFragment -> helper -> adapter items。
+     */
+    private static List<Object> collectFromScreen(Activity activity) {
+        List<Object> jobs = new ArrayList<Object>();
+        try {
+            log("collectFromScreen start, activity=" + activity.getClass().getName());
+            Object fm = null;
+            try {
+                fm = activity.getClass().getMethod("getSupportFragmentManager").invoke(activity);
+            } catch (Throwable t) {
+                log("getSupportFragmentManager error: " + t.getMessage());
+            }
+            if (fm == null) {
+                try {
+                    Class<?> fa = Class.forName("androidx.fragment.app.FragmentActivity");
+                    if (fa.isAssignableFrom(activity.getClass())) {
+                        fm = activity.getClass().getMethod("getSupportFragmentManager").invoke(activity);
+                    }
+                } catch (Throwable t2) {
+                    log("fallback FragmentActivity error: " + t2.getMessage());
+                }
+            }
+            if (fm == null) {
+                log("collectFromScreen: no supportFragmentManager available");
+                return jobs;
+            }
+            dumpFragmentTree(fm, jobs, 0);
+        } catch (Throwable t) {
+            log("collectFromScreen error: " + t.getMessage());
+        }
+        log("collectFromScreen done, total jobs=" + jobs.size());
+        return jobs;
+    }
+
+    private static void dumpFragmentTree(Object fm, List<Object> jobs, int depth) {
+        if (fm == null) {
+            return;
+        }
+        if (depth > 14) {
+            return;
+        }
+        StringBuilder indent = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            indent.append("  ");
+        }
+        try {
+            Method mFragments = fm.getClass().getMethod("getFragments");
+            Object listObj = mFragments.invoke(fm);
+            if (!(listObj instanceof List)) {
+                log(indent + "fm=" + fm.getClass().getName() + " getFragments() not List, type="
+                        + (listObj == null ? "null" : listObj.getClass().getName()));
+                return;
+            }
+            List<?> frags = (List<?>) listObj;
+            log(indent + "fm=" + fm.getClass().getName() + " frags=" + frags.size());
+            for (Object f : frags) {
+                if (f == null) {
+                    log(indent + "  <null fragment>");
+                    continue;
+                }
+                String name = f.getClass().getName();
+                log(indent + "  fragment: " + name);
+                if (name.equals("com.hpbr.bosszhipin.get.GetDiscoverFragment")) {
+                    log(indent + "    >> MATCH GetDiscoverFragment, collecting...");
+                    collectFromDiscoverFragment(f, jobs);
+                }
+                if (name.equals("com.hpbr.bosszhipin.module_geek.component.f1.GeekF1ProListFragment")) {
+                    log(indent + "    >> MATCH GeekF1ProListFragment, collecting...");
+                    collectFromGeekListFragment(f, jobs);
+                }
+                try {
+                    Method mChild = f.getClass().getMethod("getChildFragmentManager");
+                    Object childFm = mChild.invoke(f);
+                    if (childFm != null) {
+                        dumpFragmentTree(childFm, jobs, depth + 1);
+                    }
+                } catch (Throwable t) {
+                    log(indent + "    getChildFragmentManager error: " + t.getMessage());
+                }
+            }
+        } catch (Throwable t) {
+            log(indent + "dumpFragmentTree error: " + t.getMessage());
+        }
+    }
+
+    private static void collectFromDiscoverFragment(Object frag, List<Object> jobs) {
+        try {
+            Field fD = findField(frag.getClass(), "d");
+            if (fD == null) {
+                log("  collect: field d not found in " + frag.getClass().getName());
+                return;
+            }
+            Object helper = fD.get(frag);
+            if (helper == null) {
+                log("  collect: helper(d) is null");
+                return;
+            }
+            log("  collect: helper=" + helper.getClass().getName());
+            Field fE = findField(helper.getClass(), "e");
+            if (fE == null) {
+                log("  collect: field e not found in " + helper.getClass().getName());
+                return;
+            }
+            Object adapter = fE.get(helper);
+            if (adapter == null) {
+                log("  collect: adapter(e) is null");
+                return;
+            }
+            log("  collect: adapter=" + adapter.getClass().getName());
+            Method mGetItems = adapter.getClass().getMethod("getItems");
+            Object itemsObj = mGetItems.invoke(adapter);
+            if (!(itemsObj instanceof List)) {
+                log("  collect: getItems() not List, type="
+                        + (itemsObj == null ? "null" : itemsObj.getClass().getName()));
+                return;
+            }
+            List<?> items = (List<?>) itemsObj;
+            log("screen adapter items=" + items.size());
+            for (Object item : items) {
+                if (item == null) {
+                    continue;
+                }
+                Object feed = null;
+                try {
+                    Method mJ = item.getClass().getMethod("j");
+                    feed = mJ.invoke(item);
+                } catch (Throwable t) {
+                    feed = item;
+                }
+                Object job = extractJobFromFeed(feed);
+                if (job != null) {
+                    jobs.add(job);
+                }
+            }
+            log("screen collected jobs=" + jobs.size());
+        } catch (Throwable t) {
+            log("collectFromDiscoverFragment error: " + t.getMessage());
+        }
+    }
+
+    /**
+     * 从 GeekF1 职位流列表页 (求职 tab) 收集界面数据。
+     * 结构: GeekF1ProListFragment.K -> GeekF1PositionListAdapter(BaseQuickAdapter) -> getData()
+     */
+    private static void collectFromGeekListFragment(Object frag, List<Object> jobs) {
+        try {
+            Field fE = findField(frag.getClass(), "e");
+            if (fE != null) {
+                try {
+                    sViewModel = fE.get(frag);
+                    log("  collect geek: viewModel=" + (sViewModel == null ? "null" : sViewModel.getClass().getName()));
+                } catch (Throwable t) {
+                    log("  collect geek: get viewModel(e) error: " + t.getMessage());
+                }
+            }
+            Field fK = findField(frag.getClass(), "K");
+            if (fK == null) {
+                log("  collect geek: field K not found in " + frag.getClass().getName());
+                return;
+            }
+            Object adapter = fK.get(frag);
+            if (adapter == null) {
+                log("  collect geek: adapter(K) is null");
+                return;
+            }
+            log("  collect geek: adapter=" + adapter.getClass().getName());
+            Method mGetData = adapter.getClass().getMethod("getData");
+            Object listObj = mGetData.invoke(adapter);
+            if (!(listObj instanceof List)) {
+                log("  collect geek: getData() not List, type="
+                        + (listObj == null ? "null" : listObj.getClass().getName()));
+                return;
+            }
+            List<?> items = (List<?>) listObj;
+            log("screen adapter items=" + items.size());
+            for (Object item : items) {
+                if (item == null) {
+                    continue;
+                }
+                Object job = extractGeekItem(item);
+                if (job != null) {
+                    jobs.add(job);
+                }
+            }
+            log("screen collected jobs=" + jobs.size());
+        } catch (Throwable t) {
+            log("collectFromGeekListFragment error: " + t.getMessage());
+        }
+    }
+
+    /**
+     * 从 GeekF1 列表 item 中提取职位对象。
+     * 主要类型是 net.bosszhipin.api.bean.ServerJobCardBean (含 jobName/jobSalary/brandName 等)。
+     */
+    private static Object extractGeekItem(Object item) {
+        String name = item.getClass().getName();
+        if (name.equals("net.bosszhipin.api.bean.ServerJobCardBean")) {
+            log("geek item -> ServerJobCardBean");
+            return item;
+        }
+        try {
+            Field jn = item.getClass().getField("jobName");
+            if (jn != null && jn.get(item) != null) {
+                log("geek item -> " + name + " (has jobName)");
+                return item;
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
+            Object job = extractJobFromFeed(item);
+            if (job != null) {
+                log("geek item -> extracted from feed (" + name + ")");
+                return job;
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
+    private static Field findField(Class<?> clazz, String name) {
+        for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
+            try {
+                Field f = c.getDeclaredField(name);
+                f.setAccessible(true);
+                return f;
+            } catch (Throwable ignored) {
+            }
+        }
+        return null;
+    }
+
     /* ============ 分页请求 ============ */
 
     private static class PageResult {
@@ -296,26 +600,45 @@ public class ExportHelper {
     }
 
     private static String getApiUrl() throws Exception {
-        Class<?> hClass = Class.forName("com.hpbr.bosszhipin.get.export.h");
-        Field d2 = hClass.getField("D2");
-        Object v = d2.get(null);
-        String url = v == null ? "" : v.toString();
-        log("getApiUrl D2=" + url);
+        String url = "";
+        try {
+            Class<?> mClass = Class.forName("com.hpbr.bosszhipin.config.m");
+            Field x0 = mClass.getField("x0");
+            Object v = x0.get(null);
+            if (v != null) {
+                url = v.toString();
+            }
+        } catch (Throwable t) {
+            log("getApiUrl config.m.x0 error: " + t.getMessage());
+        }
+        if (url.isEmpty()) {
+            try {
+                Class<?> mClass = Class.forName("com.hpbr.bosszhipin.config.m");
+                Field d = mClass.getField("D");
+                Object v = d.get(null);
+                if (v != null) {
+                    url = v.toString();
+                }
+            } catch (Throwable t2) {
+                log("getApiUrl config.m.D fallback error: " + t2.getMessage());
+            }
+        }
+        log("getApiUrl joblist=" + url);
         return url;
     }
 
-    private static PageResult requestPageWithRetry(String url, int offset) throws Exception {
+    private static PageResult requestPageWithRetry(String url, int page) throws Exception {
         PageResult pr = null;
         for (int attempt = 0; attempt < 3; attempt++) {
             if (attempt > 0) {
-                log("retry attempt " + (attempt + 1) + " for offset=" + offset);
+                log("retry attempt " + (attempt + 1) + " for page=" + page);
                 try {
                     Thread.sleep(800L);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
             }
-            pr = requestPage(url, offset);
+            pr = requestPage(url, page);
             if (pr != null) {
                 return pr;
             }
@@ -327,25 +650,82 @@ public class ExportHelper {
         return pr;
     }
 
-    private static PageResult requestPage(String url, int offset) throws Exception {
+    private static PageResult requestPage(String url, int page) throws Exception {
         sPageDone = false;
         sPageOk = false;
         sPageError = null;
         sPageResponse = null;
         sLatch = new CountDownLatch(1);
 
-        Class<?> reqClass = Class.forName("net.bosszhipin.base.SimpleApiRequest");
-        Method mGet = reqClass.getMethod("GET", String.class);
-        Object req = mGet.invoke(null, url);
+        Class<?> reqClass = Class.forName("net.bosszhipin.api.GeekF1GetJobListRequest");
+        Object req = reqClass.newInstance();
 
-        Method mAdd = reqClass.getMethod("addParam", String.class, Object.class);
-        mAdd.invoke(req, "offset", Integer.valueOf(offset));
+        Class<?> baseClass = Class.forName("com.twl.http.client.a");
+        Field extraF = baseClass.getField("extra_map");
+        Object extraObj = extraF.get(req);
+        Map<String, Object> extra;
+        if (extraObj instanceof Map) {
+            extra = (Map<String, Object>) extraObj;
+        } else {
+            extra = new HashMap<String, Object>();
+            extraF.set(req, extra);
+        }
+        extra.put("page", String.valueOf(page));
+        extra.put("pageSize", "15");
+        extra.put("sortType", "1");
+        extra.put("expectPosition", "0");
+
+        String encryptExpectId = "";
+        long expectId = 0L;
+        String filterParams = "";
+        if (sViewModel != null) {
+            try {
+                Field fm = sViewModel.getClass().getField("m");
+                expectId = fm.getLong(sViewModel);
+            } catch (Throwable t) {
+                log("vm field m error: " + t.getMessage());
+            }
+            try {
+                Field fn = sViewModel.getClass().getField("n");
+                Object v = fn.get(sViewModel);
+                if (v != null) {
+                    encryptExpectId = v.toString();
+                }
+            } catch (Throwable t) {
+                log("vm field n error: " + t.getMessage());
+            }
+            try {
+                Field fz = sViewModel.getClass().getField("z");
+                Object z = fz.get(sViewModel);
+                if (z != null) {
+                    Method mM = Class.forName("s20.b").getMethod("M", Class.forName("v20.e"));
+                    Object fp = mM.invoke(null, z);
+                    if (fp != null) {
+                        filterParams = fp.toString();
+                    }
+                }
+            } catch (Throwable t) {
+                log("vm filterParams error: " + t.getMessage());
+            }
+        }
+        extra.put("expectId", String.valueOf(expectId));
+        if (encryptExpectId != null && !encryptExpectId.isEmpty()) {
+            extra.put("encryptExpectId", encryptExpectId);
+        }
+        if (filterParams != null && !filterParams.isEmpty()) {
+            extra.put("filterParams", filterParams);
+        }
+        log("request params page=" + page + " pageSize=15 sortType=1 expectId=" + expectId
+                + " encryptExpectId=" + encryptExpectId + " filterParams=" + filterParams);
 
         Class<?> cbClass = Class.forName("com.hpbr.bosszhipin.export2.ExportCallback");
         Object cb = cbClass.newInstance();
 
-        Method mSetCb = reqClass.getMethod("setRequestCallback", Class.forName("net.bosszhipin.base.b"));
-        mSetCb.invoke(req, cb);
+        Field cbF = baseClass.getDeclaredField("mCallback");
+        cbF.setAccessible(true);
+        cbF.set(req, cb);
+        Field reqF = Class.forName("com.twl.http.callback.a").getField("request");
+        reqF.set(cb, req);
 
         Method mExec = reqClass.getMethod("execute");
         mExec.invoke(req);
@@ -366,19 +746,40 @@ public class ExportHelper {
         try {
             Class<?> respClass = sPageResponse.getClass();
             log("response class=" + respClass.getName());
-            Field feedListF = respClass.getField("feedCardList");
-            Object feedList = feedListF.get(sPageResponse);
-            if (feedList instanceof List) {
-                pr.feedCount = ((List<?>) feedList).size();
-                log("feedCardList size=" + pr.feedCount);
-                for (Object item : (List<?>) feedList) {
-                    Object job = extractJobFromFeed(item);
-                    if (job != null) {
-                        pr.cards.add(job);
-                    }
+            Field listF = null;
+            try {
+                listF = respClass.getField("jobList");
+            } catch (Throwable ignored) {
+            }
+            if (listF == null) {
+                try {
+                    listF = respClass.getField("geekList");
+                } catch (Throwable ignored) {
                 }
+            }
+            if (listF == null) {
+                try {
+                    listF = respClass.getField("feedCardList");
+                } catch (Throwable ignored2) {
+                }
+            }
+            if (listF == null) {
+                log("response has no jobList/geekList/feedCardList field");
             } else {
-                log("feedCardList not a List: " + (feedList == null ? "null" : feedList.getClass().getName()));
+                Object listObj = listF.get(sPageResponse);
+                if (listObj instanceof List) {
+                    List<?> list = (List<?>) listObj;
+                    pr.feedCount = list.size();
+                    log("jobList size=" + pr.feedCount);
+                    for (Object item : list) {
+                        Object job = extractGeekItem(item);
+                        if (job != null) {
+                            pr.cards.add(job);
+                        }
+                    }
+                } else {
+                    log("jobList not a List: " + (listObj == null ? "null" : listObj.getClass().getName()));
+                }
             }
             Field hasMoreF = respClass.getField("hasMore");
             pr.hasMore = hasMoreF.getBoolean(sPageResponse);
@@ -388,6 +789,12 @@ public class ExportHelper {
             pr.hasMore = false;
         }
         return pr;
+    }
+
+    private static void addCond(Method mAdd, Object req, String name, String value) throws Exception {
+        if (value != null && !value.isEmpty()) {
+            mAdd.invoke(req, name, value);
+        }
     }
 
     /**
@@ -613,7 +1020,7 @@ public class ExportHelper {
             }
             return "[" + sb + "]";
         }
-        if (depth > 3) {
+        if (depth > 8) {
             return escape(String.valueOf(val));
         }
         if (seen.contains(val)) {

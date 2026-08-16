@@ -34,7 +34,7 @@
         }
     .end annotation
 
-    .line 135
+    .line 144
     iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$down:[F
 
     iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$moved:[Z
@@ -51,7 +51,7 @@
 .method public onTouch(Landroid/view/View;Landroid/view/MotionEvent;)Z
     .registers 10
 
-    .line 138
+    .line 147
     invoke-virtual {p2}, Landroid/view/MotionEvent;->getActionMasked()I
 
     move-result v0
@@ -72,7 +72,7 @@
 
     return v4
 
-    .line 147
+    .line 156
     :cond_f
     invoke-virtual {p2}, Landroid/view/MotionEvent;->getRawX()F
 
@@ -103,7 +103,7 @@
 
     if-gtz v0, :cond_41
 
-    .line 148
+    .line 157
     invoke-virtual {p2}, Landroid/view/MotionEvent;->getRawY()F
 
     move-result v0
@@ -131,13 +131,13 @@
 
     if-lez v0, :cond_45
 
-    .line 149
+    .line 158
     :cond_41
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$moved:[Z
 
     aput-boolean v4, v0, v3
 
-    .line 151
+    .line 160
     :cond_45
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$down:[F
 
@@ -157,7 +157,7 @@
 
     invoke-virtual {p1, v0}, Landroid/view/View;->setX(F)V
 
-    .line 152
+    .line 161
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$down:[F
 
     aget v0, v0, v4
@@ -178,7 +178,7 @@
 
     return v4
 
-    .line 155
+    .line 164
     :cond_68
     iget-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$moved:[Z
 
@@ -186,13 +186,13 @@
 
     if-nez p2, :cond_71
 
-    .line 156
+    .line 165
     invoke-virtual {p1}, Landroid/view/View;->performClick()Z
 
     :cond_71
     return v4
 
-    .line 140
+    .line 149
     :cond_72
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$down:[F
 
@@ -202,7 +202,7 @@
 
     aput v5, v0, v3
 
-    .line 141
+    .line 150
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$down:[F
 
     invoke-virtual {p1}, Landroid/view/View;->getY()F
@@ -211,7 +211,7 @@
 
     aput p1, v0, v4
 
-    .line 142
+    .line 151
     iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$down:[F
 
     invoke-virtual {p2}, Landroid/view/MotionEvent;->getRawX()F
@@ -220,7 +220,7 @@
 
     aput v0, p1, v2
 
-    .line 143
+    .line 152
     iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$down:[F
 
     invoke-virtual {p2}, Landroid/view/MotionEvent;->getRawY()F
@@ -229,7 +229,7 @@
 
     aput p2, p1, v1
 
-    .line 144
+    .line 153
     iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$moved:[Z
 
     aput-boolean v3, p1, v3
