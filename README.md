@@ -707,7 +707,15 @@ grep -i "code.*9\|invalid\|null\|Lack Sig\|参数格式" main.log
 
 ### 2. 如何从 boss2_v5.apk 构建出最新 APK
 
-`boss2_v5.apk` 是基础输入（完整可运行、含全部 native 补丁与 PMS hook），所有后续版本的改动都只涉及**导出功能**相关注入。构建命令:
+**boss2_v5.apk 从哪来?** 仓库不包含任何 APK（`*.apk` 已被 .gitignore 排除）。`boss2_v5.apk` 是构建产物，来源有两种:
+
+1. **自行构建**: 先准备 v1 基础 APK（见上文[前提条件](#前提条件-必读)第 1 节），再运行:
+   ```bash
+   python3 scripts/build.py --input boss2_v1.apk --output boss2_v5.apk
+   ```
+2. **向仓库维护者索取**: 找维护者要一份现成的 `boss2_v5.apk`（完整可运行、含全部 native 补丁与 PMS hook）。
+
+`boss2_v5.apk` 是导出功能的基础输入，所有后续版本的改动都只涉及**导出功能**相关注入。拿到 v5 后，构建命令:
 
 ```bash
 # 准备环境变量（apksigner/zipalign 来自 Android Build Tools r34）
