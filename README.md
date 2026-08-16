@@ -328,7 +328,7 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 在求职者"推荐职位"列表页挂载悬浮"导出"按钮，点击后自动分页拉取全部推荐职位，写入 MediaStore Downloads 目录。
 
-- 按钮注入点: `GeekF1ProListFragment` (classes7) / `GeekJobRecommendFragment` (classes6) / `MainActivity.onCreate` (classes6，兜底)
+- 按钮注入点: `GeekJobRecommendFragment` (classes6) / `MainActivity.onCreate` (classes6，兜底) / `GetDiscoverHomeFragment` (classes7，发现页宿主，含推荐 tab)
 - 新增 DEX: `classes10.dex` (ExportHelper + ExportCallback)
 - 数据源: `GeekF1GetJobListRequest` (`config.m.x0` = `zpgeek/app/geek/recommend/joblist`)
 - 分页: page 递增，pageSize=15，hasMore=false 停止
@@ -365,7 +365,7 @@ Lnet/bosszhipin/base/b<Lnet/bosszhipin/api/GeekF1GetJobListResponse;>;
 ### 实现要点
 
 1. **目标接口**: `GeekF1GetJobListRequest`，参数放 `extra_map` (非 addParam)
-2. **反射读筛选**: GListViewModel 字段 `m`(expectId) / `n`(encryptExpectId) / `z`(filterParams)
+2. **反射读筛选**: 从 Fragment 树匹配 `GeekF1ProListFragment` → 字段 `e` 取 GListViewModel → 字段 `m`(expectId) / `n`(encryptExpectId) / `z`(filterParams)
 3. **同步等待**: CountDownLatch 超时 30s
 4. **响应泛型**: ExportCallback 必须是 `GeekF1GetJobListResponse`（v23 关键修复）
 5. **分页**: page=1..N，hasMore=false 或连续 3 页无新增停止，MAX_JOBS=100
@@ -394,3 +394,4 @@ Lnet/bosszhipin/base/b<Lnet/bosszhipin/api/GeekF1GetJobListResponse;>;
 | `research/smali_all/classes9/.../GeekF1GetJobListRequest.smali` | 请求类 |
 | `research/smali_all/classes9/.../GeekF1GetJobListResponse.smali` | 响应类 (jobList/hasMore) |
 | `research/smali_all/classes7/.../GListViewModel.smali` | 界面 VM (m/n/z 字段) |
+| `research/smali_all/classes7/.../GeekF1ProListFragment.smali` | 职位列表 Fragment (字段 `e` 持有 GListViewModel) |
