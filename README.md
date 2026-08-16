@@ -2,7 +2,7 @@
 
 对 BOSS直聘 APK 进行 native library 补丁和 Smali 代码修改，绕过安全检测和签名验证，使重打包后的 APK 能正常运行。
 
-> **重要**: 先读 [完整构建流程](#完整构建流程从原始-apk-到-v5) 和 [禁止操作](#禁止操作)。
+> **重要**: 先读 [完整构建流程](#完整构建流程从原始-apk-到-v5) 和 [禁止操作](#禁止操作)。构建工具全部在 [GitHub Release v1.0.0-jadx](https://github.com/liliangxing/boss2/releases/tag/v1.0.0-jadx)，见 [工具依赖](#工具依赖)。
 
 ---
 
@@ -135,23 +135,44 @@ unzip -l boss2_v5.apk | grep -c "lib/arm64-v8a/.*\.so"   # 应为 53
 
 ## 工具依赖
 
-| 工具 | 仓库内 | 说明 |
-|------|--------|------|
-| Python 3.8+ | 否 | 系统自带 |
-| Java 8+ | 否 | `apt install default-jre` |
-| baksmali.jar | **是** (`tools/`) | DEX → smali |
-| smali.jar | **是** (`tools/`) | smali → DEX |
-| apksigner | 否 | Android Build Tools r34 |
-| zipalign | 否 | Android Build Tools r34 |
-| debug.keystore | **是** | 签名密钥 |
+### 从 Release 下载（推荐）
+
+所有构建工具已打包在 [GitHub Release v1.0.0-jadx](https://github.com/liliangxing/boss2/releases/tag/v1.0.0-jadx)：
+
+| 资产 | 内容 | 解压/使用 |
+|------|------|-----------|
+| `build-tools-android-14.zip` | Android Build Tools r34（zipalign/apksigner/d8/aapt2） | 解压到 `build-tools/android-14` |
+| `android-34-platform.zip` | android.jar（javac 编译依赖） | 解压到 `platforms/android-34` |
+| `smali-2.5.2.zip` | baksmali.jar + smali.jar | 解压到 `tools/` |
+| `jadx-1.5.6.zip` | JADX 反编译工具（源码分析） | 解压即用，`bin/jadx` |
+
+> `tools/baksmali.jar` / `tools/smali.jar` 仓库内也有，与 release 中 `smali-2.5.2.zip` 一致，二选一即可。
 
 ```bash
-curl -L -o build-tools.zip "https://dl.google.com/android/repository/build-tools_r34-linux.zip"
-unzip build-tools.zip -d build-tools
+# 下载全部工具
+BASE="https://github.com/liliangxing/boss2/releases/download/v1.0.0-jadx"
+curl -L -o build-tools.zip "$BASE/build-tools-android-14.zip"
+curl -L -o android-34-platform.zip "$BASE/android-34-platform.zip"
+curl -L -o smali.zip "$BASE/smali-2.5.2.zip"
+curl -L -o jadx.zip "$BASE/jadx-1.5.6.zip"
+
+# 解压布局
+mkdir -p build-tools platforms
+unzip build-tools.zip -d build-tools          # → build-tools/android-14/
+unzip android-34-platform.zip -d platforms     # → platforms/android-34/
+unzip smali.zip -d tools                        # → tools/baksmali.jar, tools/smali.jar
+
 export PATH="$PWD/build-tools/android-14:$PATH"
 ```
 
-签名密钥: `debug.keystore` / alias `androiddebugkey` / password `android`
+### 环境要求
+
+| 工具 | 安装方式 | 说明 |
+|------|----------|------|
+| Python 3.8+ | 系统自带 | 构建脚本 |
+| Java 8+ (JRE) | `apt install default-jre` | 运行 baksmali/smali/d8 |
+
+签名密钥: `debug.keystore`（仓库内） / alias `androiddebugkey` / password `android`
 
 ---
 
