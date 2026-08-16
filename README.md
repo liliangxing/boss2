@@ -10,30 +10,92 @@
 
 ## 前提条件 (必读)
 
-### 1. 基础 APK (boss2_v1.apk) — 必须自行准备
+### 1. 基础 APK (boss2_v1.apk) — 来源与制作
 
-**本仓库不包含基础 APK 文件** (`.gitignore` 排除了 `*.apk`)。构建脚本需要一个 v1 基础 APK 作为输入。
+#### boss2_v1.apk 是什么
 
-**v1 从哪来?** 两种方式:
+`boss2_v1.apk` 是从 **BOSS直聘官方 APK** 经过重打包和 PMS hook 安装后的中间产物。它不是本仓库生成的，而是在使用 `build.py` 之前必须准备好的输入文件。
+
+**本仓库不包含基础 APK 文件** (`.gitignore` 排除了 `*.apk`)。
+
+#### 原始 APK 信息
+
+| 属性 | 值 |
+|------|-----|
+| 应用 | BOSS直聘 (官方版) |
+| 包名 | `com.hpbr.bosszhipin` |
+| 版本名 | 14.140 |
+| 版本号 | 1414010 |
+| minSdkVersion | 22 |
+| targetSdkVersion | 33 |
+| ABI | arm64-v8a |
+
+原始 APK 可从官方渠道 (应用商店、官网) 获取对应版本。
+
+#### v1 从哪来? 两种方式
 
 1. **向仓库维护者索取**: 找维护者要一份现成的 `boss2_v1.apk`（已重打包 + 已注入 PMS hook）。
-2. **自行制作**: v1 是**手工重打包产物**，仓库不提供制作脚本，只提供参考材料。步骤概述:
-   1. 从官方渠道（应用商店 / APK 下载站）获取**原始 BOSS直聘 APK**（`com.hpbr.bosszhipin`）。
-   2. 解包并修改:
-      - 包名改为 `com.hpbr.bosszhipin2`
-      - 注入 PMS hook: 参考 `smali/com/hpbr/bosszhipin/base/PmsHookHelper.smali` 与 `PmsHookHelper$PmsProxyHandler.smali`（**已含硬编码的原始 BOSS直聘 V1 签名证书** `HEX_CERT` / `HEX_BOSSZHIP`），并在 `App.smali.attachBaseContext` 调用 `PmsHookHelper.hook()`
-   3. **必须使用 zip 级最小化改动**重打包（不要用 apktool 全量反编译重编译——会破坏 `native-code: arm64-v8a` 声明导致"安装包与系统不兼容"，详见"已修复问题汇总"）。
-   4. 保持其余 DEX 不改动（`libyzwg.so` 由本仓库构建时从 `lib/libyzwg_patched.so` 添加）。
+2. **自行制作**: v1 是**手工重打包产物**，仓库不提供制作脚本，只提供参考材料。
 
-v1 基础 APK 的特征:
-- 包名: `com.hpbr.bosszhipin2` (已重打包)
-- 已包含 PMS hook (PmsHookHelper + PmsProxyHandler + App.smali hook 调用)
+#### v1 基础 APK 的特征
+
+v1 是在原始 APK 基础上完成以下修改后的产物:
+- 包名: `com.hpbr.bosszhipin` → `com.hpbr.bosszhipin2` (用于与官方版共存)
+- 已安装 PMS hook (PmsHookHelper + PmsProxyHandler + App.smali hook 调用)
 - **不包含** `libyzwg.so` (构建时从仓库 `lib/` 目录添加)
-- minSdkVersion: 22, targetSdkVersion: 33
-- 版本名: 14.140, 版本号: 1414010
 - 仅包含 `arm64-v8a` 架构的 native 库 (53 个 .so 文件)
 
-如果没有 v1 基础 APK，**无法构建**。请先通过上述两种方式之一获得 v1，再使用本仓库的脚本进行后续补丁。
+#### v1 制作步骤
+
+> **重要警告**: 不要使用 apktool 全量反编译再重编译！apktool 会破坏 `AndroidManifest.xml` 中的 `native-code: arm64-v8a` 声明，导致安装时提示"该安装包与您的系统不兼容"。必须使用 **zip 级最小化改动** 方式重打包。
+
+**推荐方式: 直接操作 ZIP (最小化改动)**
+
+```bash
+# 1. 复制原始 APK
+cp bosszhipin_original.apk boss2_v1_work.apk
+
+# 2. 修改 AndroidManifest.xml 中的包名
+#    使用 axmleditor 或 AndroidManifest 二进制编辑工具:
+#    将 package="com.hpbr.bosszhipin" 改为 package="com.hpbr.bosszhipin2"
+#    注意: 仅改 package 属性，不要改 android:name 中的包名路径
+
+# 3. 将修改后的 AndroidManifest.xml 替换回 APK
+zip -u boss2_v1_work.apk AndroidManifest.xml
+
+# 4. 添加 PMS hook smali 文件到 classes3.dex
+#    方式 A: 反编译仅 classes3.dex → 修改 → 重新编译 classes3.dex
+java -jar tools/baksmali.jar disassemble classes3.dex -o smali_classes3
+#    复制仓库文件:
+#    - smali/com/hpbr/bosszhipin/base/PmsHookHelper.smali
+#      → smali_classes3/com/hpbr/bosszhipin/base/PmsHookHelper.smali
+#    - smali/com/hpbr/bosszhipin/base/PmsHookHelper$PmsProxyHandler.smali
+#      → smali_classes3/com/hpbr/bosszhipin/base/PmsHookHelper$PmsProxyHandler.smali
+#    修改 App.smali 的 attachBaseContext() 添加:
+#    invoke-static {p0}, Lcom/hpbr/bosszhipin/base/PmsHookHelper;->hook(Ljava/lang/Object;)V
+java -jar tools/smali.jar assemble smali_classes3 -o classes3.dex
+
+# 5. 将修改后的 classes3.dex 替换回 APK
+zip -u boss2_v1_work.apk classes3.dex
+
+# 6. 删除旧签名
+zip -d boss2_v1_work.apk "META-INF/*"
+
+# 7. 签名 (使用仓库的 debug.keystore)
+zipalign -f 4 boss2_v1_work.apk boss2_v1_aligned.apk
+apksigner sign \
+  --ks debug.keystore \
+  --ks-pass pass:android \
+  --ks-key-alias androiddebugkey \
+  --key-pass pass:android \
+  --v1-signing-enabled true \
+  --v2-signing-enabled true \
+  --out boss2_v1.apk boss2_v1_aligned.apk
+```
+
+> **注意**: v1 制作阶段**不需要**添加 libyzwg.so、修改 BuildConfig、清除 XLog 密钥或应用安全检测补丁。这些都在 `build.py` 中自动完成。v1 只需要完成包名修改和 PMS hook 安装。
+
+如果没有 v1 基础 APK 且无法自行制作，**无法使用本仓库构建**。
 
 ### 2. 设备要求
 
@@ -193,7 +255,9 @@ python3 scripts/verify.py boss2_v5.apk
 
 ### 基础 APK (v1) 状态
 
-v1 基础 APK 已包含以下修改 (在重打包阶段完成):
+v1 基础 APK 的来源和制作方法见 [前提条件 - 基础 APK (boss2_v1.apk)](#1-基础-apk-boss2_v1apk--来源与制作)。
+
+v1 已包含以下修改 (在重打包阶段完成):
 - 包名改为 `com.hpbr.bosszhipin2`
 - PMS hook 已安装 (PmsHookHelper + PmsProxyHandler + App.smali hook 调用)
 - 缺少 libyzwg.so (需要在构建时添加)
