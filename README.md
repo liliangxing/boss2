@@ -190,7 +190,7 @@ boss2/
 │   └── patch_classes9.py              # classes9 (安全检测 + native 加载器)
 ├── scripts/
 │   ├── build.py                       # v1→v5 构建脚本
-│   ├── build_v6.py                    # v5→v23 (导出功能注入)
+│   ├── build_v6.py                    # v5→v6 (导出功能注入)
 │   ├── build_classes10.sh             # 重建导出 DEX
 │   └── verify.py                      # APK 验证
 ├── src/export2/                       # 导出功能源码
@@ -345,16 +345,33 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v23.apk`。在 v5 基础上注入导出按钮 + 打包签名。
+> 当前最新构建产物 `boss2_v6.apk`。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量长连接发送）+ **Curl 验证**（第16条校验）。打包签名后部署见文末。
 
-### 功能概述
+### 功能清单（v6）
 
-在求职者"推荐职位"列表页挂载悬浮"导出"按钮，点击后自动分页拉取全部推荐职位，写入 MediaStore Downloads 目录。
+1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，共用拖动监听 → 一起滑动。
+2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 同时写 Markdown + TXT 到 MediaStore Downloads。TXT 末尾附 `===== 请求报文 (curl/Bash) =====` 段，含本次导出所有列表/详情请求的完整 curl 命令。
+3. **沟通**: 弹批量对话框选职位 → 反射长连接接口批量发送 → 每个职位 Toast「发送成功/失败: 姓名」。
+4. **Curl 验证**: 默认校验第 16 条职位。收集屏幕列表第 16 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第16条吻合」，否则失败。
 
-- 按钮注入点: `GeekJobRecommendFragment` (classes6) / `MainActivity.onCreate` (classes6，兜底) / `GetDiscoverHomeFragment` (classes7，发现页宿主，含推荐 tab)
-- 新增 DEX: `classes10.dex` (ExportHelper + ExportCallback)
-- 数据源: `GeekF1GetJobListRequest` (`config.m.x0` = `zpgeek/app/geek/recommend/joblist`)
-- 分页: page 递增，pageSize=15，hasMore=false 停止
+### 代码架构（正确路径）
+
+- 全部逻辑集中在 `src/export2/com/hpbr/bosszhipin/export2/ExportHelper.java`，**对 App 类全部反射**（javac bootclasspath 仅 android.jar，不直接依赖 App 类）。
+- 构建管线: `ExportHelper.java` → javac → d8 → baksmali → 合并手写回调 smali → smali.jar assemble → `classes10.dex`（`scripts/build_classes10.sh`）。
+- 手写回调（smali，泛型/签名必须与真实接口一致，写错则响应解析为 null）:
+  - `ExportCallback` 泛型 = `GeekF1GetJobListResponse`（列表）
+  - `ExportDetailCallback` 泛型 = `F1GeekGetJobDetailBatchResponse`（详情）
+  - `ExportChatCallback` 继承 `ChatSendCallback`（发送回调），`onComplete(Z,Object,Object)V` 调 `ExportHelper.reportSendResult(Z,Object,Object)V`
+- 注入点: `GeekJobRecommendFragment` / `MainActivity.onCreate`（classes6 锚点注入 `ExportHelper.attach`）/ `GetDiscoverHomeFragment`（classes7，发现页宿主）。`build_v6.py` 完成注入 + 替换/新增 DEX + zipalign + V1/V2 签名。
+
+### 关键实现路径（每个功能怎么做对）
+
+1. **列表导出**: `buildListRequest(page)` 构造 `GeekF1GetJobListRequest`，参数放 `extra_map`（page/pageSize=15/sortType=1/expectId/encryptExpectId/filterParams）→ `ExportCallback` 用 CountDownLatch 同步等待 → 解析响应 `jobList`/`geekList`/`feedCardList` 字段。分页 page 递增，`hasMore=false` 或连续 3 页无新增停止。
+2. **详情导出**: `new F1GeekGetJobDetailBatchRequest(callback)` → 子请求 `getJobDetailRequest.securityId` + `jobQueryBannerRequest.securityId` = 卡片 `encryptJobId` → `execute()`。回调链上 `mCallback` 在 `com/twl/http/client/a`（请求基类）。
+3. **curl 报文**: `collectCurl(tag, req, note)` 在 execute 前反射生成：URL = `getRequestUrl()` + `hg0/o.l(url, params)`（GET 拼 query）；method = `getMethod().getValue()`；headers = `getHeaders().c()` 遍历 Set 后 `a(key)` 取值（跳过 Cookie）；cookie = `CookieManager.getCookie(host)`；POST 时加 `Content-Type: application/x-www-form-urlencoded` + `--data`（`params.j()`）。收集进 `sCurlList`，TXT/Markdown 末尾输出。
+4. **批量沟通**: `message/handler/c.J`（长连接发送，参数 `(Lmessage/handler/d;Ljava/lang/String;I...;ChatSendCallback;IJ)`）返回非 null 即入队成功。发送结果经 `ExportChatCallback.onComplete` → `reportSendResult`（Toast 成功/失败）。成功时补调 `ContactManager.C(contact,0)` 更新会话记录。
+5. **Curl 验证**: `collectFromScreen(activity)` 反射 Fragment 树收集屏幕列表 → 取第 16 条 ID → `buildListRequest(2)`（第16条在第 2 页，pageSize=15，固定 page=2）→ `HttpURLConnection` 按 curl 报文的 URL+headers+Cookie GET → `body.contains(id)` 判成功。结果日志: `curl verify RESULT: SUCCESS/FAIL`。
+6. **筛选参数反射**: Fragment 树匹配 `GeekF1ProListFragment` → 字段 `e` 取 GListViewModel → 字段 `m`(expectId)/`n`(encryptExpectId)/`z`(filterParams，经 `s20/b.M` 序列化)。
 
 ### 构建
 
@@ -365,7 +382,7 @@ export PATH="$PWD/build-tools/android-14:$PATH"
 bash scripts/build_classes10.sh
 
 # 3. 注入导出功能 + 签名
-python3 scripts/build_v6.py --input boss2_v5.apk --output boss2_v23.apk
+python3 scripts/build_v6.py --input boss2_v5.apk --output boss2_v6.apk
 ```
 
 `build_v6.py` 反编译 classes6/7 → 注入 ExportHelper.attach 调用 → 重编译 → 加入 classes10.dex → zipalign + V1+V2 签名。
@@ -376,45 +393,67 @@ python3 scripts/build_v6.py --input boss2_v5.apk --output boss2_v23.apk
 
 ```
 ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → smali
-  → 合并手写 ExportCallback.smali → smali.jar assemble → classes10.dex
+  → 合并手写 ExportCallback.smali + ExportDetailCallback.smali + ExportChatCallback.smali → smali.jar assemble → classes10.dex
 ```
 
-**关键**: `ExportCallback.smali` 是手写的，泛型必须 = `GeekF1GetJobListResponse`:
-```
-Lnet/bosszhipin/base/b<Lnet/bosszhipin/api/GeekF1GetJobListResponse;>;
-```
-写错泛型 → 响应按错误类型解析 → jobList 恒 null → 分页拿不到数据。
+**关键**: 两个手写回调的泛型必须写对:
+- `ExportCallback` 泛型 = `GeekF1GetJobListResponse`
+- `ExportDetailCallback` 泛型 = `F1GeekGetJobDetailBatchResponse`
+写错泛型 → 响应按错误类型解析 → 数据恒 null。
+
+`parseResponse` 已重写: 先调用 `com.twl.http.callback.b.d(response)` 得到报文 JSON 并 `notifyRawJson`/`notifyDetailRawJson` 回传 ExportHelper，再按原逻辑解析（code/zpData 提取 + Gson + hg0/a 包装）。详情回调链上 `mCallback` 位于 `com/twl/http/client/a`（请求基类），不要在 `com/twl/http/callback/a` 上找它。
 
 ### 实现要点
 
 1. **目标接口**: `GeekF1GetJobListRequest`，参数放 `extra_map` (非 addParam)
 2. **反射读筛选**: 从 Fragment 树匹配 `GeekF1ProListFragment` → 字段 `e` 取 GListViewModel → 字段 `m`(expectId) / `n`(encryptExpectId) / `z`(filterParams)
 3. **同步等待**: CountDownLatch 超时 30s
-4. **响应泛型**: ExportCallback 必须是 `GeekF1GetJobListResponse`（v23 关键修复）
-5. **分页**: page=1..N，hasMore=false 或连续 3 页无新增停止，MAX_JOBS=100
+4. **详情请求**: `new F1GeekGetJobDetailBatchRequest(callback)`（构造即绑定 mCallback/request）→ 设置 `getJobDetailRequest.securityId` + `jobQueryBannerRequest.securityId` = `encryptJobId` → `BaseBatchApiRequest.execute()`
+5. **响应泛型**: ExportCallback = `GeekF1GetJobListResponse`，ExportDetailCallback = `F1GeekGetJobDetailBatchResponse`（v6 关键）
+6. **数量输入框**: 点击导出弹 AlertDialog + EditText，默认 15，1~75 校验，确定后按 count 导出
+7. **双文档输出**: Markdown（人类可读，含 `<details>` 全字段表）+ TXT（完整报文，每职位含列表字段 + 详情字段）
+8. **分页**: page=1..N，hasMore=false 或连续 3 页无新增停止，上限=输入框条数
 
-验证: `adb logcat -s ExportHelper`，正常看到 `request page=1` → `jobList size=15` → `hasMore=true` → ...
+验证: `adb logcat -s ExportHelper`，正常看到 `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `details collected=N/M` → 导出成功路径含 `.md` 与 `.txt` 两个文件。
 
-### 下一步: 导出完整报文 .txt
+### 已知问题与接手方向
 
-把 Markdown 改为完整报文格式:
-```
-===== 第 N 页 =====
-[请求] GET {url}?page=N&pageSize=15&...
-[返回] {原始 JSON}
-```
-- 请求 URL/参数: 从 `ExportHelper.requestPage()` 的 `extra_map` 获取
-- 原始 JSON: 从 `okhttp3.Response.body()` 或 `com/twl/http/callback/e.parseResponse()` 提取
-- 写文件复用 MediaStore 逻辑，改 MIME `text/plain`
+**消息列表看不到新会话**（沟通发送成功但消息页「全部」「仅沟通」均无记录）——这是当前唯一未闭环的问题。
+
+已逆向得到的正确链路（`research/smali_all`）:
+- 消息页 fragment = `chat/contact/fragment/ContactsFragment.smali`，实现 `ContactManager$f`（onContactChange），观察 `ContactManager.S()`（LiveData `a`: `MutableLiveData<List<ContactBean>>`）和 `R()`（LiveData `c`）。
+- 会话列表数据源 = `ContactManager.T()` 返回 `contact/k` 实现（按角色三选一：`contact/f`、`contact/g`、`contact/h`）。
+- 我们目前调用 `ContactManager.C(contact, 0)`：→ `contact/a.k(ContactBean,I)`（更新内存缓存 Map `a` + 调 `M()` 通知 onContactChange 监听器）→ 发 `kk/b` 0x2b5e/0x2b5d handler 消息。**该链路不直接 post LiveData `a`/`c`**，会话列表是否可见取决于 `contact/k` 会话数据源是否含该 contact，以及列表刷新是否触发。
+
+接手排查步骤（按序）:
+1. 先确认 `reportSendResult` 真的执行: `logcat -s ExportHelper` 应看到 `reportSendResult ok=true friend=...` 与 `reportSendResult update contact friendId=...`。若没有，是发送回调链（`handler/d` → 真实回调）未到达 `ExportChatCallback.onComplete`。
+2. 确认 `ContactManager.C` 返回 >0: `C` 第一行 `friendId<=0` 直接 return 0（不发通知）。构造 contact 时 `friendId` 必须 = bossId > 0。
+3. 若 1/2 均正常仍不显示，研究 `contact/k` 实现（`contact/f.smali` 等）的列表加载与 LiveData post 链路，或直接调用 `ContactManager.V()`（节流触发列表刷新）。
+
+### 验证（真机）
+
+`adb logcat -s ExportHelper`:
+- 导出: `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `.md`/`.txt` 写出
+- curl 收集: `collectCurl LIST len=...` / `collectCurl DETAIL len=...`
+- 沟通: `batch send longlink connected=true` → `batch send ok friendId=...` → `notifySendStart` → `reportSendResult ok=...`
+- Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 16 条）
 
 ### 参考文件
 
 | 文件 | 用途 |
 |------|------|
-| `scripts/build_v6.py` | 构建脚本 (锚点 + 注入 + 签名) |
-| `src/export2/.../ExportHelper.java` | 导出全部逻辑 |
-| `src/export2/smali/.../ExportCallback.smali` | 手写回调 (泛型=GeekF1GetJobListResponse) |
-| `research/smali_all/classes9/.../GeekF1GetJobListRequest.smali` | 请求类 |
-| `research/smali_all/classes9/.../GeekF1GetJobListResponse.smali` | 响应类 (jobList/hasMore) |
-| `research/smali_all/classes7/.../GListViewModel.smali` | 界面 VM (m/n/z 字段) |
-| `research/smali_all/classes7/.../GeekF1ProListFragment.smali` | 职位列表 Fragment (字段 `e` 持有 GListViewModel) |
+| `scripts/build_v6.py` | 构建脚本 (锚点注入 + 替换 classes6/7 + 添加 classes10 + 签名) |
+| `scripts/build_classes10.sh` | 重建 classes10.dex (javac → d8 → baksmali → 合并回调 smali → smali) |
+| `src/export2/.../ExportHelper.java` | 全部逻辑: 按钮组/导出/curl 收集/批量沟通/Curl 验证 |
+| `src/export2/smali/.../ExportCallback.smali` | 手写列表回调 (泛型=GeekF1GetJobListResponse, 捕获原始 JSON) |
+| `src/export2/smali/.../ExportDetailCallback.smali` | 手写详情回调 (泛型=F1GeekGetJobDetailBatchResponse, 捕获原始 JSON) |
+| `src/export2/smali/.../ExportChatCallback.smali` | 手写发送回调 (继承 ChatSendCallback, onComplete→reportSendResult) |
+| `research/.../classes9/GeekF1GetJobListRequest.smali` | 列表请求类 |
+| `research/.../classes9/GeekF1GetJobListResponse.smali` | 列表响应类 (jobList/hasMore) |
+| `research/.../classes7/F1GeekGetJobDetailBatchRequest.smali` | 详情批量请求类 (getJobDetailRequest/jobQueryBannerRequest) |
+| `research/.../classes7/GListViewModel.smali` | 界面 VM (m/n/z 字段) |
+| `research/.../classes7/GeekF1ProListFragment.smali` | 职位列表 Fragment (字段 `e` 持有 GListViewModel) |
+| `research/.../classes9/message/handler/c.smali` | 长连接发送入口 (J 方法) / handler/d(ContactBean) |
+| `research/.../classes4/com/hpbr/bosszhipin/data/manager/ContactManager.smali` | 会话记录管理器 (C/M/V 等) |
+| `research/.../classes4/com/hpbr/bosszhipin/data/manager/contact/a.smali` | 联系人缓存 + DB 写 (k 方法) |
+| `research/.../classes4/com/hpbr/bosszhipin/chat/contact/fragment/ContactsFragment.smali` | 消息页 fragment (会话列表观察端) |

@@ -1,4 +1,4 @@
-.class public Lcom/hpbr/bosszhipin/export2/ExportCallback;
+.class public Lcom/hpbr/bosszhipin/export2/ExportDetailCallback;
 .super Lnet/bosszhipin/base/b;
 .source "SourceFile"
 
@@ -7,7 +7,7 @@
 .annotation system Ldalvik/annotation/Signature;
     value = {
         "Lnet/bosszhipin/base/b<",
-        "Lnet/bosszhipin/api/GeekF1GetJobListResponse;",
+        "Lcom/hpbr/bosszhipin/net/response/F1GeekGetJobDetailBatchResponse;",
         ">;"
     }
 .end annotation
@@ -27,7 +27,7 @@
 .method public onSuccess(Lhg0/a;)V
     .registers 2
 
-    invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->notifySuccess(Ljava/lang/Object;)V
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->notifyDetailSuccess(Ljava/lang/Object;)V
 
     return-void
 .end method
@@ -39,7 +39,7 @@
 
     move-result-object v0
 
-    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->notifyFailed(Ljava/lang/String;)V
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->notifyDetailFailed(Ljava/lang/String;)V
 
     return-void
 .end method
@@ -87,7 +87,7 @@
     .line 6
     move-result-object v1
 
-    invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->notifyRawJson(Ljava/lang/String;)V
+    invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->notifyDetailRawJson(Ljava/lang/String;)V
 
     .line 7
     :try_start_6

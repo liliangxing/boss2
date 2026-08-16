@@ -51,10 +51,14 @@ mkdir -p "$DEX_DIR"
 echo "==> [3/5] baksmali 反汇编"
 java -jar "$BAKSMALI_JAR" disassemble "$DEX_BIN" -o "$SMALI_OUT"
 
-echo "==> [4/5] 合并手写 ExportCallback.smali"
+echo "==> [4/5] 合并手写 ExportCallback/ExportDetailCallback.smali"
 mkdir -p "$SMALI_OUT/com/hpbr/bosszhipin/export2"
 cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportCallback.smali \
    "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportCallback.smali"
+cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportDetailCallback.smali \
+   "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportDetailCallback.smali"
+cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportChatCallback.smali \
+   "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportChatCallback.smali"
 
 echo "==> [5/5] smali assemble -> classes10.dex"
 java -jar "$SMALI_JAR" assemble "$SMALI_OUT" -o "$OUT_DEX"
