@@ -842,7 +842,7 @@ Lnet/bosszhipin/base/b<Lnet/bosszhipin/api/GeekF1GetJobListResponse;>;
 - [ ] 导出格式改为完整报文 .txt（请求 URL + 请求参数 + 返回参数）— **下一步待实现**
 
 **接手者从这里开始**:
-1. 直接使用最新分支 `260815-fix-export-bug`（含全部修复与本文档）。
+1. 直接使用最新 `main` 分支（含全部修复与本文档）。
 2. 构建命令见第 2 节（先 `bash scripts/build_classes10.sh` 再 `build_v6.py`）。
 3. 调试手段: `adb logcat -s ExportHelper` 查看请求/响应/提取链路。
 4. 下一个任务: 按第 5 节把 Markdown 导出改为完整报文 .txt。
