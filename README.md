@@ -149,20 +149,22 @@ unzip -l boss2_v5.apk | grep -c "lib/arm64-v8a/.*\.so"   # 应为 53
 > `tools/baksmali.jar` / `tools/smali.jar` 仓库内也有，与 release 中 `smali-2.5.2.zip` 一致，二选一即可。
 
 ```bash
-# 下载全部工具
-BASE="https://github.com/liliangxing/boss2/releases/download/v1.0.0-jadx"
-curl -L -o build-tools.zip "$BASE/build-tools-android-14.zip"
-curl -L -o android-34-platform.zip "$BASE/android-34-platform.zip"
-curl -L -o smali.zip "$BASE/smali-2.5.2.zip"
-curl -L -o jadx.zip "$BASE/jadx-1.5.6.zip"
+# 下载全部工具（仓库为私有，需 gh 认证；curl 匿名会 404）
+mkdir -p downloads && cd downloads
+gh release download v1.0.0-jadx \
+  --pattern "build-tools-android-14.zip" \
+  --pattern "android-34-platform.zip" \
+  --pattern "smali-2.5.2.zip" \
+  --pattern "jadx-1.5.6.zip"
 
 # 解压布局
 mkdir -p build-tools platforms
-unzip build-tools.zip -d build-tools          # → build-tools/android-14/
-unzip android-34-platform.zip -d platforms     # → platforms/android-34/
-unzip smali.zip -d tools                        # → tools/baksmali.jar, tools/smali.jar
+unzip build-tools-android-14.zip -d build-tools   # → build-tools/android-14/
+unzip android-34-platform.zip -d platforms        # → platforms/android-34/
+unzip smali-2.5.2.zip -d tools                     # → tools/baksmali.jar, tools/smali.jar
 
 export PATH="$PWD/build-tools/android-14:$PATH"
+```
 ```
 
 ### 环境要求
