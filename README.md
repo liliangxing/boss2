@@ -74,7 +74,12 @@ boss2/
 │   └── patch_classes9.py              # classes9 补丁 (安全检测 + native 加载器)
 ├── scripts/
 │   ├── build.py                       # 完整构建脚本
+│   ├── build_classes10.sh             # 重建导出 DEX (javac→d8→baksmali→合并回调→smali)
+│   ├── build_v6.py                    # 在 v5 基础上注入导出按钮 + 打包签名
 │   └── verify.py                      # APK 验证脚本
+├── src/export2/                       # 导出功能源码 (见"导出功能交接说明")
+│   ├── com/hpbr/bosszhipin/export2/ExportHelper.java   # 导出主逻辑
+│   └── smali/com/hpbr/bosszhipin/export2/ExportCallback.smali  # 手写回调(泛型=响应类)
 ├── tools/
 │   ├── decode_xlog.py                 # Mars XLog 解码器
 │   ├── baksmali.jar                   # DEX 反编译工具 (已包含)
@@ -685,19 +690,20 @@ grep -i "code.*9\|invalid\|null\|Lack Sig\|参数格式" main.log
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> **本节面向后续接手的开发者。** 当前最新可用的 APK 构建产物为 `boss2_v12.apk`，其功能与 `scripts/build_v6.py` 构建出的产物完全一致（脚本名中的 `v6` 是历史遗留命名，脚本已迭代至 v12 功能）。导出按钮可以正常弹出，**但点击导出后返回"未获取到任何推荐职位数据"**，这是当前待修复的已知 bug。
+> **本节面向后续接手的开发者（含其他 Agent 工具）。** 当前最新构建产物为 `boss2_v23.apk`（在 `boss2_v22.apk` 基础上仅修复响应类型解析）。下文只给出**正确的实现思路**，从 `boss2_v5.apk` 如何一步步改到 v22/v23，以及下一步"导出完整报文 .txt"的方向。
 
 ### 1. 功能概述
 
-在 App 界面挂载一个悬浮"导出"按钮，点击后请求推荐职位接口，将结果写入 Markdown 文件（MediaStore Downloads 目录），并在 Toast 中提示文件路径。
+在求职者"推荐职位"列表页挂载一个悬浮"导出"按钮，点击后**自动分页拉取全部推荐职位**（无需手动下滑），将结果写入文件（MediaStore Downloads 目录），并在 Toast 中提示文件路径。
 
-- 按钮挂载点（**三处冗余注入**，任一命中即可弹出按钮）:
+- 按钮挂载点（三处冗余注入，任一命中即可弹出按钮）:
+  - `GeekF1ProListFragment`（求职职位流）— `classes7.dex`
   - `GeekJobRecommendFragment.initViews` 末尾 — `classes6.dex`
-  - `GetDiscoverHomeFragment` — `classes7.dex`
   - `MainActivity.onCreate` 末尾（兜底）— `classes6.dex`
 - 新增 DEX: `classes10.dex`，包含 `ExportHelper` + `ExportCallback` 两个类。
-- 数据来源: 动态流"推荐"tab 的接口 `com.hpbr.bosszhipin.get.export.h.D2`（值为 `moment/discover/index`），通过反射调用 `net.bosszhipin.base.SimpleApiRequest` 发起 GET 请求，以 `offset` 游标分页拉取（每页约 10 条，最多 100 条），同步等待回调。
-- 响应解析: `GetDiscoverIndexResponse.feedCardList`（`List<GetFeed>`），从每条 GetFeed 提取职位 bean（优先级 `contentJobInfo` > `bindJobInfoFeedVO` > `exposuredJobInfo`）。
+- 数据来源: 求职者职位流接口 `GeekF1GetJobListRequest`（`getUrl()` = `config.m.x0` = `zpgeek/app/geek/recommend/joblist`，注意区分 Boss 端 `m.D`）。
+- 分页: `page` 从 1 递增，`pageSize=15`，`hasMore=false` 时停止（自动循环，不需要界面滚动）。
+- 当前导出格式: Markdown（`buildMarkdown()`），字段读取用反射兼容多种 bean。
 
 ### 2. 如何从 boss2_v5.apk 构建出最新 APK
 
@@ -712,23 +718,24 @@ export ZIPALIGN="$PWD/build-tools/android-14/zipalign"
 # 由 src/export2 源码重建 classes10.dex（见第 3 节）
 # 注意: 脚本默认 ANDROID_JAR=/workspace/android-sdk/android-34/android.jar、D8=/workspace/build-tools/android-14/d8
 #       若路径不存在，用环境变量覆盖，例如:
-#       ANDROID_JAR=/data/user/work/android-sdk/platforms/android-34/android.jar D8=/tmp/bt/android-14/d8 \
+#       ANDROID_JAR=/data/user/work/android-sdk/platforms/android-34/android.jar \
+#       D8=/data/user/work/android-sdk/build-tools/34.0.0/d8 \
 #         bash scripts/build_classes10.sh
-bash scripts/build_classes10.sh   # 或参考第 3 节手动执行 javac/d8/baksmali/smali
+bash scripts/build_classes10.sh
 
-# 构建最新 APK（当前最新 = boss2_v15.apk）
-python3 scripts/build_v6.py --input boss2_v5.apk --output boss2_v15.apk
+# 构建最新 APK（当前最新 = boss2_v23.apk）
+python3 scripts/build_v6.py --input boss2_v5.apk --output boss2_v23.apk
 ```
 
 `build_v6.py` 会完成:
 1. 反编译 `classes6.dex` → 注入 `GeekJobRecommendFragment` + `MainActivity.onCreate` 的 `ExportHelper.attach` 调用
-2. 反编译 `classes7.dex` → 注入 `GetDiscoverHomeFragment` 的 attach 调用
+2. 反编译 `classes7.dex` → 注入 `GeekF1ProListFragment` 的 attach 调用
 3. 重编译 `classes6.dex` / `classes7.dex`
 4. 加入 `classes10.dex`
 5. `zipalign` + V1+V2 签名
 6. 内置验证（V1/V2 签名、ExportHelper 注入、classes10.dex 存在、libyzwg.so 存在）
 
-> **锚点稳定性警告**: `build_v6.py` 中的 `MAIN_ANCHOR` 匹配的是 `MainActivity.onCreate` 末尾（`Ef()V` 调用 + `.line 151/152/153` + `return-void`）。历史上 v9 曾因锚点误匹配到 `onNewIntent`（两者结尾文本相似、`onNewIntent` 只有 2 个寄存器）导致 `VerifyError: register index out of range`。当前锚点已修正为 onCreate 独有文本，**后续修改 anchors 时务必确认 `content.count(ANCHOR) == 1` 且检查 `MainActivity` 中 onCreate 的寄存器数（≥3）**。
+> **锚点稳定性警告**: `build_v6.py` 中的 `MAIN_ANCHOR` 匹配的是 `MainActivity.onCreate` 末尾（`Ef()V` 调用 + `.line 151/152/153` + `return-void`）。历史上曾因锚点误匹配导致 `VerifyError: register index out of range`。**后续修改 anchors 时务必确认 `content.count(ANCHOR) == 1` 且检查 onCreate 的寄存器数（≥3）**。
 
 ### 3. 重建 classes10.dex
 
@@ -752,93 +759,90 @@ smali  (src/export2/dex_build/smali/)
 classes10.dex  (仓库根目录，build_v6.py 使用)
 ```
 
-**注意**: `ExportCallback.smali` 是手写的（`ExportHelper.java` 内通过 `Class.forName("com.hpbr.bosszhipin.export2.ExportCallback")` 反射调用，`setRequestCallback` 需要传入 `net.bosszhipin.base.b` 类型），每次重建后必须从 `src/export2/smali/` 拷贝合并进 `src/export2/dex_build/smali/`，否则回调类缺失。
+**注意**: `ExportCallback.smali` 是手写的，每次重建后必须从 `src/export2/smali/` 拷贝合并进 `src/export2/dex_build/smali/`，否则回调类缺失。反射类名是 `com.hpbr.bosszhipin.export2.ExportCallback`（不要写错包名）。
 
-历史踩坑: v11 曾因反射字符串写错为 `net.bosszhipin.export2.ExportCallback` 导致 `ClassNotFoundException`，当前已是正确的 `com.hpbr.bosszhipin.export2.ExportCallback`。
+### 4. 从 v5 到 v22 的正确实现思路（含 v23 修复）
 
-### 4. 历史 Bug 记录: "未获取到任何推荐职位数据"（已修复，v13-v15）
+本节是核心。所有细节都在 `src/export2/com/hpbr/bosszhipin/export2/ExportHelper.java` + `src/export2/smali/.../ExportCallback.smali`。
 
-> **当前状态: 已修复并真机验证可正常导出**（用户反馈"可以导出来了"）。本节保留完整的根因分析与诊断方法，供后续接手者理解代码演进与排查思路。
+**第一步: 确认目标页面与接口。**
+求职者 App 首页职位流是 `GeekF1ProFragment` → `GeekF1ProListFragment` → 其内部持有 `GListViewModel`（fragment 字段 `e`，private，用 `findField` 遍历 `getDeclaredField` 获取）。该页面真正使用的接口是 `net.bosszhipin.api.GeekF1GetJobListRequest`:
+- `getUrl()` → `config.m.x0`（`zpgeek/app/geek/recommend/joblist`）
+- 请求参数**全部放在基类 `com.twl.http.client.a.extra_map`（`Map<String,Object>`，值会被强转 String 并入 query）**，不能用 addParam。
+- 界面组装参数参照 `s20/b.g(request, paramBean)` 与 `GListViewModel.A0()`: `expectId`、`encryptExpectId`、`filterParams`、`page`、`pageSize=15`、`sortType=1`、`expectPosition=0`。
 
-**原现象**: 按钮正常弹出，点击后 Toast 返回"未获取到任何推荐职位数据"。
+**第二步: 反射读取界面当前筛选条件。**
+从 `GListViewModel` 反射读（字段均为 public）:
+- `m`（long）→ `expectId`
+- `n`（String）→ `encryptExpectId`
+- `z`（`v20/e`）→ 经 `s20/b.M(v20/e)` 静态方法得到 `filterParams`（JSON 字符串）
+- `sortType=1`、`expectPosition=0` 固定
 
-**代码路径** (`ExportHelper.doExport`, `src/export2/com/hpbr/bosszhipin/export2/ExportHelper.java`): 该分支意味着 `requestPage` 返回了非 null（即回调已触发、`sPageOk=true`、`sPageResponse!=null`），但 `pr.cards` 为空列表 —— 响应解析成功但 `cardList` 字段为空或元素类型不匹配。
+**第三步: 发起请求并同步等待回调。**
+- `GeekF1GetJobListRequest` 用无参构造 + 反射，回调用 `com.twl.http.client.a.mCallback`（protected，必须 `getDeclaredField` + `setAccessible`）。
+- 回调对象创建后，把请求对象回填到 `com.twl.http.callback.a.request` 字段。
+- 执行 `execute()`（内部走 `hg0/c.d`），用 `CountDownLatch` 同步等待（超时 30s）。
 
-**诊断日志**（类名 `ExportHelper`, Logcat tag 可直接 `adb logcat -s ExportHelper`）:
+**第四步（v23 关键修复）: 响应类型必须与回调泛型一致。**
+BOSS 网络框架的响应反序列化类型由**回调类的泛型签名**决定: `net.bosszhipin.base.b<T>` → `getGenericSuperclass().getActualTypeArguments()[0]`。`ExportCallback.smali` 的泛型参数必须写成:
+```
+Lnet/bosszhipin/base/b<Lnet/bosszhipin/api/GeekF1GetJobListResponse;>;
+```
+若写成其他响应类（例如动态流 `GetDiscoverIndexResponse`），joblist 的真实 JSON 会按错误类型解析，`jobList` 字段（该类型没有）恒为 null、`hasMore` 恒 true，导致分页循环拿不到任何数据、表现为"需要手动下滑才能导出"。**修改响应类后必须同步改回调泛型**。
 
-| 日志行 | 含义 |
-|--------|------|
-| `getApiUrl D2=<url>` | 请求 URL 来源（`h.D2` = `moment/discover/index`） |
-| `notifySuccess wrapper=<类名> resp=<类名>` | 回调包装与响应类型（`hg0.a` / `GetDiscoverIndexResponse`） |
-| `response class=<类名>` | 反序列化后的响应类 |
-| `feedCardList size=<n>` | 动态流卡片条数（每页约 10） |
-| `feed job from <bean>` | 从 GetFeed 提取到的职位 bean 类型（`bindJobInfoFeedVO` 等） |
-| `hasMore=<bool>` | 是否还有下一页 |
-| `notifyFailed: <msg>` | 请求失败原因 |
+**第五步: 分页循环与解析。**
+- `GeekF1GetJobListResponse` 字段: `jobList`（`List<ServerJobCardBean>`）+ `hasMore`（boolean）。不是 `geekList`/`feedCardList`。
+- 循环: `page=1..N`，每页 15 条，`hasMore=false` 或连续 3 页无新增职位时停止（`MAX_JOBS=100` 上限）。
+- 去重: 用 `encryptJobId`/`jobId`/`jobName+brandName` 做 key。
+- 风控缓解: 请求间隔 300ms、失败重试最多 3 次。
 
-**根因 = 接口不匹配**。用户可见页面是动态流发现页 `GetRevisionDiscoverFragment`（顶部"推荐/附近/最新"三 tab，数据源 `moment/discover/tabInfo`），其中"推荐"tab = `GetDiscoverFragment` → `GetDiscoverHelper` → **`moment/discover/index`**（`h.D2`），响应 `GetDiscoverIndexResponse.feedCardList: List<GetFeed>`。而旧版 `ExportHelper` 请求的是 **`zprelation/geekGetJobRecommend`**（`a.w6`，属于"职位优选"页 `GeekJobRecommendFragment`），与用户所在页面无关，服务端对该上下文返回空 `cardList`。
+**验证**: 真机安装后 `adb logcat -s ExportHelper`，正常应看到 `request page=1` → `jobList size=15` → `hasMore=true` → `request page=2`... 直到 `hasMore=false`。若 `jobList not a List: null`，必是第四步泛型写错。
 
-**修复内容**（`src/export2/com/hpbr/bosszhipin/export2/ExportHelper.java`）:
+### 5. 下一步方向: 导出完整报文 .txt
 
-**v13 — 数据源修复**:
-1. 请求 URL 从 `a.w6` 改为 `h.D2`（`moment/discover/index`）。
-2. 分页参数从 `page` 改为 `offset`（游标，首页 0）。
-3. 响应解析改为 `feedCardList`（`List<GetFeed>`），新增 `extractJobFromFeed()` 从每条 GetFeed 提取职位，优先级: `contentJobInfo`(ContentJobInfoBean) > `bindJobInfoFeedVO`(GetSocialJobBean) > `exposuredJobInfo`(ExposuredJobInfoBean)。
-4. `ExportCallback.smali` 泛型签名从 `GeekGetBossResponse` 改为 `GetDiscoverIndexResponse`。
-5. Markdown 字段读取兼容三种职位 bean 的字段命名（`jobSalary`/`salaryDesc`/`salary`、`brandName`/`businessName`、`cityName`/`city`/`area`），新增 `readFieldAny()`。
+**目标**: 把导出格式从 Markdown 改为"完整报文 .txt"——每条记录包含**请求 URL、请求参数、返回参数**，便于核对接口数据。
 
-**v14 — 风控缓解**（真机首次验证时 `notifyFailed: 网络异常`）:
-1. 请求间增加 800ms 延时，降低触发服务端风控的概率。
-2. `offset` 累加改为按 feed 总数（`PageResult.feedCount`），修正按提取职位数累加导致的跳页/死循环。
-3. 连续 3 页无职位时提前终止。
-4. 网络异常自动重试（最多 3 次，间隔 1.5s），`requestPageWithRetry()`。
+**实现要点**（接手者按此实现）:
+1. 在 `ExportHelper.requestPage()` 中已能拿到完整 URL（`getApiUrl()`）与请求参数（`extra_map` 的内容，即 log 的 `request params ...` 行），把它们序列化为文本。
+2. 响应报文: 在 `ExportCallback.notifySuccess()` 中拿到的是已反序列化的响应对象；要拿**原始 JSON**，可从 `hg0/a`（wrapper）或底层 `okhttp3.Response.body()` 读取（`com/twl/http/callback/e.parseResponse()` 链路里有原始 body，`com/twl/http/callback/b.d()` 可提取）。优先直接抓原始 JSON 文本，保留完整返回结构。
+3. 文件格式建议（每页一节）:
+   ```
+   ===== 第 N 页 =====
+   [请求] GET {url}?page=N&pageSize=15&expectId=...&encryptExpectId=...&filterParams=...
+   [返回] {原始 JSON 响应体，缩进格式化}
+   ```
+4. 写文件复用现有 `writeMarkdownFile()` 的 MediaStore 逻辑，改为写 `.txt`（MIME `text/plain`，文件名如 `职位列表_完整报文_<时间戳>.txt`）。
+5. `MAX_JOBS` 上限若阻碍"全部职位"，按需放开（或保持 100 由用户决定）。
 
-**v15 — 导出上限**（用户需求"不超过 100 条"）:
-1. `MAX_JOBS` 从 1000 降为 100。
-2. 请求间隔 800ms→300ms、重试间隔 1500ms→800ms，导出更快。
-
-**已证伪的假设**:
-- `filterCode` 空/非空最终都被 `lg0/b.w` 剔除，URL 相同，非根因。
-- `h.N4`/`h.C4` 是弹窗接口（`moment/popup/*`），非职位数据源。
-- `i10/k.o3`（`zpjob/recommend/pre/geek/list`）与用户可见页面无关。
-
-**接手者注意**:
-- 若需重新调试数据拉取，Logcat 过滤 `ExportHelper` 即可看到完整请求/响应/提取链路。
-- 若导出中途遇到"网络异常"，先确认是否为服务端风控（连续快速请求），再调整延时与重试参数。
-- 若用户改需求（如导出条数、数据来源 tab），主要修改点在 `MAX_JOBS`、`getApiUrl()`、`requestPage()`、`extractJobFromFeed()`。
-
-### 5. 相关参考文件
+### 6. 相关参考文件
 
 | 文件 | 用途 |
 |------|------|
 | `scripts/build_v6.py` | 构建脚本（锚点 + 注入 + 打包签名），功能 = 最新版 |
-| `src/export2/com/hpbr/bosszhipin/export2/ExportHelper.java` | 导出功能全部逻辑（按钮挂载/请求/解析/Markdown/写文件） |
-| `src/export2/smali/com/hpbr/bosszhipin/export2/ExportCallback.smali` | 手写回调类（需合并进 dex_build/smali） |
+| `src/export2/com/hpbr/bosszhipin/export2/ExportHelper.java` | 导出功能全部逻辑（按钮挂载/请求/解析/写文件） |
+| `src/export2/smali/com/hpbr/bosszhipin/export2/ExportCallback.smali` | 手写回调类（**泛型必须 = GeekF1GetJobListResponse**） |
 | `src/export2/dex_build/smali/` | classes10.dex 反编译产物（重建流程中间态） |
 | `classes10.dex` | 当前已编译的导出 DEX（.gitignore 排除，需自行重建） |
-| `research/smali_all/classes6/com/hpbr/bosszhipin/module/main/activity/MainActivity.smali` | onCreate 锚点参考 |
-| `research/smali_all/classes6/com/hpbr/bosszhipin/module/main/fragment/joblist/GeekJobRecommendFragment.smali` | 原 App 的 zg() 请求方法参考（约 1451 行） |
-| `research/smali_all/classes9/net/bosszhipin/base/SimpleApiRequest.smali` | 请求类（反射调用目标） |
-| `research/smali_all/classes5/com/hpbr/bosszhipin/get/net/request/GetDiscoverIndexRequest.smali` | 目标请求类（getUrl = h.D2 = `moment/discover/index`） |
-| `research/smali_all/classes5/com/hpbr/bosszhipin/get/net/request/GetDiscoverIndexResponse.smali` | 目标响应类（feedCardList / hasMore） |
-| `research/smali_all/classes5/com/hpbr/bosszhipin/get/net/bean/GetFeed.smali` | 动态流卡片（contentJobInfo / bindJobInfoFeedVO / exposuredJobInfo） |
-| `research/smali_all/classes5/com/hpbr/bosszhipin/get/helper/GetDiscoverHelper.smali` | "推荐"tab 原始请求组装参考（R0/T0, offset 游标逻辑） |
-| `research/smali_all/classes5/com/hpbr/bosszhipin/get/export/h.smali` | URL 常量池（D2 = `moment/discover/index`） |
-| `research/smali_all/classes7/com/hpbr/bosszhipin/revision/get/discover/GetRevisionDiscoverFragment.smali` | 三 tab 容器（tabType 映射，Vg 方法） |
-| `research/smali_all/classes9/com/twl/http/callback/e.smali` + `hg0/a.smali` + `hg0/c.smali` | 回调/解析/执行链路 |
-| `research/smali_all/classes9/net/bosszhipin/api/GeekGetBossResponse.smali` | 旧响应类（历史参考，已弃用） |
-| `research/smali_all/classes7/com/hpbr/bosszhipin/revision/get/fragment/GetDiscoverHomeFragment.smali` | 用户可见页（发现页宿主） |
+| `research/smali_all/classes9/net/bosszhipin/api/GeekF1GetJobListRequest.smali` | 请求类（getUrl = config.m.x0，参数走 extra_map） |
+| `research/smali_all/classes9/net/bosszhipin/api/GeekF1GetJobListResponse.smali` | 响应类（jobList / hasMore） |
+| `research/smali_all/classes7/com/hpbr/bosszhipin/module_geek/component/f1/repo/viewmodel/GListViewModel.smali` | 界面 VM（m/n/z 字段 → expectId/encryptExpectId/filterParams） |
+| `research/smali_all/classes7/s20/b.smali` | 请求组装参考（g() 填 extra_map、M(v20/e)→filterParams） |
+| `research/smali_all/classes7/w20/e.smali` | paramBean 子类（d=page，继承 GeekF1ListRequestParamBean） |
+| `research/smali_all/classes4/com/hpbr/bosszhipin/config/m.smali` | URL 常量池（x0 = joblist，C0 = batch，D = Boss 端勿用） |
+| `research/smali_all/classes9/com/twl/http/client/a.smali` | 请求基类（extra_map / mCallback 字段） |
+| `research/smali_all/classes9/com/twl/http/callback/e.smali` | 回调基类（getResponseType 读泛型，parseResponse 拿原始响应） |
+| `research/smali_all/classes9/hg0/a.smali` + `hg0/c.smali` | 回调包装 / 执行链路 |
 
-### 6. 交接清单
+### 7. 交接清单
 
 - [x] 构建路径已验证: `build_v6.py --input boss2_v5.apk` 可产出功能完整的最新 APK
-- [x] 根因已定位: 接口不匹配（用户页 = `moment/discover/index`，旧请求 `geekGetJobRecommend`）
-- [x] v13-v15 代码修复已写入 `src/export2/`（数据源切换 + 风控缓解 + 导出上限 100）
-- [x] 真机回归通过: `feedCardList size=10`、职位正常提取、用户确认"可以导出来了"
-- [x] 最新构建: `boss2_v15.apk`（144,884,927 bytes，ALL PASSED）
+- [x] 数据源正确: `GeekF1GetJobListRequest`（`config.m.x0`），参数从 GListViewModel 反射读取
+- [x] v23 关键修复: `ExportCallback` 泛型 = `GeekF1GetJobListResponse`（否则响应 jobList 恒为 null）
+- [x] 自动分页: page 递增 + hasMore 判断，无需手动下滑
+- [ ] 导出格式改为完整报文 .txt（请求 URL + 请求参数 + 返回参数）— **下一步待实现**
 
 **接手者从这里开始**:
 1. 直接使用最新分支 `260815-fix-export-bug`（含全部修复与本文档）。
 2. 构建命令见第 2 节（先 `bash scripts/build_classes10.sh` 再 `build_v6.py`）。
-3. 调试手段: `adb logcat -s ExportHelper` 查看请求/响应/提取链路；安装包可自行构建或向仓库维护者要最新 APK。
-4. 若需调整导出条数/数据源/字段，见第 4 节"接手者注意"。
+3. 调试手段: `adb logcat -s ExportHelper` 查看请求/响应/提取链路。
+4. 下一个任务: 按第 5 节把 Markdown 导出改为完整报文 .txt。
