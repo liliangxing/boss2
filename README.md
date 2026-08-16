@@ -4,7 +4,123 @@
 
 对 BOSS直聘 APK 进行 native library 补丁和 Smali 代码修改，绕过安全检测和签名验证，使重打包后的 APK 能正常运行。
 
-> **重要**: 本文档面向后续功能开发者。请务必先阅读 [前提条件](#前提条件) 和 [禁止操作](#禁止操作) 章节，避免构建失败或破坏已有补丁。
+> **重要**: 本文档面向后续功能开发者。请务必先阅读 [完整构建流程](#完整构建流程从原始-apk-到-v5) 和 [禁止操作](#禁止操作) 章节，避免构建失败或破坏已有补丁。
+
+---
+
+## 完整构建流程（从原始 APK 到 v5）
+
+本节一次性讲清从原始 BOSS直聘 APK 到 `boss2_v5.apk` 的全部步骤。按顺序执行，不遗漏，不跳步，即可得到正确结果。
+
+### 阶段一: 获取原始 APK
+
+从官方渠道获取 BOSS直聘 APK，确认信息:
+
+| 属性 | 值 |
+|------|-----|
+| 包名 | `com.hpbr.bosszhipin` |
+| 版本名 | 14.140 |
+| 版本号 | 1414010 |
+| 架构 | arm64-v8a |
+
+### 阶段二: 制作 v1 基础 APK
+
+v1 = 原始 APK + 改包名 + PMS hook。v1 是 `build.py` 的输入，仓库不提供。
+
+> **唯一正确方式: zip 级最小化改动。** 不要用 apktool 全量反编译重编译，否则 `AndroidManifest.xml` 中的 `native-code: arm64-v8a` 声明丢失，导致"安装包与系统不兼容"。
+
+```bash
+# --- 环境 ---
+# baksmali.jar / smali.jar 已在仓库 tools/ 目录
+# apksigner / zipalign 需安装 Android Build Tools r34
+export PATH="$PWD/build-tools/android-14:$PATH"
+
+# --- 步骤 1: 复制原始 APK ---
+cp bosszhipin_original.apk boss2_v1_work.apk
+
+# --- 步骤 2: 改包名 ---
+# 用二进制 XML 编辑器修改 AndroidManifest.xml:
+#   package="com.hpbr.bosszhipin" → package="com.hpbr.bosszhipin2"
+# 注意: 只改 package 属性，不动 android:name 中的类路径
+# 将修改后的 AndroidManifest.xml 替换回 APK:
+zip -u boss2_v1_work.apk AndroidManifest.xml
+
+# --- 步骤 3: 注入 PMS hook 到 classes3.dex ---
+# 3a. 从 APK 中提取 classes3.dex
+unzip boss2_v1_work.apk classes3.dex -d work/
+
+# 3b. 反编译 classes3.dex
+java -jar tools/baksmali.jar disassemble work/classes3.dex -o work/smali_classes3
+
+# 3c. 复制 PMS hook 文件 (仓库已提供)
+cp smali/com/hpbr/bosszhipin/base/PmsHookHelper.smali \
+   work/smali_classes3/com/hpbr/bosszhipin/base/PmsHookHelper.smali
+cp smali/com/hpbr/bosszhipin/base/PmsHookHelper\$PmsProxyHandler.smali \
+   work/smali_classes3/com/hpbr/bosszhipin/base/PmsHookHelper\$PmsProxyHandler.smali
+
+# 3d. 在 App.smali 的 attachBaseContext() 中添加 hook 调用
+#    找到 com/hpbr/bosszhipin/base/App.smali 中的 attachBaseContext 方法
+#    在 super.attachBaseContext() 之后插入:
+#      invoke-static {p0}, Lcom/hpbr/bosszhipin/base/PmsHookHelper;->hook(Ljava/lang/Object;)V
+
+# 3e. 重新编译 classes3.dex
+java -jar tools/smali.jar assemble work/smali_classes3 -o work/classes3.dex
+
+# 3f. 替换回 APK
+zip -u boss2_v1_work.apk work/classes3.dex  # 注意路径: classes3.dex 在 APK 根目录
+cd work && zip -u ../boss2_v1_work.apk classes3.dex && cd ..
+
+# --- 步骤 4: 删除旧签名 + 重新签名 ---
+zip -d boss2_v1_work.apk "META-INF/*"
+zipalign -f 4 boss2_v1_work.apk boss2_v1_aligned.apk
+apksigner sign \
+  --ks debug.keystore --ks-pass pass:android \
+  --ks-key-alias androiddebugkey --key-pass pass:android \
+  --v1-signing-enabled true --v2-signing-enabled true \
+  --out boss2_v1.apk boss2_v1_aligned.apk
+```
+
+v1 只需要做到: 改包名 + PMS hook。**不需要**添加 libyzwg.so、修改 BuildConfig、清除 XLog 密钥——这些全部由 `build.py` 自动完成。
+
+### 阶段三: 运行 build.py 生成 v5
+
+```bash
+python3 scripts/build.py --input boss2_v1.apk --output boss2_v5.apk
+```
+
+`build.py` 自动完成 6 项补丁:
+
+| # | 补丁 | 作用 |
+|---|------|------|
+| 1 | classes3: XLog 密钥清除 | 日志可解码 |
+| 2 | classes8: BuildConfig 类名硬编码 | 修复"无效的版本" |
+| 3 | classes9: 安全检测 a() 返回 false | 禁用 Java 层安全检测 |
+| 4 | classes9: YZWG$a 加载 libyzwg.so | API 签名 native 库加载入口 |
+| 5 | libyzwg.so: 3 处二进制补丁 | 签名验证通过 + 阻止 abort/_exit |
+| 6 | V1+V2 签名 | 华为 HMS 需要 V2 签名 |
+
+### 阶段四: 验证
+
+```bash
+python3 scripts/verify.py boss2_v5.apk
+```
+
+10 项检查全部 OK 即正确:
+
+| # | 检查项 | 期望值 |
+|---|--------|--------|
+| 1 | V1 签名 | META-INF/MANIFEST.MF + .RSA 存在 |
+| 2 | V2 签名 | 包含 `APK Sig Block 42` |
+| 3 | libyzwg.so | lib/arm64-v8a/libyzwg.so 存在 |
+| 4 | 比较补丁 | 0x1E9B0 = 0x6B00001F |
+| 5 | abort GOT | 0x441ED8 = 0x0 |
+| 6 | _exit GOT | 0x441EF0 = 0x0 |
+| 7 | BuildConfig | classes8.dex 包含 `com.hpbr.bosszhipin.BuildConfig` |
+| 8 | PMS hook | classes3.dex 包含 PmsHookHelper + FakeSign + signingInfo |
+| 9 | YZWG 加载器 | classes9.dex 包含 SoLoader + yzwg |
+| 10 | XLog 密钥 | classes3.dex 不包含 `bd3949bcb962ffb9` |
+
+> 如果已有现成的 v1 基础 APK (向维护者索取)，直接跳到阶段三即可。
 
 ---
 
