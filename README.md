@@ -14,6 +14,17 @@
 
 **本仓库不包含基础 APK 文件** (`.gitignore` 排除了 `*.apk`)。构建脚本需要一个 v1 基础 APK 作为输入。
 
+**v1 从哪来?** 两种方式:
+
+1. **向仓库维护者索取**: 找维护者要一份现成的 `boss2_v1.apk`（已重打包 + 已注入 PMS hook）。
+2. **自行制作**: v1 是**手工重打包产物**，仓库不提供制作脚本，只提供参考材料。步骤概述:
+   1. 从官方渠道（应用商店 / APK 下载站）获取**原始 BOSS直聘 APK**（`com.hpbr.bosszhipin`）。
+   2. 解包并修改:
+      - 包名改为 `com.hpbr.bosszhipin2`
+      - 注入 PMS hook: 参考 `smali/com/hpbr/bosszhipin/base/PmsHookHelper.smali` 与 `PmsHookHelper$PmsProxyHandler.smali`（**已含硬编码的原始 BOSS直聘 V1 签名证书** `HEX_CERT` / `HEX_BOSSZHIP`），并在 `App.smali.attachBaseContext` 调用 `PmsHookHelper.hook()`
+   3. **必须使用 zip 级最小化改动**重打包（不要用 apktool 全量反编译重编译——会破坏 `native-code: arm64-v8a` 声明导致"安装包与系统不兼容"，详见"已修复问题汇总"）。
+   4. 保持其余 DEX 不改动（`libyzwg.so` 由本仓库构建时从 `lib/libyzwg_patched.so` 添加）。
+
 v1 基础 APK 的特征:
 - 包名: `com.hpbr.bosszhipin2` (已重打包)
 - 已包含 PMS hook (PmsHookHelper + PmsProxyHandler + App.smali hook 调用)
@@ -22,7 +33,7 @@ v1 基础 APK 的特征:
 - 版本名: 14.140, 版本号: 1414010
 - 仅包含 `arm64-v8a` 架构的 native 库 (53 个 .so 文件)
 
-如果没有 v1 基础 APK，**无法构建**。你需要从原始 BOSS直聘 APK 开始，先完成重打包和 PMS hook 安装，再使用本仓库的脚本进行后续补丁。
+如果没有 v1 基础 APK，**无法构建**。请先通过上述两种方式之一获得 v1，再使用本仓库的脚本进行后续补丁。
 
 ### 2. 设备要求
 
