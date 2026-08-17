@@ -345,14 +345,14 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v6.apk`。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量长连接发送）+ **Curl 验证**（第16条校验）。打包签名后部署见文末。
+> 当前最新构建产物 `boss2_v6.apk`。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量长连接发送）+ **Curl 验证**（第1条校验）。打包签名后部署见文末。
 
 ### 功能清单（v6）
 
-1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，共用拖动监听 → 一起滑动。
+1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部加了一条 `dragBar`（44x8dp 圆角白条），**只有拖动条能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不再拦截触摸、可正常点击）。按钮文字 12f、padding 12/5、圆角 16、背景 0xCC000000，btnGroup 水平居中、按钮间距 4dp——整体比上一版更小。
 2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 同时写 Markdown + TXT 到 MediaStore Downloads。TXT 末尾附 `===== 请求报文 (curl/Bash) =====` 段，含本次导出所有列表/详情请求的完整 curl 命令。
-3. **沟通**: 弹批量对话框选职位 → 反射长连接接口批量发送 → 每个职位 Toast「发送成功/失败: 姓名」。
-4. **Curl 验证**: 默认校验第 16 条职位。收集屏幕列表第 16 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第16条吻合」，否则失败。
+3. **沟通**: 弹批量对话框选职位 → 反射长连接接口批量发送 → 每个职位 Toast「发送成功/失败: 姓名」。成功时补调 `ContactManager.C(contact,0)` 更新会话记录，**并调 `ContactManager.V()` 触发列表刷新**（见下方消息列表闭环说明）。
+4. **Curl 验证**: 校验**第 1 条**职位（上一版第 16 条跨页、page 固定 2 导致误判，已改回第一页第一条）。收集屏幕列表第 1 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第1条吻合」，否则失败。
 
 ### 代码架构（正确路径）
 
@@ -369,9 +369,10 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 1. **列表导出**: `buildListRequest(page)` 构造 `GeekF1GetJobListRequest`，参数放 `extra_map`（page/pageSize=15/sortType=1/expectId/encryptExpectId/filterParams）→ `ExportCallback` 用 CountDownLatch 同步等待 → 解析响应 `jobList`/`geekList`/`feedCardList` 字段。分页 page 递增，`hasMore=false` 或连续 3 页无新增停止。
 2. **详情导出**: `new F1GeekGetJobDetailBatchRequest(callback)` → 子请求 `getJobDetailRequest.securityId` + `jobQueryBannerRequest.securityId` = 卡片 `encryptJobId` → `execute()`。回调链上 `mCallback` 在 `com/twl/http/client/a`（请求基类）。
 3. **curl 报文**: `collectCurl(tag, req, note)` 在 execute 前反射生成：URL = `getRequestUrl()` + `hg0/o.l(url, params)`（GET 拼 query）；method = `getMethod().getValue()`；headers = `getHeaders().c()` 遍历 Set 后 `a(key)` 取值（跳过 Cookie）；cookie = `CookieManager.getCookie(host)`；POST 时加 `Content-Type: application/x-www-form-urlencoded` + `--data`（`params.j()`）。收集进 `sCurlList`，TXT/Markdown 末尾输出。
-4. **批量沟通**: `message/handler/c.J`（长连接发送，参数 `(Lmessage/handler/d;Ljava/lang/String;I...;ChatSendCallback;IJ)`）返回非 null 即入队成功。发送结果经 `ExportChatCallback.onComplete` → `reportSendResult`（Toast 成功/失败）。成功时补调 `ContactManager.C(contact,0)` 更新会话记录。
-5. **Curl 验证**: `collectFromScreen(activity)` 反射 Fragment 树收集屏幕列表 → 取第 16 条 ID → `buildListRequest(2)`（第16条在第 2 页，pageSize=15，固定 page=2）→ `HttpURLConnection` 按 curl 报文的 URL+headers+Cookie GET → `body.contains(id)` 判成功。结果日志: `curl verify RESULT: SUCCESS/FAIL`。
+4. **批量沟通**: `message/handler/c.J`（长连接发送，参数 `(Lmessage/handler/d;Ljava/lang/String;I...;ChatSendCallback;IJ)`）返回非 null 即入队成功。发送结果经 `ExportChatCallback.onComplete` → `reportSendResult`（Toast 成功/失败）。成功时补调 `ContactManager.C(contact,0)` 更新会话记录 + `ContactManager.V()` 触发列表刷新。
+5. **Curl 验证**: `collectFromScreen(activity)` 反射 Fragment 树收集屏幕列表 → 取第 1 条 ID → `buildListRequest(1)`（第1条在第一页，固定 page=1）→ `HttpURLConnection` 按 curl 报文的 URL+headers+Cookie GET → `body.contains(id)` 判成功。结果日志: `curl verify RESULT: SUCCESS/FAIL`。
 6. **筛选参数反射**: Fragment 树匹配 `GeekF1ProListFragment` → 字段 `e` 取 GListViewModel → 字段 `m`(expectId)/`n`(encryptExpectId)/`z`(filterParams，经 `s20/b.M` 序列化)。
+7. **详情关键词兜底**: `appendDetailTxt` 在 jobBaseInfo 块后追加 `dumpObjectFields` 全量反射输出（`jobBaseInfo` 全字段、`salaryWelfareInfo` 薪资福利模块、`jobTemplateModule` 职位模板模块；List 输出 `(N) item1 | item2` 最多 50 项，超长截断 600 字符），确保职位详情关键词（如 Java/银行/Mysql/AI）无论如何都能落进导出文件；Markdown 另加「关键词/技能」行（`jobSkillLabelDesc` + `jobSkills` + `jobDescHighlights` + `requiredSkills` 拼接）。
 
 ### 构建
 
@@ -418,25 +419,27 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 
 ### 已知问题与接手方向
 
-**消息列表看不到新会话**（沟通发送成功但消息页「全部」「仅沟通」均无记录）——这是当前唯一未闭环的问题。
+**消息列表看不到新会话** —— 已定位根因并给出修复（`reportSendResult` 成功时调 `ContactManager.V()`），待真机验证。
 
-已逆向得到的正确链路（`research/smali_all`）:
-- 消息页 fragment = `chat/contact/fragment/ContactsFragment.smali`，实现 `ContactManager$f`（onContactChange），观察 `ContactManager.S()`（LiveData `a`: `MutableLiveData<List<ContactBean>>`）和 `R()`（LiveData `c`）。
-- 会话列表数据源 = `ContactManager.T()` 返回 `contact/k` 实现（按角色三选一：`contact/f`、`contact/g`、`contact/h`）。
-- 我们目前调用 `ContactManager.C(contact, 0)`：→ `contact/a.k(ContactBean,I)`（更新内存缓存 Map `a` + 调 `M()` 通知 onContactChange 监听器）→ 发 `kk/b` 0x2b5e/0x2b5d handler 消息。**该链路不直接 post LiveData `a`/`c`**，会话列表是否可见取决于 `contact/k` 会话数据源是否含该 contact，以及列表刷新是否触发。
+逆向得到的完整加载链路（`research/smali_all`）:
+- 消息页 fragment = `chat/contact/fragment/ContactsFragment.smali`，实现 `ContactManager$f`（onContactChange），`observeContacts()` 同时观察三个源: `te/l.S()`（联系人主 LiveData）、`ContactManager.R()`（LiveData `c`）、`ContactManager.S()`（LiveData `a`: `MutableLiveData<List<ContactBean>>`）。
+- **列表刷新入口链**: ContactManager LiveData `a` post → fragment `M` observer（`fragment/i.smali`）→ `Vf` → `zg` → **`onContactChange()` 模板方法** → `J` Runnable（`ContactsFragment$d.run`，150ms 延迟，检查登录/连接状态）→ **`refreshAdapter(boolean)`** → 从 `te/l.x().r(groupType)` 的 `te/c.d` 重建 adapter 数据。
+- **数据源链**: `te/l`（`te/` 根包，F2ContactClassifyHelper）单例持有分类列表 `te/c`；`refreshGroup`（`te/l.W(List)`）从 `dx/a.r().j()` 全量联系人缓存取数 → `l()` 处理 → `T()` 分类 → `U()` 写 `te/c.d` → post LiveData。
+- **根因**: 我们此前只调 `ContactManager.C(contact,0)`（→ `contact/a.k` 更新内存 Map + `M()` 通知 `onContactChange(ContactBean)`，后者**只把 friendId 加入 fragment 的 `B` 集合，不触发刷新**）。真正触发刷新的只有 LiveData `a` 的 post，而 `C` 不 post 任何 LiveData。
+- **修复**: `ContactManager.V()` 是公开方法 = `refreshContacts`（日志 `refreshContacts %b`），节流调度 `k` Runnable（`data/manager/c`）→ 内部 `H()` 执行: post LiveData `c`（contact/b）+ post LiveData `a`（contact/b 缓存列表 + `dx/a` 全量列表）+ `X(List)` → `dx/a.h(List)` 写缓存。LiveData `a` post 后即走上面的刷新入口链。已加到 `reportSendResult` 成功分支（日志 `reportSendResult trigger refreshContacts V() ok`）。
 
-接手排查步骤（按序）:
-1. 先确认 `reportSendResult` 真的执行: `logcat -s ExportHelper` 应看到 `reportSendResult ok=true friend=...` 与 `reportSendResult update contact friendId=...`。若没有，是发送回调链（`handler/d` → 真实回调）未到达 `ExportChatCallback.onComplete`。
-2. 确认 `ContactManager.C` 返回 >0: `C` 第一行 `friendId<=0` 直接 return 0（不发通知）。构造 contact 时 `friendId` 必须 = bossId > 0。
-3. 若 1/2 均正常仍不显示，研究 `contact/k` 实现（`contact/f.smali` 等）的列表加载与 LiveData post 链路，或直接调用 `ContactManager.V()`（节流触发列表刷新）。
+验证要点（真机 `adb logcat -s ExportHelper`）:
+1. `reportSendResult ok=true friend=...` + `reportSendResult update contact friendId=...` + `reportSendResult trigger refreshContacts V() ok`。
+2. 若无 V() 日志，说明 `ContactManager.C` 抛异常（检查 contact 构造，`friendId` 必须 = bossId > 0）。
+3. 若 V() 正常仍不显示，再检查 `te/l` 的 `refreshGroup` 是否把新 contact 纳入 `te/c.d`（新会话需在 `dx/a` 全量缓存/DB 中存在）。
 
 ### 验证（真机）
 
 `adb logcat -s ExportHelper`:
 - 导出: `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `.md`/`.txt` 写出
 - curl 收集: `collectCurl LIST len=...` / `collectCurl DETAIL len=...`
-- 沟通: `batch send longlink connected=true` → `batch send ok friendId=...` → `notifySendStart` → `reportSendResult ok=...`
-- Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 16 条）
+- 沟通: `batch send longlink connected=true` → `batch send ok friendId=...` → `notifySendStart` → `reportSendResult ok=...` → `reportSendResult trigger refreshContacts V() ok`
+- Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 1 条）
 
 ### 参考文件
 

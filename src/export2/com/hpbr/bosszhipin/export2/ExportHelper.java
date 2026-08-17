@@ -119,15 +119,15 @@ public class ExportHelper {
             final TextView btn = new TextView(activity);
             btn.setText("\u5BFC\u51FA");
             btn.setTextColor(Color.WHITE);
-            btn.setTextSize(14f);
+            btn.setTextSize(12f);
             btn.setGravity(Gravity.CENTER);
-            btn.setPadding(dp(activity, 16), dp(activity, 8), dp(activity, 16), dp(activity, 8));
+            btn.setPadding(dp(activity, 12), dp(activity, 5), dp(activity, 12), dp(activity, 5));
 
             GradientDrawable bg = new GradientDrawable();
-            bg.setColor(0xE6000000);
-            bg.setCornerRadius(dp(activity, 20));
+            bg.setColor(0xCC000000);
+            bg.setCornerRadius(dp(activity, 16));
             btn.setBackground(bg);
-            btn.setElevation(dp(activity, 4));
+            btn.setElevation(dp(activity, 3));
             if (Build.VERSION.SDK_INT >= 21) {
                 btn.setZ(100f);
             }
@@ -135,11 +135,11 @@ public class ExportHelper {
             final TextView chatBtn = new TextView(activity);
             chatBtn.setText("\u6C9F\u901A");
             chatBtn.setTextColor(Color.WHITE);
-            chatBtn.setTextSize(14f);
+            chatBtn.setTextSize(12f);
             chatBtn.setGravity(Gravity.CENTER);
-            chatBtn.setPadding(dp(activity, 16), dp(activity, 8), dp(activity, 16), dp(activity, 8));
+            chatBtn.setPadding(dp(activity, 12), dp(activity, 5), dp(activity, 12), dp(activity, 5));
             chatBtn.setBackground(bg);
-            chatBtn.setElevation(dp(activity, 4));
+            chatBtn.setElevation(dp(activity, 3));
             if (Build.VERSION.SDK_INT >= 21) {
                 chatBtn.setZ(100f);
             }
@@ -147,26 +147,39 @@ public class ExportHelper {
             final TextView curlBtn = new TextView(activity);
             curlBtn.setText("Curl");
             curlBtn.setTextColor(Color.WHITE);
-            curlBtn.setTextSize(14f);
+            curlBtn.setTextSize(12f);
             curlBtn.setGravity(Gravity.CENTER);
-            curlBtn.setPadding(dp(activity, 16), dp(activity, 8), dp(activity, 16), dp(activity, 8));
+            curlBtn.setPadding(dp(activity, 12), dp(activity, 5), dp(activity, 12), dp(activity, 5));
             curlBtn.setBackground(bg);
-            curlBtn.setElevation(dp(activity, 4));
+            curlBtn.setElevation(dp(activity, 3));
             if (Build.VERSION.SDK_INT >= 21) {
                 curlBtn.setZ(100f);
             }
 
+            View dragBar = new View(activity);
+            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 44), dp(activity, 8));
+            dbp.setMargins(0, 0, 0, dp(activity, 4));
+            dragBar.setLayoutParams(dbp);
+            GradientDrawable dbg = new GradientDrawable();
+            dbg.setColor(0x99FFFFFF);
+            dbg.setCornerRadius(dp(activity, 4));
+            dragBar.setBackground(dbg);
+
             LinearLayout btnGroup = new LinearLayout(activity);
             btnGroup.setOrientation(LinearLayout.VERTICAL);
-            btnGroup.setGravity(Gravity.END);
+            btnGroup.setGravity(Gravity.CENTER_HORIZONTAL);
             LinearLayout.LayoutParams gb1 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb1.setMargins(0, 0, 0, dp(activity, 6));
-            btnGroup.addView(chatBtn, gb1);
+            gb1.setMargins(0, 0, 0, dp(activity, 4));
+            btnGroup.addView(dragBar, gb1);
             LinearLayout.LayoutParams gb2 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb2.setMargins(0, 0, 0, dp(activity, 6));
-            btnGroup.addView(btn, gb2);
+            gb2.setMargins(0, 0, 0, dp(activity, 4));
+            btnGroup.addView(chatBtn, gb2);
+            LinearLayout.LayoutParams gb3 = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            gb3.setMargins(0, 0, 0, dp(activity, 4));
+            btnGroup.addView(btn, gb3);
             btnGroup.addView(curlBtn, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -208,13 +221,13 @@ public class ExportHelper {
 
             final float[] down = new float[4];
             final boolean[] moved = new boolean[1];
-            btnGroup.setOnTouchListener(new View.OnTouchListener() {
+            dragBar.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getActionMasked()) {
                         case MotionEvent.ACTION_DOWN:
-                            down[0] = v.getX();
-                            down[1] = v.getY();
+                            down[0] = btnGroup.getX();
+                            down[1] = btnGroup.getY();
                             down[2] = event.getRawX();
                             down[3] = event.getRawY();
                             moved[0] = false;
@@ -224,13 +237,11 @@ public class ExportHelper {
                                     || Math.abs(event.getRawY() - down[3]) > dp(activity, 3)) {
                                 moved[0] = true;
                             }
-                            v.setX(down[0] + (event.getRawX() - down[2]));
-                            v.setY(down[1] + (event.getRawY() - down[3]));
+                            btnGroup.setX(down[0] + (event.getRawX() - down[2]));
+                            btnGroup.setY(down[1] + (event.getRawY() - down[3]));
                             return true;
                         case MotionEvent.ACTION_UP:
-                            if (!moved[0]) {
-                                v.performClick();
-                            }
+                        case MotionEvent.ACTION_CANCEL:
                             return true;
                         default:
                             return true;
@@ -1481,12 +1492,11 @@ public class ExportHelper {
             public void run() {
                 try {
                     List<Object> jobs = collectFromScreen(activity);
-                    if (jobs == null || jobs.size() < 16) {
-                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u5F53\u524D\u5217\u8868\u4E0D\u8DB316\u6761(\u5171"
-                                + (jobs == null ? 0 : jobs.size()) + "\u6761)");
+                    if (jobs == null || jobs.size() < 1) {
+                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u5F53\u524D\u5217\u8868\u4E3A\u7A7A");
                         return;
                     }
-                    Object target = jobs.get(15);
+                    Object target = jobs.get(0);
                     String id = readFieldSafe(target, "encryptJobId", "");
                     String key = "encryptJobId";
                     if (id.isEmpty()) {
@@ -1494,10 +1504,10 @@ public class ExportHelper {
                         key = "jobId";
                     }
                     if (id.isEmpty()) {
-                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u7B2C16\u6761\u65E0\u6709\u6548ID");
+                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u7B2C1\u6761\u65E0\u6709\u6548ID");
                         return;
                     }
-                    Object req = buildListRequest(2);
+                    Object req = buildListRequest(1);
                     String fullUrl = buildFullUrl(req);
                     if (fullUrl == null || fullUrl.isEmpty()) {
                         toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u65E0\u6CD5\u6784\u9020\u8BF7\u6C42URL");
@@ -1513,10 +1523,10 @@ public class ExportHelper {
                     log("curl verify: key=" + key + " id=" + id + " respLen=" + body.length());
                     if (body.contains(id)) {
                         log("curl verify RESULT: SUCCESS key=" + key + " id=" + id);
-                        toastMain(activity, "Curl\u9A8C\u8BC1\u6210\u529F: \u8FD4\u56DE\u6570\u636E\u4E0E\u7B2C16\u6761\u543B\u5408");
+                        toastMain(activity, "Curl\u9A8C\u8BC1\u6210\u529F: \u8FD4\u56DE\u6570\u636E\u4E0E\u7B2C1\u6761\u543B\u5408");
                     } else {
                         log("curl verify RESULT: FAIL key=" + key + " id=" + id);
-                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u8FD4\u56DE\u6570\u636E\u672A\u5305\u542B\u7B2C16\u6761[" + key + "]=" + id);
+                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u8FD4\u56DE\u6570\u636E\u672A\u5305\u542B\u7B2C1\u6761[" + key + "]=" + id);
                     }
                 } catch (Throwable t) {
                     log("verifyCurl error: " + t.getMessage());
@@ -1746,6 +1756,12 @@ public class ExportHelper {
                             if (cm != null) {
                                 cm.getClass().getMethod("C", contact.getClass(), int.class).invoke(cm, contact, 0);
                                 log("reportSendResult update contact friendId=" + friendId);
+                                try {
+                                    cm.getClass().getMethod("V").invoke(cm);
+                                    log("reportSendResult trigger refreshContacts V() ok");
+                                } catch (Throwable tv) {
+                                    log("reportSendResult refreshContacts V() error: " + tv.getMessage());
+                                }
                             }
                         } catch (Throwable t) {
                             log("reportSendResult ContactManager.C error: " + t.getMessage());
@@ -2178,6 +2194,18 @@ public class ExportHelper {
             sb.append("jobSkills=").append(readFieldSafe(jobBase, "jobSkills", "")).append("\n");
             sb.append("distanceDesc=").append(readFieldSafe(jobBase, "distanceDesc", "")).append("\n");
             sb.append("jobValidStatus=").append(readFieldSafe(jobBase, "jobValidStatus", "")).append("\n");
+            sb.append("[jobBaseInfo \u5168\u5B57\u6BB5]\n");
+            dumpObjectFields(sb, jobBase, "  ");
+            Object sw = readFieldSafeObject(jobBase, "salaryWelfareInfo");
+            if (sw != null) {
+                sb.append("[\u85AA\u8D44\u798F\u5229\u6A21\u5757]\n");
+                dumpObjectFields(sb, sw, "  ");
+            }
+            Object tm = readFieldSafeObject(jobBase, "jobTemplateModule");
+            if (tm != null) {
+                sb.append("[\u804C\u4F4D\u6A21\u677F\u6A21\u5757]\n");
+                dumpObjectFields(sb, tm, "  ");
+            }
         }
 
         Object brand = readFieldSafeObject(resp, "brandComInfo");
@@ -2227,6 +2255,11 @@ public class ExportHelper {
             sb.append("| \u5730\u5740 | ").append(escape(readFieldSafe(jobBase, "address", ""))).append(" |\n");
             sb.append("| \u53D1\u5E03\u65F6\u95F4 | ").append(escape(readFieldSafe(jobBase, "jobPubTimeDesc", ""))).append(" |\n");
             sb.append("| \u804C\u4F4D\u63CF\u8FF0 | ").append(escape(readFieldSafe(jobBase, "jobDesc", ""))).append(" |\n");
+            String kw = readFieldSafe(jobBase, "jobSkillLabelDesc", "");
+            String sk = readFieldSafe(jobBase, "jobSkills", "");
+            String hi = readFieldSafe(jobBase, "jobDescHighlights", "");
+            String rq = readFieldSafe(jobBase, "requiredSkills", "");
+            sb.append("| \u5173\u952E\u8BCD/\u6280\u80FD | ").append(escape(kw + " " + sk + " " + hi + " " + rq)).append(" |\n");
         }
 
         Object brand = readFieldSafeObject(resp, "brandComInfo");
@@ -2235,6 +2268,44 @@ public class ExportHelper {
             sb.append("| \u884C\u4E1A | ").append(escape(readFieldSafe(brand, "industryName", ""))).append(" |\n");
             sb.append("| \u89C4\u6A21 | ").append(escape(readFieldSafe(brand, "scaleName", ""))).append(" |\n");
             sb.append("| \u878D\u8D44\u9636\u6BB5 | ").append(escape(readFieldSafe(brand, "stageName", ""))).append(" |\n");
+        }
+    }
+
+    private static void dumpObjectFields(StringBuilder sb, Object o, String prefix) {
+        if (o == null) {
+            return;
+        }
+        Field[] fs = o.getClass().getFields();
+        for (Field f : fs) {
+            try {
+                Object v = f.get(o);
+                String name = f.getName();
+                if (v == null) {
+                    sb.append(prefix).append(name).append("=null\n");
+                } else if (v instanceof List) {
+                    List<?> list = (List<?>) v;
+                    sb.append(prefix).append(name).append("=(").append(list.size()).append(") ");
+                    int max = Math.min(list.size(), 50);
+                    for (int i = 0; i < max; i++) {
+                        Object item = list.get(i);
+                        sb.append(item == null ? "null" : item.toString());
+                        if (i < max - 1) {
+                            sb.append(" | ");
+                        }
+                    }
+                    sb.append("\n");
+                } else if (v.getClass().isArray()) {
+                    sb.append(prefix).append(name).append("=")
+                            .append(java.util.Arrays.toString((Object[]) v)).append("\n");
+                } else {
+                    String s = v.toString();
+                    if (s.length() > 600) {
+                        s = s.substring(0, 600) + "...";
+                    }
+                    sb.append(prefix).append(name).append("=").append(s).append("\n");
+                }
+            } catch (Throwable ignored) {
+            }
         }
     }
 

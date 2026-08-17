@@ -34,7 +34,7 @@
         }
     .end annotation
 
-    .line 470
+    .line 481
     iput p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$9;->val$idx:I
 
     iput p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$9;->val$totalN:I
@@ -51,7 +51,7 @@
 .method public run()V
     .registers 3
 
-    .line 473
+    .line 484
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "batch progress "
