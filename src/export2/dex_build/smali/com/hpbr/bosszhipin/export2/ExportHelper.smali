@@ -1570,7 +1570,7 @@
     .line 115
     monitor-exit v5
     :try_end_23
-    .catchall {:try_start_19 .. :try_end_23} :catchall_23f
+    .catchall {:try_start_19 .. :try_end_23} :catchall_243
 
     if-nez p2, :cond_28
 
@@ -1604,7 +1604,7 @@
     .line 121
     invoke-virtual {v5, v0}, Landroid/widget/TextView;->setTextColor(I)V
 
-    const/high16 v7, 0x41300000    # 11.0f
+    const v7, 0x419e6666    # 19.8f
 
     .line 122
     invoke-virtual {v5, v7}, Landroid/widget/TextView;->setTextSize(F)V
@@ -1614,14 +1614,14 @@
     .line 123
     invoke-virtual {v5, v8}, Landroid/widget/TextView;->setGravity(I)V
 
-    const/high16 v9, 0x41200000    # 10.0f
+    const/high16 v9, 0x41900000    # 18.0f
 
     .line 124
     invoke-static {v1, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v10
 
-    const/high16 v11, 0x40800000    # 4.0f
+    const/high16 v11, 0x40e00000    # 7.0f
 
     invoke-static {v1, v11}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
@@ -1647,71 +1647,71 @@
     .line 127
     invoke-virtual {v10, v12}, Landroid/graphics/drawable/GradientDrawable;->setColor(I)V
 
-    const/high16 v12, 0x41400000    # 12.0f
+    const v13, 0x41accccd    # 21.6f
 
     .line 128
-    invoke-static {v1, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
-
-    move-result v12
-
-    int-to-float v12, v12
-
-    invoke-virtual {v10, v12}, Landroid/graphics/drawable/GradientDrawable;->setCornerRadius(F)V
-
-    .line 129
-    invoke-virtual {v5, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
-
-    const/high16 v12, 0x40000000    # 2.0f
-
-    .line 130
-    invoke-static {v1, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
+    invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v13
 
     int-to-float v13, v13
 
-    invoke-virtual {v5, v13}, Landroid/widget/TextView;->setElevation(F)V
+    invoke-virtual {v10, v13}, Landroid/graphics/drawable/GradientDrawable;->setCornerRadius(F)V
+
+    .line 129
+    invoke-virtual {v5, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
+
+    const v13, 0x40666666    # 3.6f
+
+    .line 130
+    invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
+
+    move-result v14
+
+    int-to-float v14, v14
+
+    invoke-virtual {v5, v14}, Landroid/widget/TextView;->setElevation(F)V
 
     .line 131
-    sget v13, Landroid/os/Build$VERSION;->SDK_INT:I
+    sget v14, Landroid/os/Build$VERSION;->SDK_INT:I
 
-    const/high16 v14, 0x42c80000    # 100.0f
+    const/high16 v15, 0x42c80000    # 100.0f
 
-    const/16 v15, 0x15
+    const/16 v4, 0x15
 
-    if-lt v13, v15, :cond_89
+    if-lt v14, v4, :cond_8c
 
     .line 132
-    invoke-virtual {v5, v14}, Landroid/widget/TextView;->setZ(F)V
+    invoke-virtual {v5, v15}, Landroid/widget/TextView;->setZ(F)V
 
     .line 135
-    :cond_89
-    new-instance v13, Landroid/widget/TextView;
+    :cond_8c
+    new-instance v14, Landroid/widget/TextView;
 
-    invoke-direct {v13, v1}, Landroid/widget/TextView;-><init>(Landroid/content/Context;)V
+    invoke-direct {v14, v1}, Landroid/widget/TextView;-><init>(Landroid/content/Context;)V
 
-    const-string v4, "\u6c9f\u901a"
+    const-string v6, "\u6c9f\u901a"
 
     .line 136
-    invoke-virtual {v13, v4}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
+    invoke-virtual {v14, v6}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
     .line 137
-    invoke-virtual {v13, v0}, Landroid/widget/TextView;->setTextColor(I)V
+    invoke-virtual {v14, v0}, Landroid/widget/TextView;->setTextColor(I)V
 
     .line 138
-    invoke-virtual {v13, v7}, Landroid/widget/TextView;->setTextSize(F)V
+    invoke-virtual {v14, v7}, Landroid/widget/TextView;->setTextSize(F)V
 
     .line 139
-    invoke-virtual {v13, v8}, Landroid/widget/TextView;->setGravity(I)V
+    invoke-virtual {v14, v8}, Landroid/widget/TextView;->setGravity(I)V
 
     .line 140
     invoke-static {v1, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
-    move-result v4
+    move-result v6
 
     invoke-static {v1, v11}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
-    move-result v6
+    move-result v12
 
     invoke-static {v1, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
@@ -1721,107 +1721,107 @@
 
     move-result v9
 
-    invoke-virtual {v13, v4, v6, v8, v9}, Landroid/widget/TextView;->setPadding(IIII)V
+    invoke-virtual {v14, v6, v12, v8, v9}, Landroid/widget/TextView;->setPadding(IIII)V
 
     .line 141
-    invoke-virtual {v13, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
+    invoke-virtual {v14, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
 
     .line 142
-    invoke-static {v1, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
+    invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
-    move-result v4
+    move-result v6
 
-    int-to-float v4, v4
+    int-to-float v6, v6
 
-    invoke-virtual {v13, v4}, Landroid/widget/TextView;->setElevation(F)V
+    invoke-virtual {v14, v6}, Landroid/widget/TextView;->setElevation(F)V
 
     .line 143
-    sget v4, Landroid/os/Build$VERSION;->SDK_INT:I
+    sget v6, Landroid/os/Build$VERSION;->SDK_INT:I
 
-    if-lt v4, v15, :cond_c1
+    if-lt v6, v4, :cond_c4
 
     .line 144
-    invoke-virtual {v13, v14}, Landroid/widget/TextView;->setZ(F)V
+    invoke-virtual {v14, v15}, Landroid/widget/TextView;->setZ(F)V
 
     .line 147
-    :cond_c1
-    new-instance v4, Landroid/widget/TextView;
+    :cond_c4
+    new-instance v6, Landroid/widget/TextView;
 
-    invoke-direct {v4, v1}, Landroid/widget/TextView;-><init>(Landroid/content/Context;)V
+    invoke-direct {v6, v1}, Landroid/widget/TextView;-><init>(Landroid/content/Context;)V
 
-    const-string v6, "Curl"
+    const-string v8, "Curl"
 
     .line 148
-    invoke-virtual {v4, v6}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
+    invoke-virtual {v6, v8}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
     .line 149
-    invoke-virtual {v4, v0}, Landroid/widget/TextView;->setTextColor(I)V
+    invoke-virtual {v6, v0}, Landroid/widget/TextView;->setTextColor(I)V
 
     .line 150
-    invoke-virtual {v4, v7}, Landroid/widget/TextView;->setTextSize(F)V
+    invoke-virtual {v6, v7}, Landroid/widget/TextView;->setTextSize(F)V
 
     const/16 v0, 0x11
 
     .line 151
-    invoke-virtual {v4, v0}, Landroid/widget/TextView;->setGravity(I)V
+    invoke-virtual {v6, v0}, Landroid/widget/TextView;->setGravity(I)V
 
-    const/high16 v0, 0x41200000    # 10.0f
+    const/high16 v0, 0x41900000    # 18.0f
 
     .line 152
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
-    move-result v6
+    move-result v7
 
     invoke-static {v1, v11}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
-    move-result v7
+    move-result v8
 
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
-    move-result v8
+    move-result v9
 
     invoke-static {v1, v11}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v0
 
-    invoke-virtual {v4, v6, v7, v8, v0}, Landroid/widget/TextView;->setPadding(IIII)V
+    invoke-virtual {v6, v7, v8, v9, v0}, Landroid/widget/TextView;->setPadding(IIII)V
 
     .line 153
-    invoke-virtual {v4, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
+    invoke-virtual {v6, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
 
     .line 154
-    invoke-static {v1, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
+    invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v0
 
     int-to-float v0, v0
 
-    invoke-virtual {v4, v0}, Landroid/widget/TextView;->setElevation(F)V
+    invoke-virtual {v6, v0}, Landroid/widget/TextView;->setElevation(F)V
 
     .line 155
     sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
 
-    if-lt v0, v15, :cond_fd
+    if-lt v0, v4, :cond_100
 
     .line 156
-    invoke-virtual {v4, v14}, Landroid/widget/TextView;->setZ(F)V
+    invoke-virtual {v6, v15}, Landroid/widget/TextView;->setZ(F)V
 
     .line 159
-    :cond_fd
-    new-instance v6, Landroid/view/View;
+    :cond_100
+    new-instance v4, Landroid/view/View;
 
-    invoke-direct {v6, v1}, Landroid/view/View;-><init>(Landroid/content/Context;)V
+    invoke-direct {v4, v1}, Landroid/view/View;-><init>(Landroid/content/Context;)V
 
     .line 160
     new-instance v0, Landroid/widget/LinearLayout$LayoutParams;
 
-    const/high16 v7, 0x42700000    # 60.0f
+    const/high16 v7, 0x42d80000    # 108.0f
 
     invoke-static {v1, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v7
 
-    const/high16 v8, 0x41200000    # 10.0f
+    const/high16 v8, 0x41900000    # 18.0f
 
     invoke-static {v1, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
@@ -1829,7 +1829,7 @@
 
     invoke-direct {v0, v7, v8}, Landroid/widget/LinearLayout$LayoutParams;-><init>(II)V
 
-    const/high16 v7, 0x40c00000    # 6.0f
+    const v7, 0x412ccccd    # 10.8f
 
     .line 161
     invoke-static {v1, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
@@ -1845,12 +1845,12 @@
 
     invoke-direct {v7}, Landroid/graphics/drawable/GradientDrawable;-><init>()V
 
-    const v9, -0x19000001
+    const/high16 v9, -0x4d000000
 
     .line 163
     invoke-virtual {v7, v9}, Landroid/graphics/drawable/GradientDrawable;->setColor(I)V
 
-    const/high16 v9, 0x40a00000    # 5.0f
+    const/high16 v9, 0x41100000    # 9.0f
 
     .line 164
     invoke-static {v1, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
@@ -1862,7 +1862,7 @@
     invoke-virtual {v7, v9}, Landroid/graphics/drawable/GradientDrawable;->setCornerRadius(F)V
 
     .line 165
-    invoke-virtual {v6, v7}, Landroid/view/View;->setBackground(Landroid/graphics/drawable/Drawable;)V
+    invoke-virtual {v4, v7}, Landroid/view/View;->setBackground(Landroid/graphics/drawable/Drawable;)V
 
     .line 167
     new-instance v7, Landroid/widget/LinearLayout;
@@ -1878,7 +1878,7 @@
     invoke-virtual {v7, v9}, Landroid/widget/LinearLayout;->setGravity(I)V
 
     .line 170
-    invoke-virtual {v7, v6, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
+    invoke-virtual {v7, v4, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
     .line 171
     new-instance v0, Landroid/widget/LinearLayout$LayoutParams;
@@ -1887,7 +1887,7 @@
 
     invoke-direct {v0, v9, v9}, Landroid/widget/LinearLayout$LayoutParams;-><init>(II)V
 
-    const/high16 v10, 0x40400000    # 3.0f
+    const v10, 0x40accccd    # 5.4f
 
     .line 173
     invoke-static {v1, v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
@@ -1897,7 +1897,7 @@
     invoke-virtual {v0, v8, v8, v8, v11}, Landroid/widget/LinearLayout$LayoutParams;->setMargins(IIII)V
 
     .line 174
-    invoke-virtual {v7, v13, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
+    invoke-virtual {v7, v14, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
     .line 175
     new-instance v0, Landroid/widget/LinearLayout$LayoutParams;
@@ -1919,7 +1919,7 @@
 
     invoke-direct {v0, v9, v9}, Landroid/widget/LinearLayout$LayoutParams;-><init>(II)V
 
-    invoke-virtual {v7, v4, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
+    invoke-virtual {v7, v6, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
     .line 182
     new-instance v10, Landroid/widget/FrameLayout$LayoutParams;
@@ -1945,11 +1945,11 @@
     move-result v9
 
     invoke-virtual {v10, v8, v8, v0, v9}, Landroid/widget/FrameLayout$LayoutParams;->setMargins(IIII)V
-    :try_end_186
-    .catchall {:try_start_2e .. :try_end_186} :catchall_203
+    :try_end_18a
+    .catchall {:try_start_2e .. :try_end_18a} :catchall_207
 
     .line 190
-    :try_start_186
+    :try_start_18a
     invoke-virtual/range {p0 .. p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
 
     move-result-object v0
@@ -1961,22 +1961,22 @@
     .line 191
     instance-of v8, v0, Landroid/view/ViewGroup;
 
-    if-eqz v8, :cond_1ab
+    if-eqz v8, :cond_1af
 
     .line 192
     check-cast v0, Landroid/view/ViewGroup;
-    :try_end_194
-    .catchall {:try_start_186 .. :try_end_194} :catchall_197
+    :try_end_198
+    .catchall {:try_start_18a .. :try_end_198} :catchall_19b
 
     move-object/from16 v16, v0
 
-    goto :goto_1ad
+    goto :goto_1b1
 
-    :catchall_197
+    :catchall_19b
     move-exception v0
 
     .line 195
-    :try_start_198
+    :try_start_19c
     new-instance v8, Ljava/lang/StringBuilder;
 
     invoke-direct {v8, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -1993,26 +1993,26 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    :cond_1ab
+    :cond_1af
     const/16 v16, 0x0
 
-    :goto_1ad
-    if-nez v16, :cond_1ca
+    :goto_1b1
+    if-nez v16, :cond_1ce
 
     .line 198
     instance-of v0, v2, Landroid/view/ViewGroup;
 
-    if-eqz v0, :cond_1b8
+    if-eqz v0, :cond_1bc
 
     .line 199
     move-object/from16 v16, v2
 
     check-cast v16, Landroid/view/ViewGroup;
 
-    goto :goto_1ca
+    goto :goto_1ce
 
-    :cond_1b8
-    if-eqz v2, :cond_1ca
+    :cond_1bc
+    if-eqz v2, :cond_1ce
 
     .line 200
     invoke-virtual/range {p1 .. p1}, Landroid/view/View;->getParent()Landroid/view/ViewParent;
@@ -2021,7 +2021,7 @@
 
     instance-of v0, v0, Landroid/view/ViewGroup;
 
-    if-eqz v0, :cond_1ca
+    if-eqz v0, :cond_1ce
 
     .line 201
     invoke-virtual/range {p1 .. p1}, Landroid/view/View;->getParent()Landroid/view/ViewParent;
@@ -2032,11 +2032,11 @@
 
     check-cast v16, Landroid/view/ViewGroup;
 
-    :cond_1ca
-    :goto_1ca
+    :cond_1ce
+    :goto_1ce
     move-object/from16 v0, v16
 
-    if-nez v0, :cond_1d4
+    if-nez v0, :cond_1d8
 
     const-string v0, "\u5bfc\u51fa\u6302\u8f7d\u5931\u8d25: \u672a\u627e\u5230\u5bb9\u5668"
 
@@ -2046,7 +2046,7 @@
     return-void
 
     .line 208
-    :cond_1d4
+    :cond_1d8
     invoke-virtual {v0, v7, v10}, Landroid/view/ViewGroup;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
     const-string v0, "\u5bfc\u51fa\u529f\u80fd\u5df2\u52a0\u8f7d, \u6309\u94ae\u5728\u53f3\u4e0b\u89d2"
@@ -2059,7 +2059,7 @@
 
     invoke-direct {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;-><init>(Landroid/app/Activity;)V
 
-    invoke-virtual {v13, v0}, Landroid/widget/TextView;->setOnClickListener(Landroid/view/View$OnClickListener;)V
+    invoke-virtual {v14, v0}, Landroid/widget/TextView;->setOnClickListener(Landroid/view/View$OnClickListener;)V
 
     const/4 v0, 0x4
 
@@ -2074,7 +2074,7 @@
 
     invoke-direct {v3, v0, v7, v2, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper$2;-><init>([FLandroid/widget/LinearLayout;[ZLandroid/app/Activity;)V
 
-    invoke-virtual {v6, v3}, Landroid/view/View;->setOnTouchListener(Landroid/view/View$OnTouchListener;)V
+    invoke-virtual {v4, v3}, Landroid/view/View;->setOnTouchListener(Landroid/view/View$OnTouchListener;)V
 
     .line 248
     new-instance v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$3;
@@ -2088,13 +2088,13 @@
 
     invoke-direct {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper$4;-><init>(Landroid/app/Activity;)V
 
-    invoke-virtual {v4, v0}, Landroid/widget/TextView;->setOnClickListener(Landroid/view/View$OnClickListener;)V
-    :try_end_202
-    .catchall {:try_start_198 .. :try_end_202} :catchall_203
+    invoke-virtual {v6, v0}, Landroid/widget/TextView;->setOnClickListener(Landroid/view/View$OnClickListener;)V
+    :try_end_206
+    .catchall {:try_start_19c .. :try_end_206} :catchall_207
 
-    goto :goto_23e
+    goto :goto_242
 
-    :catchall_203
+    :catchall_207
     move-exception v0
 
     .line 270
@@ -2149,17 +2149,17 @@
 
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->toast(Landroid/content/Context;Ljava/lang/String;)V
 
-    :goto_23e
+    :goto_242
     return-void
 
-    :catchall_23f
+    :catchall_243
     move-exception v0
 
     .line 115
-    :try_start_240
+    :try_start_244
     monitor-exit v5
-    :try_end_241
-    .catchall {:try_start_240 .. :try_end_241} :catchall_23f
+    :try_end_245
+    .catchall {:try_start_244 .. :try_end_245} :catchall_243
 
     throw v0
 .end method

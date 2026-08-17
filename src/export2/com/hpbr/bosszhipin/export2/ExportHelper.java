@@ -119,15 +119,15 @@ public class ExportHelper {
             final TextView btn = new TextView(activity);
             btn.setText("\u5BFC\u51FA");
             btn.setTextColor(Color.WHITE);
-            btn.setTextSize(11f);
+            btn.setTextSize(19.8f);
             btn.setGravity(Gravity.CENTER);
-            btn.setPadding(dp(activity, 10), dp(activity, 4), dp(activity, 10), dp(activity, 4));
+            btn.setPadding(dp(activity, 18), dp(activity, 7), dp(activity, 18), dp(activity, 7));
 
             GradientDrawable bg = new GradientDrawable();
             bg.setColor(0xB3000000);
-            bg.setCornerRadius(dp(activity, 12));
+            bg.setCornerRadius(dp(activity, 21.6f));
             btn.setBackground(bg);
-            btn.setElevation(dp(activity, 2));
+            btn.setElevation(dp(activity, 3.6f));
             if (Build.VERSION.SDK_INT >= 21) {
                 btn.setZ(100f);
             }
@@ -135,11 +135,11 @@ public class ExportHelper {
             final TextView chatBtn = new TextView(activity);
             chatBtn.setText("\u6C9F\u901A");
             chatBtn.setTextColor(Color.WHITE);
-            chatBtn.setTextSize(11f);
+            chatBtn.setTextSize(19.8f);
             chatBtn.setGravity(Gravity.CENTER);
-            chatBtn.setPadding(dp(activity, 10), dp(activity, 4), dp(activity, 10), dp(activity, 4));
+            chatBtn.setPadding(dp(activity, 18), dp(activity, 7), dp(activity, 18), dp(activity, 7));
             chatBtn.setBackground(bg);
-            chatBtn.setElevation(dp(activity, 2));
+            chatBtn.setElevation(dp(activity, 3.6f));
             if (Build.VERSION.SDK_INT >= 21) {
                 chatBtn.setZ(100f);
             }
@@ -147,21 +147,21 @@ public class ExportHelper {
             final TextView curlBtn = new TextView(activity);
             curlBtn.setText("Curl");
             curlBtn.setTextColor(Color.WHITE);
-            curlBtn.setTextSize(11f);
+            curlBtn.setTextSize(19.8f);
             curlBtn.setGravity(Gravity.CENTER);
-            curlBtn.setPadding(dp(activity, 10), dp(activity, 4), dp(activity, 10), dp(activity, 4));
+            curlBtn.setPadding(dp(activity, 18), dp(activity, 7), dp(activity, 18), dp(activity, 7));
             curlBtn.setBackground(bg);
-            curlBtn.setElevation(dp(activity, 2));
+            curlBtn.setElevation(dp(activity, 3.6f));
             if (Build.VERSION.SDK_INT >= 21) {
                 curlBtn.setZ(100f);
             }
 
             View dragBar = new View(activity);
-            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 60), dp(activity, 10));
-            dbp.setMargins(0, 0, 0, dp(activity, 6));
+            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 108), dp(activity, 18));
+            dbp.setMargins(0, 0, 0, dp(activity, 10.8f));
             GradientDrawable dbg = new GradientDrawable();
-            dbg.setColor(0xE6FFFFFF);
-            dbg.setCornerRadius(dp(activity, 5));
+            dbg.setColor(0xB3000000);
+            dbg.setCornerRadius(dp(activity, 9));
             dragBar.setBackground(dbg);
 
             LinearLayout btnGroup = new LinearLayout(activity);
@@ -170,11 +170,11 @@ public class ExportHelper {
             btnGroup.addView(dragBar, dbp);
             LinearLayout.LayoutParams gb2 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb2.setMargins(0, 0, 0, dp(activity, 3));
+            gb2.setMargins(0, 0, 0, dp(activity, 5.4f));
             btnGroup.addView(chatBtn, gb2);
             LinearLayout.LayoutParams gb3 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb3.setMargins(0, 0, 0, dp(activity, 3));
+            gb3.setMargins(0, 0, 0, dp(activity, 5.4f));
             btnGroup.addView(btn, gb3);
             btnGroup.addView(curlBtn, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
