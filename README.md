@@ -345,14 +345,14 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v6.apk`。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量长连接发送）+ **Curl 验证**（第1条校验）。打包签名后部署见文末。
+> 当前最新构建产物 `boss2_v6.apk`（md5 `80b2ca94a0f254a3493b7aba588b341e`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验）。构建与部署见下方「构建与部署（当前版本）」。
 
 ### 功能清单（v6）
 
 1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部加了一条 `dragBar`（60x10dp 白色圆角条），**只有拖动条能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
    - **踩坑记录**: dragBar 必须 `btnGroup.addView(dragBar, 固定dp的LayoutParams)` 直接传入固定尺寸。若先 `setLayoutParams(dp)` 再 `addView(view, wrap_content)` 会把参数覆盖为 WRAP_CONTENT，普通 `View` 在 LinearLayout 中 WRAP_CONTENT 会被 `getDefaultSize` 按 `AT_MOST` 测量成父容器满尺寸 → 白色半透明条铺满屏幕并拦截所有触摸（用户反馈"白色透明遮罩一大片 + 按钮拖不动"）。
 2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 同时写 Markdown + TXT 到 MediaStore Downloads。TXT 末尾附 `===== 请求报文 (curl/Bash) =====` 段，含本次导出所有列表/详情请求的完整 curl 命令。
-3. **沟通**: 弹批量对话框选职位 → 反射长连接接口批量发送 → 每个职位 Toast「发送成功/失败: 姓名」。成功时补调 `ContactManager.C(contact,0)` 更新会话记录，**并调 `ContactManager.V()` 触发列表刷新**（见下方消息列表闭环说明）。
+3. **沟通**: 弹批量对话框选职位 → 反射长连接接口批量发送 → 每个职位 Toast「发送成功/失败: 姓名」。发送成功后消息列表可见该会话（闭环原理见「聊天记录如何显示出来」）。
 4. **Curl 验证**: 校验**第 1 条**职位（上一版第 16 条跨页、page 固定 2 导致误判，已改回第一页第一条）。收集屏幕列表第 1 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第1条吻合」，否则失败。
 
 ### 代码架构（正确路径）
@@ -418,28 +418,32 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 
 验证: `adb logcat -s ExportHelper`，正常看到 `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `details collected=N/M` → 导出成功路径含 `.md` 与 `.txt` 两个文件。
 
-### 已知问题与接手方向
+### 聊天记录如何显示出来（消息列表闭环，已修复）
 
-**消息列表看不到新会话** —— 已定位根因并给出修复（`reportSendResult` 成功时调 `ContactManager.V()`），待真机验证。
+发送消息后「消息」页能看到该会话的关键：**ContactBean 三字段完整 + 触发列表刷新**。根因是补丁 newInstance 的 ContactBean 只填 `friendId/friendSource/friendName`，缺 `myId`（当前登录 uid）与 `myRole`，而列表/写库查询均按 `myId=当前uid AND myRole=?` 过滤 → 落库存在但查不到。
 
-逆向得到的完整加载链路（`research/smali_all`）:
-- 消息页 fragment = `chat/contact/fragment/ContactsFragment.smali`，实现 `ContactManager$f`（onContactChange），`observeContacts()` 同时观察三个源: `te/l.S()`（联系人主 LiveData）、`ContactManager.R()`（LiveData `c`）、`ContactManager.S()`（LiveData `a`: `MutableLiveData<List<ContactBean>>`）。
-- **列表刷新入口链**: ContactManager LiveData `a` post → fragment `M` observer（`fragment/i.smali`）→ `Vf` → `zg` → **`onContactChange()` 模板方法** → `J` Runnable（`ContactsFragment$d.run`，150ms 延迟，检查登录/连接状态）→ **`refreshAdapter(boolean)`** → 从 `te/l.x().r(groupType)` 的 `te/c.d` 重建 adapter 数据。
-- **数据源链**: `te/l`（`te/` 根包，F2ContactClassifyHelper）单例持有分类列表 `te/c`；`refreshGroup`（`te/l.W(List)`）从 `dx/a.r().j()` 全量联系人缓存取数 → `l()` 处理 → `T()` 分类 → `U()` 写 `te/c.d` → post LiveData。
-- **根因**: 我们此前只调 `ContactManager.C(contact,0)`（→ `contact/a.k` 更新内存 Map + `M()` 通知 `onContactChange(ContactBean)`，后者**只把 friendId 加入 fragment 的 `B` 集合，不触发刷新**）。真正触发刷新的只有 LiveData `a` 的 post，而 `C` 不 post 任何 LiveData。
-- **修复**: `ContactManager.V()` 是公开方法 = `refreshContacts`（日志 `refreshContacts %b`），节流调度 `k` Runnable（`data/manager/c`）→ 内部 `H()` 执行: post LiveData `c`（contact/b）+ post LiveData `a`（contact/b 缓存列表 + `dx/a` 全量列表）+ `X(List)` → `dx/a.h(List)` 写缓存。LiveData `a` post 后即走上面的刷新入口链。已加到 `reportSendResult` 成功分支（日志 `reportSendResult trigger refreshContacts V() ok`）。
+**数据链路**（`research/smali_all`）:
+- 消息页 = `chat/contact/fragment/ContactsFragment.smali`，实现 `ContactManager$f`；`observeContacts()` 观察 `ContactManager.S()`（LiveData `a`）等三个源
+- LiveData `a` post → fragment observer → `refreshAdapter(boolean)` → 从 `te/l.x().r(groupType)` 的 `te/c.d` 重建 adapter
+- 数据源: `te/l`（F2ContactClassifyHelper）→ `dx/a.r().j()` 全量联系人缓存 → `refreshGroup` → 分类写 `te/c.d`
+- DB 查询条件: `ContactDaoImpl.insertOrUpdateAllField`/`queryIdByFriendId` 用 `friendId=? AND myId=当前uid AND myRole=?`；`getAllContactList(I)` 用 `myId=当前uid AND myRole=?`
 
-验证要点（真机 `adb logcat -s ExportHelper`）:
-1. `reportSendResult ok=true friend=...` + `reportSendResult update contact friendId=...` + `reportSendResult trigger refreshContacts V() ok`。
-2. 若无 V() 日志，说明 `ContactManager.C` 抛异常（检查 contact 构造，`friendId` 必须 = bossId > 0）。
-3. 若 V() 正常仍不显示，再检查 `te/l` 的 `refreshGroup` 是否把新 contact 纳入 `te/c.d`（新会话需在 `dx/a` 全量缓存/DB 中存在）。
+**正确做法**（`ExportHelper.sendOneContact` + `reportSendResult`）:
+1. 发送前解析 `role = com.hpbr.bosszhipin.data.manager.r.E().get()`，`myId = r.A()`（= `AccountHelper.getUid()`，见 `classes2/com/bszp/kernel/account/AccountHelper.smali`）
+2. `ContactManager.U(bossId, role, friendSource)` —— 第二参数传 **role**（正常链路 ChatCommon 同款）；U 查缓存，null 则 newInstance 并补设 `myId`/`myRole`（reuse 分支也要修正，防缓存遗留 myId=0）
+3. 发送成功后 `ContactManager.C(contact, 0)` 更新会话 + `ContactManager.V()`（= refreshContacts）触发 LiveData `a` post → 列表刷新。**仅调 `C` 不会刷新列表**（只加 friendId 进 fragment 的 `B` 集合）
+
+**验证**（真机 `adb logcat -s ExportHelper`）:
+- `batch send role=.. myId=..`（必须非 0）
+- `batch send new ContactBean friendId=.. myId=.. myRole=..`
+- `reportSendResult trigger refreshContacts V() ok`
 
 ### 验证（真机）
 
 `adb logcat -s ExportHelper`:
 - 导出: `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `.md`/`.txt` 写出
 - curl 收集: `collectCurl LIST len=...` / `collectCurl DETAIL len=...`
-- 沟通: `batch send longlink connected=true` → `batch send ok friendId=...` → `notifySendStart` → `reportSendResult ok=...` → `reportSendResult trigger refreshContacts V() ok`
+- 沟通: `batch send role=.. myId=..` → `batch send longlink connected=true` → `batch send ok friendId=...` → `notifySendStart` → `reportSendResult ok=...` → `reportSendResult trigger refreshContacts V() ok` → 消息列表可见该会话
 - Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 1 条）
 
 ### 参考文件
@@ -458,6 +462,33 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 | `research/.../classes7/GListViewModel.smali` | 界面 VM (m/n/z 字段) |
 | `research/.../classes7/GeekF1ProListFragment.smali` | 职位列表 Fragment (字段 `e` 持有 GListViewModel) |
 | `research/.../classes9/message/handler/c.smali` | 长连接发送入口 (J 方法) / handler/d(ContactBean) |
-| `research/.../classes4/com/hpbr/bosszhipin/data/manager/ContactManager.smali` | 会话记录管理器 (C/M/V 等) |
+| `research/.../classes4/com/hpbr/bosszhipin/data/manager/ContactManager.smali` | 会话记录管理器 (U 查/建 ContactBean, C 更新, M/V 通知刷新) |
 | `research/.../classes4/com/hpbr/bosszhipin/data/manager/contact/a.smali` | 联系人缓存 + DB 写 (k 方法) |
-| `research/.../classes4/com/hpbr/bosszhipin/chat/contact/fragment/ContactsFragment.smali` | 消息页 fragment (会话列表观察端) |
+| `research/.../classes4/com/hpbr/bosszhipin/data/db/dao/ContactDaoImpl.smali` | DB 写库/查询 (insertOrUpdateAllField / queryIdByFriendId / getAllContactList 的 myId+myRole 过滤) |
+| `research/.../classes4/com/hpbr/bosszhipin/data/db/entry/ContactBean.smali` | 联系人实体 (friendId:J / myId:J / myRole:I 字段) |
+| `research/.../classes4/com/hpbr/bosszhipin/data/manager/r.smali` | 会话数据入口 (A()=当前 uid, E()=当前 role) |
+| `research/.../classes2/com/bszp/kernel/account/AccountHelper.smali` | getUid() / getIdentity() |
+| `research/.../classes4/com/hpbr/bosszhipin/chat/contact/fragment/ContactsFragment.smali` | 消息页 fragment (会话列表观察端, refreshAdapter) |
+
+### 构建与部署（当前版本）
+
+```bash
+# 1. 修改源码后重建导出 DEX（ExportHelper.java → javac → d8 → 合并回调 smali → classes10.dex）
+export PATH="$PWD/build-tools/android-14:$PATH"
+bash scripts/build_classes10.sh
+
+# 2. 从 v5 重打 v6（注入 classes6/7 锚点 + 替换 DEX + 添加 classes10 + zipalign + V1/V2 签名）
+python3 scripts/build_v6.py --input downloads/boss2_v5.apk --output boss2_v6.apk
+
+# 3. 验证 10 项全部 PASSED
+python3 scripts/verify.py boss2_v6.apk
+```
+
+APK 约 144MB，直接交付不便，用 20MB 分段 + 合并后 md5 校验:
+
+```bash
+split -b 20M boss2_v6.apk boss2_v6_part_
+md5sum boss2_v6_part_* > parts.md5   # 合并校验: cat boss2_v6_part_* | md5sum 应与整包一致
+```
+
+部署: 在 `/workspace/boss2` 起 `python3 -m http.server 8080`（后台常驻），分段/`parts.md5` 放同目录。下载地址: `https://8080-1085837e71e955d9.monkeycode-ai.online/boss2_v6.apk`（curl 直接下载整包）。
