@@ -534,10 +534,35 @@ public class ExportHelper {
         }
         String friendName = readFieldAny(job, "", "bossName", "brandName", "jobName");
 
+        int role = 0;
+        try {
+            Object roleEnum = Class.forName("com.hpbr.bosszhipin.data.manager.r").getMethod("E").invoke(null);
+            if (roleEnum != null) {
+                Object rv = roleEnum.getClass().getMethod("get").invoke(roleEnum);
+                if (rv instanceof Integer) {
+                    role = ((Integer) rv).intValue();
+                }
+            }
+        } catch (Throwable tr) {
+            log("batch send role resolve error: " + tr.getMessage());
+        }
+        long myId = 0L;
+        try {
+            Object uid = Class.forName("com.hpbr.bosszhipin.data.manager.r").getMethod("A").invoke(null);
+            if (uid instanceof Long) {
+                myId = ((Long) uid).longValue();
+            } else if (uid != null) {
+                myId = Long.parseLong(uid.toString());
+            }
+        } catch (Throwable tu) {
+            log("batch send myId resolve error: " + tu.getMessage());
+        }
+        log("batch send role=" + role + " myId=" + myId);
+
         Object contactBean = null;
         try {
             Method mU = contactManagerClass.getMethod("U", long.class, int.class, int.class);
-            contactBean = mU.invoke(contactManager, bossId, 0, friendSource);
+            contactBean = mU.invoke(contactManager, bossId, role, friendSource);
         } catch (Throwable t) {
             log("batch send ContactManager.U error: " + t.getMessage());
         }
@@ -547,13 +572,19 @@ public class ExportHelper {
                 setLongField(contactBean, "friendId", bossId);
                 setIntField(contactBean, "friendSource", friendSource);
                 setStringField(contactBean, "friendName", friendName);
-                log("batch send new ContactBean friendId=" + bossId + " name=" + friendName);
+                setLongField(contactBean, "myId", myId);
+                setIntField(contactBean, "myRole", role);
+                log("batch send new ContactBean friendId=" + bossId + " name=" + friendName
+                        + " myId=" + myId + " myRole=" + role);
             } catch (Throwable t) {
                 log("batch send new ContactBean error: " + t.getMessage());
                 return false;
             }
         } else {
-            log("batch send reuse ContactBean friendId=" + bossId + " name=" + friendName);
+            setLongField(contactBean, "myId", myId);
+            setIntField(contactBean, "myRole", role);
+            log("batch send reuse ContactBean friendId=" + bossId + " name=" + friendName
+                    + " myId=" + myId + " myRole=" + role);
         }
 
         try {
