@@ -9,7 +9,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.PathShape;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -89,6 +92,7 @@ public class ExportHelper {
     private static volatile Object sCreateRelation;
 
     private static final List<String> sCurlList = new ArrayList<String>();
+    private static final List<String> sCurlRespList = new ArrayList<String>();
 
     private static volatile Activity sAttachActivity;
 
@@ -162,12 +166,18 @@ public class ExportHelper {
             }
 
             View dragBar = new View(activity);
-            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 86.4f), dp(activity, 14.4f));
-            dbp.setMargins(0, 0, 0, dp(activity, 8.64f));
-            GradientDrawable dbg = new GradientDrawable();
-            dbg.setColor(0xB3000000);
-            dbg.setCornerRadius(dp(activity, 7.2f));
-            dragBar.setBackground(dbg);
+            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 28.8f), dp(activity, 21.6f));
+            dbp.setMargins(0, 0, 0, dp(activity, 1.44f));
+            Path triPath = new Path();
+            triPath.moveTo(0, dp(activity, 21.6f));
+            triPath.lineTo(dp(activity, 14.4f), 0);
+            triPath.lineTo(dp(activity, 28.8f), dp(activity, 21.6f));
+            triPath.close();
+            PathShape triShape = new PathShape(triPath, dp(activity, 28.8f), dp(activity, 21.6f));
+            ShapeDrawable triDrawable = new ShapeDrawable(triShape);
+            triDrawable.getPaint().setColor(0x66000000);
+            triDrawable.getPaint().setAntiAlias(true);
+            dragBar.setBackground(triDrawable);
 
             LinearLayout btnGroup = new LinearLayout(activity);
             btnGroup.setOrientation(LinearLayout.VERTICAL);
@@ -448,6 +458,7 @@ public class ExportHelper {
         int sent = 0;
         int failed = 0;
         int skipped = 0;
+        log("batch send start total=" + total);
         StringBuilder sb = new StringBuilder("\u6279\u91CF\u6C9F\u901A\u5B8C\u6210: \u6210\u529F " + sent + ", \u5931\u8D25 " + failed);
 
         Class<?> contactBeanClass = null;
@@ -472,20 +483,12 @@ public class ExportHelper {
             return "\u6279\u91CF\u6C9F\u901A\u5931\u8D25: \u6D88\u606F\u901A\u9053\u5F02\u5E38 " + t.getMessage();
         }
 
-        int progressed = 0;
         for (int i = 0; i < total; i++) {
             final Object job = jobs.get(i);
             final int idx = i + 1;
             final int totalN = total;
             String bossName = readFieldAny(job, "\u672A\u77E5", "bossName", "jobName");
-            final String recvName = bossName;
-            sMainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    log("batch progress " + idx + "/" + totalN + " \u63A5\u6536\u4EBA:" + recvName);
-                }
-            });
-            progressed++;
+            log("batch progress " + idx + "/" + totalN + " \u63A5\u6536\u4EBA:" + bossName);
             try {
                 boolean ok = sendOneContact(activity, job, msg, contactBeanClass, contactManagerClass, contactManager,
                         handlerDClass, handlerCClass);
@@ -922,6 +925,7 @@ public class ExportHelper {
         String txt = buildTxt(jobs, details, activity);
         File savedMd = writeMarkdownFile(activity, jobs, md);
         File savedTxt = writeTxtFile(activity, jobs, txt);
+        File savedCurl = writeCurlTxtFile(activity, jobs);
         if (savedMd == null && savedTxt == null) {
             return "\u6587\u4EF6\u5199\u5165\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u6743\u9650";
         }
@@ -932,6 +936,9 @@ public class ExportHelper {
         sb.append("\n").append(savedMd != null ? savedMd.getAbsolutePath() : "");
         if (savedTxt != null) {
             sb.append("\n").append(savedTxt.getAbsolutePath());
+        }
+        if (savedCurl != null) {
+            sb.append("\n").append(savedCurl.getAbsolutePath());
         }
         return sb.toString();
     }
@@ -1344,6 +1351,7 @@ public class ExportHelper {
         sPageOk = false;
         sPageError = null;
         sPageResponse = null;
+        sPageRawJson = null;
         sLatch = new CountDownLatch(1);
 
         Object req = buildListRequest(page);
@@ -1362,6 +1370,7 @@ public class ExportHelper {
         mExec.invoke(req);
 
         boolean done = sLatch.await(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        appendCurlResp(sPageRawJson);
         if (!done) {
             return null;
         }
@@ -1509,6 +1518,12 @@ public class ExportHelper {
 
     /* ============ curl 验证 ============ */
 
+    private static void appendCurlResp(String raw) {
+        synchronized (sCurlRespList) {
+            sCurlRespList.add(raw == null ? "" : raw);
+        }
+    }
+
     private static String buildFullUrl(Object req) {
         try {
             String url = "";
@@ -1642,13 +1657,14 @@ public class ExportHelper {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                List<Object> screenJobs = null;
                 try {
-                    List<Object> jobs = collectFromScreen(activity);
-                    if (jobs == null || jobs.size() < 1) {
+                    screenJobs = collectFromScreen(activity);
+                    if (screenJobs == null || screenJobs.size() < 1) {
                         toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u5F53\u524D\u5217\u8868\u4E3A\u7A7A");
                         return;
                     }
-                    Object target = jobs.get(0);
+                    Object target = screenJobs.get(0);
                     String id = readFieldSafe(target, "encryptJobId", "");
                     String key = "encryptJobId";
                     if (id.isEmpty()) {
@@ -1688,6 +1704,18 @@ public class ExportHelper {
                 } catch (Throwable t) {
                     log("verifyCurl error: " + t.getMessage());
                     toastMain(activity, "Curl\u9A8C\u8BC1\u5F02\u5E38: " + t.getClass().getSimpleName() + ": " + t.getMessage());
+                } finally {
+                    if (screenJobs != null && !screenJobs.isEmpty()) {
+                        final File curlFile = writeCurlTxtFile(activity, screenJobs);
+                        if (curlFile != null) {
+                            sMainHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    toast(activity, "Curl\u62A5\u6587\u5DF2\u4FDD\u5B58: " + curlFile.getAbsolutePath());
+                                }
+                            });
+                        }
+                    }
                 }
             }
         }).start();
@@ -1797,6 +1825,7 @@ public class ExportHelper {
             mExec.invoke(req);
 
             boolean done = sDetailLatch.await(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            appendCurlResp(sDetailRawJson);
             if (!done) {
                 log("detail timeout securityId=" + securityId);
                 return null;
@@ -2142,15 +2171,6 @@ public class ExportHelper {
             idx++;
         }
 
-        synchronized (sCurlList) {
-            if (!sCurlList.isEmpty()) {
-                sb.append("# \u8BF7\u6C42\u62A5\u6587 (curl/Bash)\n\n");
-                for (String c : sCurlList) {
-                    sb.append("```bash\n").append(c).append("```\n\n");
-                }
-                sCurlList.clear();
-            }
-        }
         return sb.toString();
     }
 
@@ -2353,15 +2373,6 @@ public class ExportHelper {
             sb.append("\n\n");
         }
 
-        synchronized (sCurlList) {
-            if (!sCurlList.isEmpty()) {
-                sb.append("===== \u8BF7\u6C42\u62A5\u6587 (curl/Bash) =====\n\n");
-                for (String c : sCurlList) {
-                    sb.append(c).append("\n");
-                }
-                sCurlList.clear();
-            }
-        }
         return sb.toString();
     }
 
@@ -2535,13 +2546,53 @@ public class ExportHelper {
         }
     }
 
+    private static File writeCurlTxtFile(Context ctx, List<Object> jobs) {
+        String firstTitle = "";
+        if (jobs != null && !jobs.isEmpty()) {
+            firstTitle = readFieldAny(jobs.get(0), "", "jobName");
+        }
+        String base = sanitize(firstTitle);
+        if (base.isEmpty()) {
+            base = "\u804C\u4F4D\u5217\u8868";
+        }
+        String baseName = "Curl" + base;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("# \u8BF7\u6C42\u62A5\u6587 (curl) + \u8FD4\u56DE\n\n");
+        sb.append("\u7B2C1\u6761\u804C\u4F4D: ").append(firstTitle).append("\n");
+        sb.append("\u751F\u6210\u65F6\u95F4: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(new Date())).append("\n\n");
+        synchronized (sCurlList) {
+            synchronized (sCurlRespList) {
+                int size = sCurlList.size();
+                for (int i = 0; i < size; i++) {
+                    sb.append("===== \u8BF7\u6C42 ").append(i + 1).append(" =====\n");
+                    sb.append(sCurlList.get(i)).append("\n");
+                    String resp = i < sCurlRespList.size() ? sCurlRespList.get(i) : "";
+                    sb.append("===== \u8FD4\u56DE ").append(i + 1).append(" =====\n");
+                    if (resp.isEmpty()) {
+                        sb.append("(\u65E0\u54CD\u5E94)\n");
+                    } else {
+                        sb.append(resp).append("\n");
+                    }
+                    sb.append("\n");
+                }
+                sCurlList.clear();
+                sCurlRespList.clear();
+            }
+        }
+        return writePlainTxtFile(ctx, baseName, sb.toString());
+    }
+
     private static File writeTxtFile(Context ctx, List<Object> jobs, String txt) {
         String firstTitle = readFieldAny(jobs.get(0), "\u804C\u4F4D", "jobName");
         String baseName = sanitize(firstTitle);
         if (baseName.isEmpty()) {
             baseName = "\u804C\u4F4D\u5217\u8868";
         }
+        return writePlainTxtFile(ctx, baseName, txt);
+    }
 
+    private static File writePlainTxtFile(Context ctx, String baseName, String txt) {
         try {
             if (Build.VERSION.SDK_INT >= 29) {
                 String fileName = pickUniqueNameMediaStore(ctx, baseName, ".txt");

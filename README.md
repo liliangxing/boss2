@@ -346,15 +346,15 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v6.apk`（md5 `fef9a9a1a9e7b22f92b1110b45e61a98`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验）。构建与部署见下方「构建与部署（当前版本）」。
+> 当前最新构建产物 `boss2_v6.apk`（md5 `dfe293672e6d1be247ddc429bce6e74b`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）。构建与部署见下方「构建与部署（当前版本）」。
 
 ### 功能清单（v6）
 
-1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部加了一条 `dragBar`（60x10dp 白色圆角条），**只有拖动条能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
-   - **踩坑记录**: dragBar 必须 `btnGroup.addView(dragBar, 固定dp的LayoutParams)` 直接传入固定尺寸。若先 `setLayoutParams(dp)` 再 `addView(view, wrap_content)` 会把参数覆盖为 WRAP_CONTENT，普通 `View` 在 LinearLayout 中 WRAP_CONTENT 会被 `getDefaultSize` 按 `AT_MOST` 测量成父容器满尺寸 → 白色半透明条铺满屏幕并拦截所有触摸（用户反馈"白色透明遮罩一大片 + 按钮拖不动"）。
-2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 同时写 Markdown + TXT 到 MediaStore Downloads。TXT 末尾附 `===== 请求报文 (curl/Bash) =====` 段，含本次导出所有列表/详情请求的完整 curl 命令。
+1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部是一个 **正立三角形** dragBar（▲ 尖端朝上，28.8x21.6dp，`ShapeDrawable`+`PathShape` 绘制，颜色 0x66000000 半透明，比按钮更透，底边距仅 1.44dp，比按钮间距 4.32dp 更贴近沟通按钮），**只有三角形能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
+   - **踩坑记录**: dragBar 必须 `btnGroup.addView(dragBar, 固定dp的LayoutParams)` 直接传入固定尺寸。若先 `setLayoutParams(dp)` 再 `addView(view, wrap_content)` 会把参数覆盖为 WRAP_CONTENT，普通 `View` 在 LinearLayout 中 WRAP_CONTENT 会被 `getDefaultSize` 按 `AT_MOST` 测量成父容器满尺寸 → 白色半透明条铺满屏幕并拦截所有触摸（用户反馈"白色透明遮罩一大片 + 按钮拖不动"）。`ShapeDrawable` 无 `setAntiAlias` 方法，抗锯齿要调 `getPaint().setAntiAlias(true)`。
+2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 写 Markdown + TXT 到 MediaStore Downloads。**curl 报文不再附在 md/txt 里**，改为单独写一个 `Curl[第1条职位名].txt`：按顺序列出本次所有列表/详情请求的完整 curl 命令，**每个请求下方附对应返回 JSON**（`notifyRawJson`/`notifyDetailRawJson` 捕获的原始报文）。
 3. **沟通**: 弹批量对话框选职位 → **每个职位先 HTTP 建联**（`GeekCreateFriendRequest` → POST `zpgeek/app/friend/add`，15s 同步等待）→ 建联成功用 relation（`ServerAddFriendBean`）全字段填充 ContactBean 并存库 → 再走反射长连接接口发送 → 每个职位 Toast「发送成功/失败: 姓名」。发送成功后消息列表可见该会话，且头像/公司/岗位/薪资齐全（闭环原理见「聊天记录如何显示出来」）。
-4. **Curl 验证**: 校验**第 1 条**职位（上一版第 16 条跨页、page 固定 2 导致误判，已改回第一页第一条）。收集屏幕列表第 1 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第1条吻合」，否则失败。
+4. **Curl 验证**: 校验**第 1 条**职位（上一版第 16 条跨页、page 固定 2 导致误判，已改回第一页第一条）。收集屏幕列表第 1 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第1条吻合」，否则失败。**验证结束同样写一份 `Curl[第1条职位名].txt`**（含本次请求 curl + 返回 JSON），文件名与导出时一致（重名自动追加 ` (1)` 后缀）。
 
 ### 代码架构（正确路径）
 
@@ -371,9 +371,9 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 1. **列表导出**: `buildListRequest(page)` 构造 `GeekF1GetJobListRequest`，参数放 `extra_map`（page/pageSize=15/sortType=1/expectId/encryptExpectId/filterParams）→ `ExportCallback` 用 CountDownLatch 同步等待 → 解析响应 `jobList`/`geekList`/`feedCardList` 字段。分页 page 递增，`hasMore=false` 或连续 3 页无新增停止。
 2. **详情导出**: `new F1GeekGetJobDetailBatchRequest(callback)` → 子请求 `getJobDetailRequest.securityId` + `jobQueryBannerRequest.securityId` = 卡片 `encryptJobId` → `execute()`。回调链上 `mCallback` 在 `com/twl/http/client/a`（请求基类）。
-3. **curl 报文**: `collectCurl(tag, req, note)` 在 execute 前反射生成：URL = `getRequestUrl()` + `hg0/o.l(url, params)`（GET 拼 query）；method = `getMethod().getValue()`；headers = `getHeaders().c()` 遍历 Set 后 `a(key)` 取值（跳过 Cookie）；cookie = `CookieManager.getCookie(host)`；POST 时加 `Content-Type: application/x-www-form-urlencoded` + `--data`（`params.j()`）。收集进 `sCurlList`，TXT/Markdown 末尾输出。
+3. **curl 报文（独立文件）**: `collectCurl(tag, req, note)` 在 execute 前反射生成 curl 命令：URL = `getRequestUrl()` + `hg0/o.l(url, params)`（GET 拼 query）；method = `getMethod().getValue()`；headers = `getHeaders().c()` 遍历 Set 后 `a(key)` 取值（跳过 Cookie）；cookie = `CookieManager.getCookie(host)`；POST 时加 `Content-Type: application/x-www-form-urlencoded` + `--data`（`params.j()`）。收集进 `sCurlList`。**响应配对**: 每次请求 await 完成后 `appendCurlResp(rawJson)` 追加到 `sCurlRespList`（`requestPage` 取 `sPageRawJson`，`requestDetail` 取 `sDetailRawJson`，两个 list 按下标一一对应）。`writeCurlTxtFile(ctx, jobs)` 遍历两个 list 输出「===== 请求 i ===== / curl ... / ===== 返回 i ===== / JSON」到 `Curl[第1条职位名].txt`（`sanitize(jobs[0].jobName)` 前缀 `Curl`，保存路径 Downloads/Android/BOSS2/，写入后清空两个 list）。md/txt 不再含 curl 段。
 4. **批量沟通**: `message/handler/c.J`（长连接发送，参数 `(Lmessage/handler/d;Ljava/lang/String;I...;ChatSendCallback;IJ)`）返回非 null 即入队成功。发送结果经 `ExportChatCallback.onComplete` → `reportSendResult`（Toast 成功/失败）。成功时补调 `ContactManager.C(contact,0)` 更新会话记录 + `ContactManager.V()` 触发列表刷新。
-5. **Curl 验证**: `collectFromScreen(activity)` 反射 Fragment 树收集屏幕列表 → 取第 1 条 ID → `buildListRequest(1)`（第1条在第一页，固定 page=1）→ `HttpURLConnection` 按 curl 报文的 URL+headers+Cookie GET → `body.contains(id)` 判成功。结果日志: `curl verify RESULT: SUCCESS/FAIL`。
+5. **Curl 验证**: `collectFromScreen(activity)` 反射 Fragment 树收集屏幕列表 → 取第 1 条 ID → `buildListRequest(1)`（第1条在第一页，固定 page=1）→ `HttpURLConnection` 按 curl 报文的 URL+headers+Cookie GET → `body.contains(id)` 判成功。结果日志: `curl verify RESULT: SUCCESS/FAIL`。**finally 中调 `writeCurlTxtFile`** 生成 `Curl[第1条职位名].txt`（只要屏幕列表非空就生成，即使验证失败/异常）。
 6. **筛选参数反射**: Fragment 树匹配 `GeekF1ProListFragment` → 字段 `e` 取 GListViewModel → 字段 `m`(expectId)/`n`(encryptExpectId)/`z`(filterParams，经 `s20/b.M` 序列化)。
 7. **详情关键词兜底**: `appendDetailTxt` 在 jobBaseInfo 块后追加 `dumpObjectFields` 全量反射输出（`jobBaseInfo` 全字段、`salaryWelfareInfo` 薪资福利模块、`jobTemplateModule` 职位模板模块；List 输出 `(N) item1 | item2` 最多 50 项，超长截断 600 字符），确保职位详情关键词（如 Java/银行/Mysql/AI）无论如何都能落进导出文件；Markdown 另加「关键词/技能」行（`jobSkillLabelDesc` + `jobSkills` + `jobDescHighlights` + `requiredSkills` 拼接）。
 
@@ -419,7 +419,7 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 7. **双文档输出**: Markdown（人类可读，含 `<details>` 全字段表）+ TXT（完整报文，每职位含列表字段 + 详情字段）
 8. **分页**: page=1..N，hasMore=false 或连续 3 页无新增停止，上限=输入框条数
 
-验证: `adb logcat -s ExportHelper`，正常看到 `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `details collected=N/M` → 导出成功路径含 `.md` 与 `.txt` 两个文件。
+验证: `adb logcat -s ExportHelper`，正常看到 `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `details collected=N/M` → 导出成功路径含 `.md`、`.txt` 与 `Curl[第1条职位名].txt` 三个文件。
 
 ### 聊天记录如何显示出来（消息列表闭环，已修复）
 
@@ -439,18 +439,20 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 5. 再发送：`message.handler.d.a(contactBean)` 取 target → `message.handler.c.J(target, msg, 1, ExportChatCallback, 0, 0L)`，返回非 null 即入队成功 → `reportSendResult` Toast
 
 **验证**（真机 `adb logcat -s ExportHelper`）:
+- `batch send start total=N`（批次开始，必须出现）
 - `batch send role=.. myId=..`（必须非 0）
 - `batch send create friend request friendId=.. jobId=.. securityId=.. lid=..` → `batch send create friend ok friendId=..`（失败见 `batch send create friend failed friendId=.. err=..` / `create friend timeout`，该职位会跳过）
 - `batch send fill contact from relation friendId=..` → `batch send save contact DB friendId=..` → `batch send refresh contacts V() friendId=..`
 - `batch send longlink connected=true` → `batch send ok friendId=..` → `reportSendResult ok=..`
+- 进度日志 `batch progress i/N 接收人:..` 直接输出（不走主线程 post，避免延迟/丢失）
 
 ### 验证（真机）
 
 `adb logcat -s ExportHelper`:
-- 导出: `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `.md`/`.txt` 写出
-- curl 收集: `collectCurl LIST len=...` / `collectCurl DETAIL len=...`
-- 沟通: `batch send role=.. myId=..` → `batch send create friend request friendId=..` → `batch send create friend ok friendId=..`（失败/超时会跳过该职位）→ `batch send fill contact from relation friendId=..` → `batch send save contact DB friendId=..` → `batch send refresh contacts V() friendId=..` → `batch send longlink connected=true` → `batch send ok friendId=...` → `reportSendResult ok=...` → 消息列表可见该会话
-- Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 1 条）
+- 导出: `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `.md`/`.txt`/`Curl[第1条职位名].txt` 写出
+- curl 收集: `collectCurl LIST len=...` / `collectCurl DETAIL len=...` / `notifyRawJson len=...` / `notifyDetailRawJson len=...`
+- 沟通: `batch send start total=N` → `batch send role=.. myId=..` → `batch send create friend request friendId=..` → `batch send create friend ok friendId=..`（失败/超时会跳过该职位）→ `batch send fill contact from relation friendId=..` → `batch send save contact DB friendId=..` → `batch send refresh contacts V() friendId=..` → `batch send longlink connected=true` → `batch send ok friendId=...` → `reportSendResult ok=...` → 消息列表可见该会话
+- Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 1 条）→ Toast「Curl报文已保存: .../Curl[第1条职位名].txt」
 
 ### 参考文件
 
@@ -458,7 +460,7 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 |------|------|
 | `scripts/build_v6.py` | 构建脚本 (锚点注入 + 替换 classes6/7 + 添加 classes10 + 签名) |
 | `scripts/build_classes10.sh` | 重建 classes10.dex (javac → d8 → baksmali → 合并回调 smali → smali) |
-| `src/export2/.../ExportHelper.java` | 全部逻辑: 按钮组/导出/curl 收集/批量沟通/Curl 验证 |
+| `src/export2/.../ExportHelper.java` | 全部逻辑: 按钮组(三角形dragBar)/导出/curl 收集+Curl独立txt/批量沟通/Curl 验证 |
 | `src/export2/smali/.../ExportCallback.smali` | 手写列表回调 (泛型=GeekF1GetJobListResponse, 捕获原始 JSON) |
 | `src/export2/smali/.../ExportDetailCallback.smali` | 手写详情回调 (泛型=F1GeekGetJobDetailBatchResponse, 捕获原始 JSON) |
 | `src/export2/smali/.../ExportChatCallback.smali` | 手写发送回调 (继承 ChatSendCallback, onComplete→reportSendResult) |
