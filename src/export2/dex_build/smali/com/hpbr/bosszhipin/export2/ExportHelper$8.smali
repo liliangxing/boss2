@@ -34,7 +34,7 @@
         }
     .end annotation
 
-    .line 417
+    .line 413
     iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$8;->val$activity:Landroid/app/Activity;
 
     iput p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$8;->val$count:I
@@ -57,7 +57,7 @@
 
     const-string v2, "batch send error: "
 
-    .line 422
+    .line 418
     :try_start_6
     iget-object v3, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$8;->val$activity:Landroid/app/Activity;
 
@@ -66,7 +66,7 @@
 
     move-result-object v3
 
-    .line 423
+    .line 419
     new-instance v4, Ljava/lang/StringBuilder;
 
     invoke-direct {v4, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -84,7 +84,7 @@
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    .line 424
+    .line 420
     invoke-interface {v3}, Ljava/util/List;->isEmpty()Z
 
     move-result v1
@@ -95,7 +95,7 @@
 
     goto :goto_32
 
-    .line 427
+    .line 423
     :cond_28
     iget-object v1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$8;->val$activity:Landroid/app/Activity;
 
@@ -110,7 +110,7 @@
     :try_end_32
     .catchall {:try_start_6 .. :try_end_32} :catchall_3f
 
-    .line 434
+    .line 430
     :goto_32
     # getter for: Lcom/hpbr/bosszhipin/export2/ExportHelper;->sMainHandler:Landroid/os/Handler;
     invoke-static {}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1200()Landroid/os/Handler;
@@ -129,7 +129,7 @@
     :catchall_3f
     move-exception v1
 
-    .line 430
+    .line 426
     :try_start_40
     new-instance v3, Ljava/lang/StringBuilder;
 
@@ -144,7 +144,7 @@
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    .line 431
+    .line 427
     new-instance v2, Ljava/lang/StringBuilder;
 
     invoke-direct {v2, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -161,7 +161,7 @@
     :try_end_5f
     .catchall {:try_start_40 .. :try_end_5f} :catchall_6a
 
-    .line 434
+    .line 430
     # getter for: Lcom/hpbr/bosszhipin/export2/ExportHelper;->sMainHandler:Landroid/os/Handler;
     invoke-static {}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1200()Landroid/os/Handler;
 
@@ -192,7 +192,7 @@
 
     invoke-virtual {v1, v2}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
 
-    .line 440
+    .line 436
     goto :goto_7a
 
     :goto_79

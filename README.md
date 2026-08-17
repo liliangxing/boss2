@@ -349,7 +349,8 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ### 功能清单（v6）
 
-1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部加了一条 `dragBar`（44x8dp 圆角白条），**只有拖动条能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不再拦截触摸、可正常点击）。按钮文字 12f、padding 12/5、圆角 16、背景 0xCC000000，btnGroup 水平居中、按钮间距 4dp——整体比上一版更小。
+1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部加了一条 `dragBar`（60x10dp 白色圆角条），**只有拖动条能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
+   - **踩坑记录**: dragBar 必须 `btnGroup.addView(dragBar, 固定dp的LayoutParams)` 直接传入固定尺寸。若先 `setLayoutParams(dp)` 再 `addView(view, wrap_content)` 会把参数覆盖为 WRAP_CONTENT，普通 `View` 在 LinearLayout 中 WRAP_CONTENT 会被 `getDefaultSize` 按 `AT_MOST` 测量成父容器满尺寸 → 白色半透明条铺满屏幕并拦截所有触摸（用户反馈"白色透明遮罩一大片 + 按钮拖不动"）。
 2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 同时写 Markdown + TXT 到 MediaStore Downloads。TXT 末尾附 `===== 请求报文 (curl/Bash) =====` 段，含本次导出所有列表/详情请求的完整 curl 命令。
 3. **沟通**: 弹批量对话框选职位 → 反射长连接接口批量发送 → 每个职位 Toast「发送成功/失败: 姓名」。成功时补调 `ContactManager.C(contact,0)` 更新会话记录，**并调 `ContactManager.V()` 触发列表刷新**（见下方消息列表闭环说明）。
 4. **Curl 验证**: 校验**第 1 条**职位（上一版第 16 条跨页、page 固定 2 导致误判，已改回第一页第一条）。收集屏幕列表第 1 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第1条吻合」，否则失败。

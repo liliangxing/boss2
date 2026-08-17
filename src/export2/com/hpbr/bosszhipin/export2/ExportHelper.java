@@ -119,15 +119,15 @@ public class ExportHelper {
             final TextView btn = new TextView(activity);
             btn.setText("\u5BFC\u51FA");
             btn.setTextColor(Color.WHITE);
-            btn.setTextSize(12f);
+            btn.setTextSize(11f);
             btn.setGravity(Gravity.CENTER);
-            btn.setPadding(dp(activity, 12), dp(activity, 5), dp(activity, 12), dp(activity, 5));
+            btn.setPadding(dp(activity, 10), dp(activity, 4), dp(activity, 10), dp(activity, 4));
 
             GradientDrawable bg = new GradientDrawable();
-            bg.setColor(0xCC000000);
-            bg.setCornerRadius(dp(activity, 16));
+            bg.setColor(0xB3000000);
+            bg.setCornerRadius(dp(activity, 12));
             btn.setBackground(bg);
-            btn.setElevation(dp(activity, 3));
+            btn.setElevation(dp(activity, 2));
             if (Build.VERSION.SDK_INT >= 21) {
                 btn.setZ(100f);
             }
@@ -135,11 +135,11 @@ public class ExportHelper {
             final TextView chatBtn = new TextView(activity);
             chatBtn.setText("\u6C9F\u901A");
             chatBtn.setTextColor(Color.WHITE);
-            chatBtn.setTextSize(12f);
+            chatBtn.setTextSize(11f);
             chatBtn.setGravity(Gravity.CENTER);
-            chatBtn.setPadding(dp(activity, 12), dp(activity, 5), dp(activity, 12), dp(activity, 5));
+            chatBtn.setPadding(dp(activity, 10), dp(activity, 4), dp(activity, 10), dp(activity, 4));
             chatBtn.setBackground(bg);
-            chatBtn.setElevation(dp(activity, 3));
+            chatBtn.setElevation(dp(activity, 2));
             if (Build.VERSION.SDK_INT >= 21) {
                 chatBtn.setZ(100f);
             }
@@ -147,38 +147,34 @@ public class ExportHelper {
             final TextView curlBtn = new TextView(activity);
             curlBtn.setText("Curl");
             curlBtn.setTextColor(Color.WHITE);
-            curlBtn.setTextSize(12f);
+            curlBtn.setTextSize(11f);
             curlBtn.setGravity(Gravity.CENTER);
-            curlBtn.setPadding(dp(activity, 12), dp(activity, 5), dp(activity, 12), dp(activity, 5));
+            curlBtn.setPadding(dp(activity, 10), dp(activity, 4), dp(activity, 10), dp(activity, 4));
             curlBtn.setBackground(bg);
-            curlBtn.setElevation(dp(activity, 3));
+            curlBtn.setElevation(dp(activity, 2));
             if (Build.VERSION.SDK_INT >= 21) {
                 curlBtn.setZ(100f);
             }
 
             View dragBar = new View(activity);
-            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 44), dp(activity, 8));
-            dbp.setMargins(0, 0, 0, dp(activity, 4));
-            dragBar.setLayoutParams(dbp);
+            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 60), dp(activity, 10));
+            dbp.setMargins(0, 0, 0, dp(activity, 6));
             GradientDrawable dbg = new GradientDrawable();
-            dbg.setColor(0x99FFFFFF);
-            dbg.setCornerRadius(dp(activity, 4));
+            dbg.setColor(0xE6FFFFFF);
+            dbg.setCornerRadius(dp(activity, 5));
             dragBar.setBackground(dbg);
 
             LinearLayout btnGroup = new LinearLayout(activity);
             btnGroup.setOrientation(LinearLayout.VERTICAL);
             btnGroup.setGravity(Gravity.CENTER_HORIZONTAL);
-            LinearLayout.LayoutParams gb1 = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb1.setMargins(0, 0, 0, dp(activity, 4));
-            btnGroup.addView(dragBar, gb1);
+            btnGroup.addView(dragBar, dbp);
             LinearLayout.LayoutParams gb2 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb2.setMargins(0, 0, 0, dp(activity, 4));
+            gb2.setMargins(0, 0, 0, dp(activity, 3));
             btnGroup.addView(chatBtn, gb2);
             LinearLayout.LayoutParams gb3 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb3.setMargins(0, 0, 0, dp(activity, 4));
+            gb3.setMargins(0, 0, 0, dp(activity, 3));
             btnGroup.addView(btn, gb3);
             btnGroup.addView(curlBtn, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
