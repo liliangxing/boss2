@@ -32,7 +32,7 @@
         }
     .end annotation
 
-    .line 358
+    .line 367
     iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$6;->val$input:Landroid/widget/EditText;
 
     iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$6;->val$activity:Landroid/app/Activity;
@@ -47,7 +47,7 @@
 .method public onClick(Landroid/content/DialogInterface;I)V
     .registers 4
 
-    .line 363
+    .line 372
     :try_start_0
     iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$6;->val$input:Landroid/widget/EditText;
 
@@ -88,7 +88,7 @@
 
     const/16 p1, 0x4b
 
-    .line 372
+    .line 381
     :cond_1f
     new-instance p2, Ljava/lang/StringBuilder;
 
@@ -105,7 +105,7 @@
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
     invoke-static {p2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    .line 373
+    .line 382
     iget-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$6;->val$activity:Landroid/app/Activity;
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->showBatchMsgDialog(Landroid/app/Activity;I)V

@@ -91,6 +91,19 @@ public class ExportHelper {
     private static volatile String sCreateError;
     private static volatile Object sCreateRelation;
 
+    private static volatile CountDownLatch sResumeLatch;
+    private static volatile boolean sResumeDone;
+    private static volatile boolean sResumeOk;
+    private static volatile String sResumeError;
+    private static volatile Object sResumeResponse;
+
+    private static volatile CountDownLatch sSaveLatch;
+    private static volatile boolean sSaveDone;
+    private static volatile boolean sSaveOk;
+    private static volatile String sSaveError;
+
+    private static final Object sImportLock = new Object();
+
     private static final List<String> sCurlList = new ArrayList<String>();
     private static final List<String> sCurlRespList = new ArrayList<String>();
 
@@ -154,7 +167,7 @@ public class ExportHelper {
             }
 
             final TextView curlBtn = new TextView(activity);
-            curlBtn.setText("Curl");
+            curlBtn.setText("\u66F4\u591A");
             curlBtn.setTextColor(Color.WHITE);
             curlBtn.setTextSize(15.84f);
             curlBtn.setGravity(Gravity.CENTER);
@@ -274,11 +287,7 @@ public class ExportHelper {
             curlBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (sRunning) {
-                        toast(activity, "\u9A8C\u8BC1\u4E2D...\u8BF7\u7A0D\u540E");
-                        return;
-                    }
-                    verifyCurl(activity);
+                    showMorePanel(activity);
                 }
             });
         } catch (Throwable t) {
@@ -1653,6 +1662,399 @@ public class ExportHelper {
         });
     }
 
+    /* ============ 更多面板 ============ */
+
+    private static void showMorePanel(final Activity activity) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            log("showMorePanel skip, activity not usable");
+            return;
+        }
+        try {
+            LinearLayout grid = new LinearLayout(activity);
+            grid.setOrientation(LinearLayout.VERTICAL);
+            grid.setPadding(dp(activity, 16), dp(activity, 12), dp(activity, 16), dp(activity, 12));
+
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+
+            row.addView(makePanelItem(activity, "C", "Curl", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (sRunning) {
+                        toast(activity, "\u9A8C\u8BC1\u4E2D...\u8BF7\u7A0D\u540E");
+                        return;
+                    }
+                    verifyCurl(activity);
+                }
+            }));
+            row.addView(makePanelItem(activity, "\u2193", "\u5BFC\u51FA\u7B80\u5386", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    exportResumeMd(activity);
+                }
+            }));
+            row.addView(makePanelItem(activity, "\u2191", "\u5BFC\u5165\u7B80\u5386", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    importResumeMd(activity);
+                }
+            }));
+
+            for (int i = 0; i < row.getChildCount(); i++) {
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) row.getChildAt(i).getLayoutParams();
+                lp.weight = 1f;
+                lp.width = 0;
+                row.getChildAt(i).setLayoutParams(lp);
+            }
+            grid.addView(row, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            final AlertDialog panel = new AlertDialog.Builder(activity)
+                    .setTitle("\u66F4\u591A\u529F\u80FD")
+                    .setView(grid)
+                    .setNegativeButton("\u5173\u95ED", null)
+                    .create();
+            panel.setCanceledOnTouchOutside(true);
+            panel.show();
+        } catch (Throwable t) {
+            log("showMorePanel error: " + t.getMessage());
+            toast(activity, "\u66F4\u591A\u9762\u677F\u542F\u52A8\u5F02\u5E38: " + t.getMessage());
+        }
+    }
+
+    private static View makePanelItem(final Activity activity, final String icon, final String label,
+                                      final View.OnClickListener click) {
+        LinearLayout item = new LinearLayout(activity);
+        item.setOrientation(LinearLayout.VERTICAL);
+        item.setGravity(Gravity.CENTER);
+        int pad = dp(activity, 8);
+        item.setPadding(pad, pad, pad, pad);
+
+        TextView iv = new TextView(activity);
+        iv.setText(icon);
+        iv.setTextColor(0xFF1E5EFF);
+        iv.setTextSize(20f);
+        iv.setGravity(Gravity.CENTER);
+        item.addView(iv, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(activity, 32)));
+
+        TextView tv = new TextView(activity);
+        tv.setText(label);
+        tv.setTextColor(0xFF333333);
+        tv.setTextSize(12f);
+        tv.setGravity(Gravity.CENTER);
+        item.addView(tv, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(0xFFF5F6F8);
+        bg.setCornerRadius(dp(activity, 8));
+        item.setBackground(bg);
+
+        if (click != null) {
+            item.setOnClickListener(click);
+        }
+        return item;
+    }
+
+    /* ============ 在线简历导出/导入 ============ */
+
+    private static final String RESUME_MD_MARK = "\u5728\u7EBF\u7B80\u5386\u5BFC\u51FA";
+    private static final String RESUME_MD_VERSION = "1";
+
+    private static void exportResumeMd(final Activity activity) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Object resp = requestResumeDetail(activity);
+                    if (resp == null) {
+                        toastMain(activity, "\u83B7\u53D6\u5728\u7EBF\u7B80\u5386\u5931\u8D25");
+                        return;
+                    }
+                    Object detail = null;
+                    try {
+                        Field f = resp.getClass().getField("geekDetail");
+                        detail = f.get(resp);
+                    } catch (Throwable t) {
+                        log("resp geekDetail error: " + t.getMessage());
+                    }
+                    if (detail == null) {
+                        toastMain(activity, "\u7B80\u5386\u6570\u636E\u4E3A\u7A7A");
+                        return;
+                    }
+                    String md = buildResumeMd(detail);
+                    File out = writeResumeMdFile(activity, md);
+                    if (out != null) {
+                        toastMain(activity, "\u7B80\u5386\u5DF2\u5BFC\u51FA: " + out.getAbsolutePath());
+                    } else {
+                        toastMain(activity, "\u7B80\u5386\u5BFC\u51FA\u5931\u8D25: \u5199\u5165\u6587\u4EF6\u51FA\u9519");
+                    }
+                } catch (Throwable t) {
+                    log("exportResumeMd error: " + t.getMessage());
+                    toastMain(activity, "\u5BFC\u51FA\u7B80\u5386\u5F02\u5E38: " + t.getMessage());
+                }
+            }
+        }).start();
+    }
+
+    private static Object requestResumeDetail(Activity activity) throws Exception {
+        sResumeDone = false;
+        sResumeOk = false;
+        sResumeError = null;
+        sResumeResponse = null;
+        sResumeLatch = new CountDownLatch(1);
+
+        Class<?> reqClass = Class.forName("net.bosszhipin.api.GetUserAccountGeekDetailRequest");
+        Object req = reqClass.newInstance();
+
+        Class<?> cbClass = Class.forName("com.hpbr.bosszhipin.export2.ExportResumeCallback");
+        Object cb = cbClass.newInstance();
+
+        Class<?> baseClass = Class.forName("com.twl.http.client.a");
+        Field cbF = baseClass.getDeclaredField("mCallback");
+        cbF.setAccessible(true);
+        cbF.set(req, cb);
+        Field reqF = Class.forName("com.twl.http.callback.a").getField("request");
+        reqF.set(cb, req);
+
+        Method mExec = req.getClass().getMethod("execute");
+        mExec.invoke(req);
+
+        boolean done = sResumeLatch.await(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        if (!done || !sResumeOk) {
+            log("resume detail request not ok done=" + done + " err=" + sResumeError);
+            return null;
+        }
+        return sResumeResponse;
+    }
+
+    public static void notifyResumeLoaded(Object hg0a) {
+        try {
+            if (hg0a != null) {
+                Field aF = hg0a.getClass().getField("a");
+                Object resp = aF.get(hg0a);
+                if (resp != null) {
+                    sResumeResponse = resp;
+                    sResumeOk = true;
+                }
+            }
+        } catch (Throwable t) {
+            log("notifyResumeLoaded error: " + t.getMessage());
+            sResumeError = t.getMessage();
+        } finally {
+            sResumeDone = true;
+            if (sResumeLatch != null) {
+                sResumeLatch.countDown();
+            }
+        }
+    }
+
+    public static void notifyResumeFailed(String msg) {
+        sResumeError = msg == null ? "" : msg;
+        sResumeOk = false;
+        sResumeDone = true;
+        if (sResumeLatch != null) {
+            sResumeLatch.countDown();
+        }
+    }
+
+    private static File writeResumeMdFile(Context ctx, String md) {
+        try {
+            if (Build.VERSION.SDK_INT >= 29) {
+                String fileName = pickUniqueNameMediaStore(ctx, "\u7B80\u5386" + new SimpleDateFormat("MMddHHmmss", Locale.CHINA).format(new Date()));
+                Uri uri = insertIntoMediaStore(ctx, fileName, md);
+                if (uri == null) {
+                    return null;
+                }
+                return new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS), "Android/BOSS2/" + fileName);
+            } else {
+                File dir = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS), "Android/BOSS2");
+                if (!dir.exists() && !dir.mkdirs()) {
+                    return null;
+                }
+                String fileName = pickUniqueNameFile(dir, "\u7B80\u5386" + new SimpleDateFormat("MMddHHmmss", Locale.CHINA).format(new Date()));
+                File out = new File(dir, fileName);
+                FileOutputStream fos = new FileOutputStream(out);
+                try {
+                    fos.write(md.getBytes("UTF-8"));
+                } finally {
+                    fos.close();
+                }
+                return out;
+            }
+        } catch (Throwable t) {
+            log("write resume md error: " + t.getMessage());
+            return null;
+        }
+    }
+
+    private static String buildResumeMd(Object detail) {
+        StringBuilder sb = new StringBuilder(8192);
+        sb.append("# ").append(RESUME_MD_MARK).append("\n\n");
+        sb.append("> BOSS\u76F4\u8058 \u5728\u7EBF\u7B80\u5386\u5BFC\u51FA (\u683C\u5F0F\u7248\u672C: ").append(RESUME_MD_VERSION).append(")\n");
+        sb.append("> \u5BFC\u51FA\u65F6\u95F4: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(new Date())).append("\n\n");
+
+        Object userInfo = null;
+        try {
+            Field f = detail.getClass().getField("userInfo");
+            userInfo = f.get(detail);
+        } catch (Throwable t) {
+            log("detail userInfo error: " + t.getMessage());
+        }
+
+        sb.append("## \u57FA\u672C\u4FE1\u606F\n");
+        sb.append("- \u59D3\u540D\uFF1A").append(userInfo == null ? "" : readFieldSafe(userInfo, "name", "")).append("\n");
+        sb.append("- \u6027\u522B\uFF1A").append(genderText(readIntField(detail, "gender", -1))).append("\n");
+        sb.append("- \u751F\u65E5\uFF1A").append(readFieldSafe(detail, "birthday", "")).append("\n");
+        sb.append("- \u5B66\u5386\uFF1A").append(readFieldSafe(detail, "degreeCategory", "")).append("\n");
+        sb.append("- \u5DE5\u4F5C\u5E74\u9650\uFF1A").append(readFieldSafe(detail, "workYearsDesc", "")).append("\n");
+        sb.append("- \u7535\u5B50\u90AE\u7BB1\uFF1A").append(readFieldSafe(detail, "email", "")).append("\n");
+        sb.append("- \u5FAE\u4FE1\uFF1A").append(userInfo == null ? "" : readFieldSafe(userInfo, "weixin", "")).append("\n");
+        sb.append("- \u4E2A\u4EBA\u4F18\u52BF\uFF1A").append(readFieldSafe(detail, "userDescription", "")).append("\n\n");
+
+        appendExpectSection(sb, detail);
+        appendListSection(sb, detail, "workExperienceList", "work", "\u5DE5\u4F5C\u7ECF\u5386");
+        appendListSection(sb, detail, "eduExperienceList", "edu", "\u6559\u80B2\u7ECF\u5386");
+        appendListSection(sb, detail, "projectExperienceList", "project", "\u9879\u76EE\u7ECF\u5386");
+        appendListSection(sb, detail, "trainingExpList", "training", "\u57F9\u8BAD\u7ECF\u5386");
+
+        sb.append("## \u4E13\u4E1A\u6280\u80FD\n");
+        sb.append("- \u6280\u80FD\uFF1A").append(readFieldSafe(detail, "professionalSkill", "")).append("\n");
+        return sb.toString();
+    }
+
+    private static String genderText(int g) {
+        if (g == 1) {
+            return "\u7537";
+        }
+        if (g == 2) {
+            return "\u5973";
+        }
+        return "";
+    }
+
+    private static int readIntField(Object o, String name, int def) {
+        try {
+            Field f = o.getClass().getField(name);
+            return f.getInt(o);
+        } catch (Throwable t) {
+            return def;
+        }
+    }
+
+    private static void appendExpectSection(StringBuilder sb, Object detail) {
+        sb.append("## \u671F\u671B\u804C\u4F4D\n");
+        List<Object> list = readListField(detail, "expectPositionList");
+        if (list == null || list.isEmpty()) {
+            sb.append("- \u671F\u671B\u5C97\u4F4D\uFF1A\n");
+            sb.append("- \u671F\u671B\u57CE\u5E02\uFF1A\n");
+            sb.append("- \u671F\u671B\u85AA\u8D44\uFF1A\n\n");
+            return;
+        }
+        for (Object e : list) {
+            if (e == null) {
+                continue;
+            }
+            String pos = readFieldAny(e, "", "positionName", "nameAfterLabel", "suggestPosition");
+            String loc = readFieldSafe(e, "locationName", "");
+            String salary = readFieldSafe(e, "salaryDesc", "");
+            sb.append("- \u671F\u671B\u5C97\u4F4D\uFF1A").append(pos).append("\n");
+            sb.append("- \u671F\u671B\u57CE\u5E02\uFF1A").append(loc).append("\n");
+            sb.append("- \u671F\u671B\u85AA\u8D44\uFF1A").append(salary).append("\n\n");
+            break;
+        }
+    }
+
+    private static void appendListSection(StringBuilder sb, Object detail, String fieldName,
+                                          String kind, String title) {
+        sb.append("## ").append(title).append("\n");
+        List<Object> list = readListField(detail, fieldName);
+        if (list == null || list.isEmpty()) {
+            sb.append("(\u65E0)\n\n");
+            return;
+        }
+        int idx = 0;
+        for (Object item : list) {
+            if (item == null) {
+                continue;
+            }
+            idx++;
+            if ("work".equals(kind)) {
+                String company = readFieldSafe(item, "company", "");
+                String positionName = readFieldSafe(item, "positionName", "");
+                String start = readFieldSafe(item, "startDateMonth", "");
+                String end = readFieldSafe(item, "endDateMonth", "");
+                sb.append("### ").append(company).append(" - ").append(positionName)
+                        .append(" (").append(start).append(" - ").append(end).append(")\n");
+                sb.append("- \u516C\u53F8\uFF1A").append(company).append("\n");
+                sb.append("- \u804C\u4F4D\uFF1A").append(positionName).append("\n");
+                sb.append("- \u5F00\u59CB\u65F6\u95F4\uFF1A").append(start).append("\n");
+                sb.append("- \u7ED3\u675F\u65F6\u95F4\uFF1A").append(end).append("\n");
+                sb.append("- \u5DE5\u4F5C\u5185\u5BB9\uFF1A").append(readFieldSafe(item, "responsibility", "")).append("\n");
+                sb.append("- \u4E1A\u7EE9\uFF1A").append(readFieldSafe(item, "workPerformance", "")).append("\n");
+                sb.append("- \u90E8\u95E8\uFF1A").append(readFieldSafe(item, "department", "")).append("\n\n");
+            } else if ("edu".equals(kind)) {
+                String school = readFieldSafe(item, "school", "");
+                String major = readFieldSafe(item, "major", "");
+                String degree = readFieldSafe(item, "degreeName", "");
+                String start = readFieldSafe(item, "startDate", "");
+                String end = readFieldSafe(item, "endDate", "");
+                sb.append("### ").append(school).append(" - ").append(major)
+                        .append(" (").append(start).append(" - ").append(end).append(")\n");
+                sb.append("- \u5B66\u6821\uFF1A").append(school).append("\n");
+                sb.append("- \u4E13\u4E1A\uFF1A").append(major).append("\n");
+                sb.append("- \u5B66\u5386\uFF1A").append(degree).append("\n");
+                sb.append("- \u5F00\u59CB\u65F6\u95F4\uFF1A").append(start).append("\n");
+                sb.append("- \u7ED3\u675F\u65F6\u95F4\uFF1A").append(end).append("\n");
+                sb.append("- \u5728\u6821\u7ECF\u5386\uFF1A").append(readFieldSafe(item, "eduDescription", "")).append("\n\n");
+            } else if ("project".equals(kind)) {
+                String name = readFieldSafe(item, "name", "");
+                String role = readFieldSafe(item, "roleName", "");
+                String start = readFieldSafe(item, "startDate", "");
+                String end = readFieldSafe(item, "endDate", "");
+                sb.append("### ").append(name).append(" (").append(start).append(" - ").append(end).append(")\n");
+                sb.append("- \u9879\u76EE\u540D\uFF1A").append(name).append("\n");
+                sb.append("- \u89D2\u8272\uFF1A").append(role).append("\n");
+                sb.append("- \u5F00\u59CB\u65F6\u95F4\uFF1A").append(start).append("\n");
+                sb.append("- \u7ED3\u675F\u65F6\u95F4\uFF1A").append(end).append("\n");
+                sb.append("- \u9879\u76EE\u63CF\u8FF0\uFF1A").append(readFieldSafe(item, "projectDescription", "")).append("\n");
+                sb.append("- \u4E1A\u7EE9\uFF1A").append(readFieldSafe(item, "performance", "")).append("\n\n");
+            } else if ("training".equals(kind)) {
+                String course = readFieldSafe(item, "course", "");
+                String agency = readFieldSafe(item, "company", "");
+                String start = readFieldSafe(item, "startDate", "");
+                String end = readFieldSafe(item, "endDate", "");
+                sb.append("### ").append(course).append(" (").append(start).append(" - ").append(end).append(")\n");
+                sb.append("- \u57F9\u8BAD\u673A\u6784\uFF1A").append(agency).append("\n");
+                sb.append("- \u57F9\u8BAD\u8BFE\u7A0B\uFF1A").append(course).append("\n");
+                sb.append("- \u5F00\u59CB\u65F6\u95F4\uFF1A").append(start).append("\n");
+                sb.append("- \u7ED3\u675F\u65F6\u95F4\uFF1A").append(end).append("\n\n");
+            }
+        }
+        sb.append("\n");
+    }
+
+    private static List<Object> readListField(Object o, String name) {
+        try {
+            Field f = o.getClass().getField(name);
+            Object v = f.get(o);
+            if (v instanceof List) {
+                List<?> l = (List<?>) v;
+                List<Object> out = new ArrayList<Object>();
+                for (Object item : l) {
+                    out.add(item);
+                }
+                return out;
+            }
+        } catch (Throwable t) {
+            log("readListField " + name + " error: " + t.getMessage());
+        }
+        return null;
+    }
+
     private static void verifyCurl(final Activity activity) {
         new Thread(new Runnable() {
             @Override
@@ -2744,6 +3146,649 @@ public class ExportHelper {
             r = r.substring(0, 50);
         }
         return r;
+    }
+
+    /* ============ 导入在线简历 ============ */
+
+    private static class ResumeData {
+        String userDescription = "";
+        String skill = "";
+        Map<String, String> expect = new HashMap<String, String>();
+        List<Map<String, String>> works = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> edus = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> projects = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> trainings = new ArrayList<Map<String, String>>();
+    }
+
+    private static void importResumeMd(final Activity activity) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+        try {
+            final List<File> files = listResumeMdFiles(activity);
+            if (files.isEmpty()) {
+                toast(activity, "\u672A\u627E\u5230\u53EF\u5BFC\u5165\u7684 .md \u7B80\u5386\u6587\u4EF6\uFF08\u8BF7\u5148\u5BFC\u51FA\u7B80\u5386\uFF09");
+                return;
+            }
+            final String[] names = new String[files.size()];
+            for (int i = 0; i < files.size(); i++) {
+                names[i] = files.get(i).getName();
+            }
+            AlertDialog dlg = new AlertDialog.Builder(activity)
+                    .setTitle("\u9009\u62E9\u8981\u5BFC\u5165\u7684\u7B80\u5386\u6587\u4EF6")
+                    .setItems(names, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface d, int which) {
+                            doImportResume(activity, files.get(which));
+                        }
+                    })
+                    .setNegativeButton("\u53D6\u6D88", null)
+                    .create();
+            dlg.setCanceledOnTouchOutside(true);
+            dlg.show();
+        } catch (Throwable t) {
+            log("importResumeMd error: " + t.getMessage());
+            toast(activity, "\u5BFC\u5165\u7B80\u5386\u542F\u52A8\u5F02\u5E38: " + t.getMessage());
+        }
+    }
+
+    private static List<File> listResumeMdFiles(Context ctx) {
+        List<File> out = new ArrayList<File>();
+        try {
+            File dir = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS), "Android/BOSS2");
+            File[] all = dir.listFiles();
+            if (all != null) {
+                for (File f : all) {
+                    if (f.isFile() && f.getName().toLowerCase(Locale.US).endsWith(".md")) {
+                        out.add(f);
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            log("listResumeMdFiles error: " + t.getMessage());
+        }
+        return out;
+    }
+
+    private static void doImportResume(final Activity activity, final File file) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String result = null;
+                synchronized (sImportLock) {
+                    try {
+                        String md = readResumeMdFile(file);
+                        if (md == null) {
+                            result = "\u5BFC\u5165\u5931\u8D25: \u8BFB\u53D6\u6587\u4EF6\u5931\u8D25";
+                            return;
+                        }
+                        if (!validateResumeMd(md)) {
+                            result = "\u683C\u5F0F\u4E0D\u5BF9";
+                            return;
+                        }
+                        ResumeData data = parseResumeMd(md);
+                        result = importResumeData(activity, data);
+                    } catch (Throwable t) {
+                        log("doImportResume error: " + t.getMessage());
+                        result = "\u5BFC\u5165\u7B80\u5386\u5F02\u5E38: " + t.getMessage();
+                    }
+                }
+                final String finalResult = result;
+                sMainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast(activity, finalResult);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private static String readResumeMdFile(File file) {
+        try {
+            java.io.InputStream in = new java.io.FileInputStream(file);
+            try {
+                byte[] buf = new byte[(int) Math.min(file.length(), 1024 * 1024)];
+                int off = 0;
+                int n;
+                while (off < buf.length && (n = in.read(buf, off, buf.length - off)) > 0) {
+                    off += n;
+                }
+                return new String(buf, 0, off, "UTF-8");
+            } finally {
+                in.close();
+            }
+        } catch (Throwable t) {
+            log("readResumeMdFile error: " + t.getMessage());
+            return null;
+        }
+    }
+
+    private static boolean validateResumeMd(String md) {
+        if (md == null) {
+            return false;
+        }
+        if (!md.contains("# " + RESUME_MD_MARK)) {
+            return false;
+        }
+        if (!md.contains("## \u57FA\u672C\u4FE1\u606F")) {
+            return false;
+        }
+        if (!md.contains("\u683C\u5F0F\u7248\u672C: " + RESUME_MD_VERSION)) {
+            return false;
+        }
+        return true;
+    }
+
+    private static String fieldValue(String line, String prefix) {
+        if (line == null) {
+            return "";
+        }
+        String s = line.trim();
+        if (s.startsWith(prefix)) {
+            String v = s.substring(prefix.length()).trim();
+            return v.equals("\uFF08\u65E0\uFF09") ? "" : v;
+        }
+        return null;
+    }
+
+    private static ResumeData parseResumeMd(String md) {
+        ResumeData data = new ResumeData();
+        String[] lines = md.split("\n");
+        String section = "";
+        Map<String, String> cur = null;
+        for (String raw : lines) {
+            String line = raw.trim();
+            if (line.startsWith("## ")) {
+                section = line.substring(3).trim();
+                cur = null;
+                continue;
+            }
+            if (line.startsWith("### ")) {
+                if ("\u5DE5\u4F5C\u7ECF\u5386".equals(section)) {
+                    cur = new HashMap<String, String>();
+                    data.works.add(cur);
+                } else if ("\u6559\u80B2\u7ECF\u5386".equals(section)) {
+                    cur = new HashMap<String, String>();
+                    data.edus.add(cur);
+                } else if ("\u9879\u76EE\u7ECF\u5386".equals(section)) {
+                    cur = new HashMap<String, String>();
+                    data.projects.add(cur);
+                } else if ("\u57F9\u8BAD\u7ECF\u5386".equals(section)) {
+                    cur = new HashMap<String, String>();
+                    data.trainings.add(cur);
+                }
+                continue;
+            }
+            String v;
+            if ("\u57FA\u672C\u4FE1\u606F".equals(section)) {
+                if ((v = fieldValue(line, "- \u4E2A\u4EBA\u4F18\u52BF\uFF1A")) != null) {
+                    data.userDescription = v;
+                }
+            } else if ("\u4E13\u4E1A\u6280\u80FD".equals(section)) {
+                if ((v = fieldValue(line, "- \u6280\u80FD\uFF1A")) != null) {
+                    data.skill = v;
+                }
+            } else if ("\u671F\u671B\u804C\u4F4D".equals(section)) {
+                if ((v = fieldValue(line, "- \u671F\u671B\u5C97\u4F4D\uFF1A")) != null) {
+                    data.expect.put("positionName", v);
+                } else if ((v = fieldValue(line, "- \u671F\u671B\u57CE\u5E02\uFF1A")) != null) {
+                    data.expect.put("locationName", v);
+                } else if ((v = fieldValue(line, "- \u671F\u671B\u85AA\u8D44\uFF1A")) != null) {
+                    data.expect.put("salaryDesc", v);
+                }
+            } else if ("\u5DE5\u4F5C\u7ECF\u5386".equals(section) && cur != null) {
+                if ((v = fieldValue(line, "- \u516C\u53F8\uFF1A")) != null) {
+                    cur.put("company", v);
+                } else if ((v = fieldValue(line, "- \u804C\u4F4D\uFF1A")) != null) {
+                    cur.put("positionName", v);
+                } else if ((v = fieldValue(line, "- \u5F00\u59CB\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("startDate", v);
+                } else if ((v = fieldValue(line, "- \u7ED3\u675F\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("endDate", v);
+                } else if ((v = fieldValue(line, "- \u5DE5\u4F5C\u5185\u5BB9\uFF1A")) != null) {
+                    cur.put("responsibility", v);
+                } else if ((v = fieldValue(line, "- \u4E1A\u7EE9\uFF1A")) != null) {
+                    cur.put("workPerformance", v);
+                } else if ((v = fieldValue(line, "- \u90E8\u95E8\uFF1A")) != null) {
+                    cur.put("department", v);
+                }
+            } else if ("\u6559\u80B2\u7ECF\u5386".equals(section) && cur != null) {
+                if ((v = fieldValue(line, "- \u5B66\u6821\uFF1A")) != null) {
+                    cur.put("school", v);
+                } else if ((v = fieldValue(line, "- \u4E13\u4E1A\uFF1A")) != null) {
+                    cur.put("major", v);
+                } else if ((v = fieldValue(line, "- \u5B66\u5386\uFF1A")) != null) {
+                    cur.put("degree", v);
+                } else if ((v = fieldValue(line, "- \u5F00\u59CB\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("startDate", v);
+                } else if ((v = fieldValue(line, "- \u7ED3\u675F\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("endDate", v);
+                } else if ((v = fieldValue(line, "- \u5728\u6821\u7ECF\u5386\uFF1A")) != null) {
+                    cur.put("eduDescription", v);
+                }
+            } else if ("\u9879\u76EE\u7ECF\u5386".equals(section) && cur != null) {
+                if ((v = fieldValue(line, "- \u9879\u76EE\u540D\uFF1A")) != null) {
+                    cur.put("name", v);
+                } else if ((v = fieldValue(line, "- \u89D2\u8272\uFF1A")) != null) {
+                    cur.put("roleName", v);
+                } else if ((v = fieldValue(line, "- \u5F00\u59CB\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("startDate", v);
+                } else if ((v = fieldValue(line, "- \u7ED3\u675F\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("endDate", v);
+                } else if ((v = fieldValue(line, "- \u9879\u76EE\u63CF\u8FF0\uFF1A")) != null) {
+                    cur.put("projectDescription", v);
+                } else if ((v = fieldValue(line, "- \u4E1A\u7EE9\uFF1A")) != null) {
+                    cur.put("performance", v);
+                }
+            } else if ("\u57F9\u8BAD\u7ECF\u5386".equals(section) && cur != null) {
+                if ((v = fieldValue(line, "- \u57F9\u8BAD\u673A\u6784\uFF1A")) != null) {
+                    cur.put("company", v);
+                } else if ((v = fieldValue(line, "- \u57F9\u8BAD\u8BFE\u7A0B\uFF1A")) != null) {
+                    cur.put("course", v);
+                } else if ((v = fieldValue(line, "- \u5F00\u59CB\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("startDate", v);
+                } else if ((v = fieldValue(line, "- \u7ED3\u675F\u65F6\u95F4\uFF1A")) != null) {
+                    cur.put("endDate", v);
+                }
+            }
+        }
+        return data;
+    }
+
+    private static String importResumeData(Activity activity, ResumeData data) {
+        try {
+            Object detail = null;
+            Object resp = requestResumeDetail(activity);
+            if (resp != null) {
+                try {
+                    Field f = resp.getClass().getField("geekDetail");
+                    detail = f.get(resp);
+                } catch (Throwable t) {
+                    log("import geekDetail error: " + t.getMessage());
+                }
+            }
+
+            if (!data.userDescription.isEmpty() || !data.skill.isEmpty()) {
+                Map<String, Object> extra = new HashMap<String, Object>();
+                if (!data.userDescription.isEmpty()) {
+                    extra.put("userDescription", data.userDescription);
+                }
+                if (!data.skill.isEmpty()) {
+                    extra.put("professionalSkill", data.skill);
+                }
+                boolean baseOk = executeSimplePost("net.bosszhipin.api.GeekUpdateBaseInfoRequest", extra);
+                log("import baseinfo result=" + baseOk);
+            }
+
+            if (detail != null) {
+                deleteAllWorks(detail);
+                deleteAllEdus(detail);
+                deleteAllProjects(detail);
+                deleteAllExpects(detail);
+                deleteAllTrainings(detail);
+            }
+
+            int wOk = 0;
+            for (Map<String, String> w : data.works) {
+                if (saveWorkExp(w)) {
+                    wOk++;
+                }
+            }
+            int eOk = 0;
+            for (Map<String, String> e : data.edus) {
+                if (saveEduExp(e)) {
+                    eOk++;
+                }
+            }
+            int pOk = 0;
+            for (Map<String, String> p : data.projects) {
+                if (saveProjectExp(p)) {
+                    pOk++;
+                }
+            }
+            int tOk = 0;
+            for (Map<String, String> t : data.trainings) {
+                if (saveTrainingExp(t)) {
+                    tOk++;
+                }
+            }
+            boolean expectOk = true;
+            if (!data.expect.isEmpty() && !isEmptyVal(data.expect.get("positionName"))) {
+                expectOk = saveExpectPosition(data.expect);
+            }
+
+            return "\u5BFC\u5165\u5B8C\u6210: \u5DE5\u4F5C " + wOk + "/" + data.works.size()
+                    + ", \u6559\u80B2 " + eOk + "/" + data.edus.size()
+                    + ", \u9879\u76EE " + pOk + "/" + data.projects.size()
+                    + ", \u57F9\u8BAD " + tOk + "/" + data.trainings.size()
+                    + ", \u671F\u671B " + (expectOk ? "\u6210\u529F" : "\u5931\u8D25");
+        } catch (Throwable t) {
+            log("importResumeData error: " + t.getMessage());
+            return "\u5BFC\u5165\u7B80\u5386\u5F02\u5E38: " + t.getMessage();
+        }
+    }
+
+    private static boolean isEmptyVal(String s) {
+        return s == null || s.isEmpty();
+    }
+
+    private static Object newReq(String cls) throws Exception {
+        Class<?> reqClass = Class.forName(cls);
+        Class<?> cbClass = Class.forName("com.twl.http.callback.a");
+        Object cb = Class.forName("com.hpbr.bosszhipin.export2.ExportSaveCallback").newInstance();
+        Object req;
+        try {
+            java.lang.reflect.Constructor<?> c = reqClass.getConstructor(cbClass);
+            req = c.newInstance(cb);
+        } catch (NoSuchMethodException e) {
+            Class<?> baseBClass = Class.forName("net.bosszhipin.base.b");
+            java.lang.reflect.Constructor<?> c2 = reqClass.getConstructor(baseBClass);
+            req = c2.newInstance(cb);
+        }
+        Field reqF = Class.forName("com.twl.http.callback.a").getField("request");
+        reqF.set(cb, req);
+        return req;
+    }
+
+    private static boolean executeAndWait(Object req) throws Exception {
+        sSaveDone = false;
+        sSaveOk = false;
+        sSaveError = null;
+        sSaveLatch = new CountDownLatch(1);
+        Method mExec = req.getClass().getMethod("execute");
+        mExec.invoke(req);
+        boolean done = sSaveLatch.await(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        if (!done || !sSaveOk) {
+            log("save req not ok done=" + done + " err=" + sSaveError);
+            return false;
+        }
+        return true;
+    }
+
+    private static void setExtraMap(Object req, Map<String, Object> extra) throws Exception {
+        Class<?> baseClass = Class.forName("com.twl.http.client.a");
+        Field extraF = baseClass.getField("extra_map");
+        extraF.set(req, extra);
+    }
+
+    private static boolean executeSimplePost(String cls, Map<String, Object> extra) {
+        try {
+            Object req = newReq(cls);
+            setExtraMap(req, extra);
+            return executeAndWait(req);
+        } catch (Throwable t) {
+            log("executeSimplePost " + cls + " error: " + t.getMessage());
+            return false;
+        }
+    }
+
+    private static void deleteAllWorks(Object detail) {
+        List<Object> list = readListField(detail, "workExperienceList");
+        if (list == null) {
+            return;
+        }
+        for (Object item : list) {
+            try {
+                long workId = readLongField(item, "workId", 0L);
+                if (workId <= 0) {
+                    continue;
+                }
+                Object req = newReq("net.bosszhipin.api.WorkExpDeleteRequest");
+                Class<?> rc = Class.forName("net.bosszhipin.api.WorkExpDeleteRequest");
+                Field f = rc.getField("workId");
+                f.setLong(req, workId);
+                executeAndWait(req);
+            } catch (Throwable t) {
+                log("delete work error: " + t.getMessage());
+            }
+        }
+    }
+
+    private static void deleteAllEdus(Object detail) {
+        List<Object> list = readListField(detail, "eduExperienceList");
+        if (list == null) {
+            return;
+        }
+        for (Object item : list) {
+            try {
+                long eduId = readLongField(item, "eduId", 0L);
+                if (eduId <= 0) {
+                    continue;
+                }
+                Object req = newReq("net.bosszhipin.api.GeekDeleteEducationExpRequest");
+                Class<?> rc = Class.forName("net.bosszhipin.api.GeekDeleteEducationExpRequest");
+                Field f = rc.getField("eduId");
+                f.setLong(req, eduId);
+                executeAndWait(req);
+            } catch (Throwable t) {
+                log("delete edu error: " + t.getMessage());
+            }
+        }
+    }
+
+    private static void deleteAllProjects(Object detail) {
+        List<Object> list = readListField(detail, "projectExperienceList");
+        if (list == null) {
+            return;
+        }
+        for (Object item : list) {
+            try {
+                long projectId = readLongField(item, "projectId", 0L);
+                if (projectId <= 0) {
+                    continue;
+                }
+                Object req = newReq("net.bosszhipin.api.GeekDeleteProjectExpRequest");
+                Class<?> rc = Class.forName("net.bosszhipin.api.GeekDeleteProjectExpRequest");
+                Field f = rc.getField("projectId");
+                f.setLong(req, projectId);
+                executeAndWait(req);
+            } catch (Throwable t) {
+                log("delete project error: " + t.getMessage());
+            }
+        }
+    }
+
+    private static void deleteAllExpects(Object detail) {
+        List<Object> list = readListField(detail, "expectPositionList");
+        if (list == null) {
+            return;
+        }
+        for (Object item : list) {
+            try {
+                long expectId = readLongField(item, "expectId", 0L);
+                if (expectId <= 0) {
+                    continue;
+                }
+                Object req = newReq("net.bosszhipin.api.DeleteJobIntentRequest");
+                Class<?> rc = Class.forName("net.bosszhipin.api.DeleteJobIntentRequest");
+                Field f = rc.getField("expectId");
+                f.setLong(req, expectId);
+                rc.getField("type").setInt(req, 0);
+                rc.getField("entrance").setInt(req, 0);
+                executeAndWait(req);
+            } catch (Throwable t) {
+                log("delete expect error: " + t.getMessage());
+            }
+        }
+    }
+
+    private static void deleteAllTrainings(Object detail) {
+        List<Object> list = readListField(detail, "trainingExpList");
+        if (list == null) {
+            return;
+        }
+        for (Object item : list) {
+            try {
+                String encryptId = readFieldSafe(item, "encryptId", "");
+                if (encryptId.isEmpty()) {
+                    continue;
+                }
+                Object req = newReq("net.bosszhipin.api.TrainingExpDeleteRequest");
+                Class<?> rc = Class.forName("net.bosszhipin.api.TrainingExpDeleteRequest");
+                Field f = rc.getField("encryptId");
+                f.set(req, encryptId);
+                executeAndWait(req);
+            } catch (Throwable t) {
+                log("delete training error: " + t.getMessage());
+            }
+        }
+    }
+
+    private static long readLongField(Object o, String name, long def) {
+        try {
+            Field f = o.getClass().getField(name);
+            return f.getLong(o);
+        } catch (Throwable t) {
+            return def;
+        }
+    }
+
+    private static Map<String, Object> strMap(String... kv) {
+        Map<String, Object> m = new HashMap<String, Object>();
+        for (int i = 0; i + 1 < kv.length; i += 2) {
+            if (kv[i + 1] != null && !kv[i + 1].isEmpty()) {
+                m.put(kv[i], kv[i + 1]);
+            }
+        }
+        return m;
+    }
+
+    private static boolean saveWorkExp(Map<String, String> w) {
+        try {
+            Map<String, Object> extra = strMap(
+                    "company", w.get("company"),
+                    "positionName", w.get("positionName"),
+                    "startDate", w.get("startDate"),
+                    "endDate", w.get("endDate"),
+                    "responsibility", w.get("responsibility"),
+                    "workPerformance", w.get("workPerformance"),
+                    "department", w.get("department"),
+                    "workDate8", w.get("startDate"),
+                    "position", "",
+                    "industryCode", "",
+                    "workEmphasis", "",
+                    "entrance", "",
+                    "isPublic", "1",
+                    "freshGraduate", "0",
+                    "industrySource", "");
+            Object req = newReq("net.bosszhipin.api.WorkExpSaveRequest");
+            setExtraMap(req, extra);
+            return executeAndWait(req);
+        } catch (Throwable t) {
+            log("saveWorkExp error: " + t.getMessage());
+            return false;
+        }
+    }
+
+    private static boolean saveEduExp(Map<String, String> e) {
+        try {
+            Map<String, Object> extra = strMap(
+                    "school", e.get("school"),
+                    "major", e.get("major"),
+                    "startDate", e.get("startDate"),
+                    "endDate", e.get("endDate"),
+                    "eduDescription", e.get("eduDescription"),
+                    "degree", "",
+                    "eduType", "0",
+                    "schoolId", "",
+                    "eduId", "");
+            Object req = newReq("net.bosszhipin.api.EduExpUpdateRequest");
+            setExtraMap(req, extra);
+            return executeAndWait(req);
+        } catch (Throwable t) {
+            log("saveEduExp error: " + t.getMessage());
+            return false;
+        }
+    }
+
+    private static boolean saveProjectExp(Map<String, String> p) {
+        try {
+            Map<String, Object> extra = strMap(
+                    "name", p.get("name"),
+                    "roleName", p.get("roleName"),
+                    "startDate", p.get("startDate"),
+                    "endDate", p.get("endDate"),
+                    "projectDescription", p.get("projectDescription"),
+                    "performance", p.get("performance"),
+                    "url", "",
+                    "projectId", "");
+            Object req = newReq("net.bosszhipin.api.GeekUpdateProjectExpRequest");
+            setExtraMap(req, extra);
+            return executeAndWait(req);
+        } catch (Throwable t) {
+            log("saveProjectExp error: " + t.getMessage());
+            return false;
+        }
+    }
+
+    private static boolean saveTrainingExp(Map<String, String> t) {
+        try {
+            Map<String, Object> extra = strMap(
+                    "course", t.get("course"),
+                    "company", t.get("company"),
+                    "startDate", t.get("startDate"),
+                    "endDate", t.get("endDate"),
+                    "encryptId", "");
+            Object req = newReq("net.bosszhipin.api.TrainingExpSaveRequest");
+            setExtraMap(req, extra);
+            return executeAndWait(req);
+        } catch (Throwable t2) {
+            log("saveTrainingExp error: " + t2.getMessage());
+            return false;
+        }
+    }
+
+    private static boolean saveExpectPosition(Map<String, String> x) {
+        try {
+            String salaryDesc = x.get("salaryDesc");
+            String high = "";
+            String low = "";
+            if (salaryDesc != null) {
+                String s = salaryDesc.replaceAll("[^0-9\\-Kk]", "");
+                int dash = s.indexOf('-');
+                if (dash > 0) {
+                    low = s.substring(0, dash);
+                    high = s.substring(dash + 1).replaceAll("[Kk].*", "");
+                }
+            }
+            Map<String, Object> extra = strMap(
+                    "positionName", x.get("positionName"),
+                    "locationName", x.get("locationName"),
+                    "highSalary", high,
+                    "lowSalary", low,
+                    "expectId", "",
+                    "position", "",
+                    "location", "",
+                    "entrance", "",
+                    "markType", "",
+                    "freshGraduate", "0");
+            Object req = newReq("net.bosszhipin.api.GeekUpdateExpectPositionRequest");
+            setExtraMap(req, extra);
+            return executeAndWait(req);
+        } catch (Throwable t) {
+            log("saveExpectPosition error: " + t.getMessage());
+            return false;
+        }
+    }
+
+    public static void notifySaveLoaded() {
+        sSaveOk = true;
+        sSaveError = null;
+        sSaveDone = true;
+        if (sSaveLatch != null) {
+            sSaveLatch.countDown();
+        }
+    }
+
+    public static void notifySaveFailed(String msg) {
+        sSaveOk = false;
+        sSaveError = msg == null ? "" : msg;
+        sSaveDone = true;
+        if (sSaveLatch != null) {
+            sSaveLatch.countDown();
+        }
     }
 
     /* ============ 工具 ============ */

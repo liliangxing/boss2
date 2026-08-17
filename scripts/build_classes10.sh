@@ -61,8 +61,10 @@ cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportChatCallback.smali \
    "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportChatCallback.smali"
 cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportCreateFriendCallback.smali \
    "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportCreateFriendCallback.smali"
-
-echo "==> [5/5] smali assemble -> classes10.dex"
+cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportResumeCallback.smali \
+   "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportResumeCallback.smali"
+cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportSaveCallback.smali \
+   "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportSaveCallback.smali"
 java -jar "$SMALI_JAR" assemble "$SMALI_OUT" -o "$OUT_DEX"
 
 echo "完成: $OUT_DEX ($(stat -c%s "$OUT_DEX") bytes)"

@@ -32,7 +32,7 @@
         }
     .end annotation
 
-    .line 1646
+    .line 1655
     iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$10;->val$activity:Landroid/app/Activity;
 
     iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$10;->val$msg:Ljava/lang/String;
@@ -47,7 +47,7 @@
 .method public run()V
     .registers 3
 
-    .line 1649
+    .line 1658
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$10;->val$activity:Landroid/app/Activity;
 
     if-eqz v0, :cond_11
@@ -58,7 +58,7 @@
 
     if-nez v0, :cond_11
 
-    .line 1650
+    .line 1659
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$10;->val$activity:Landroid/app/Activity;
 
     iget-object v1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$10;->val$msg:Ljava/lang/String;

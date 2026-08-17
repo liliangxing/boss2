@@ -346,15 +346,20 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v6.apk`（md5 `dfe293672e6d1be247ddc429bce6e74b`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）。构建与部署见下方「构建与部署（当前版本）」。
+> 当前最新构建产物 `boss2_v6.apk`（md5 `641504419ab9775528dc8d620710168a`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）+ **更多面板**（在线简历导出/导入，见功能清单第 5 项）。构建与部署见下方「构建与部署（当前版本）」。
 
 ### 功能清单（v6）
 
-1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部是一个 **正立三角形** dragBar（▲ 尖端朝上，28.8x21.6dp，`ShapeDrawable`+`PathShape` 绘制，颜色 0x66000000 半透明，比按钮更透，底边距仅 1.44dp，比按钮间距 4.32dp 更贴近沟通按钮），**只有三角形能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
+1. **悬浮按钮组**: 「沟通」「导出」「更多」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部是一个 **正立三角形** dragBar（▲ 尖端朝上，28.8x21.6dp，`ShapeDrawable`+`PathShape` 绘制，颜色 0x66000000 半透明，比按钮更透，底边距仅 1.44dp，比按钮间距 4.32dp 更贴近沟通按钮），**只有三角形能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
    - **踩坑记录**: dragBar 必须 `btnGroup.addView(dragBar, 固定dp的LayoutParams)` 直接传入固定尺寸。若先 `setLayoutParams(dp)` 再 `addView(view, wrap_content)` 会把参数覆盖为 WRAP_CONTENT，普通 `View` 在 LinearLayout 中 WRAP_CONTENT 会被 `getDefaultSize` 按 `AT_MOST` 测量成父容器满尺寸 → 白色半透明条铺满屏幕并拦截所有触摸（用户反馈"白色透明遮罩一大片 + 按钮拖不动"）。`ShapeDrawable` 无 `setAntiAlias` 方法，抗锯齿要调 `getPaint().setAntiAlias(true)`。
 2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 写 Markdown + TXT 到 MediaStore Downloads。**curl 报文不再附在 md/txt 里**，改为单独写一个 `Curl[第1条职位名].txt`：按顺序列出本次所有列表/详情请求的完整 curl 命令，**每个请求下方附对应返回 JSON**（`notifyRawJson`/`notifyDetailRawJson` 捕获的原始报文）。
 3. **沟通**: 弹批量对话框选职位 → **每个职位先 HTTP 建联**（`GeekCreateFriendRequest` → POST `zpgeek/app/friend/add`，15s 同步等待）→ 建联成功用 relation（`ServerAddFriendBean`）全字段填充 ContactBean 并存库 → 再走反射长连接接口发送 → 每个职位 Toast「发送成功/失败: 姓名」。发送成功后消息列表可见该会话，且头像/公司/岗位/薪资齐全（闭环原理见「聊天记录如何显示出来」）。
 4. **Curl 验证**: 校验**第 1 条**职位（上一版第 16 条跨页、page 固定 2 导致误判，已改回第一页第一条）。收集屏幕列表第 1 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第1条吻合」，否则失败。**验证结束同样写一份 `Curl[第1条职位名].txt`**（含本次请求 curl + 返回 JSON），文件名与导出时一致（重名自动追加 ` (1)` 后缀）。
+5. **更多面板 + 在线简历导出/导入**: 「更多」按钮弹三宫格面板（Curl / 导出简历 / 导入简历）。
+   - **导出简历**: `GetUserAccountGeekDetailRequest`（GET，无参构造）→ 反射挂 `ExportResumeCallback`（继承 `net/bosszhipin/base/b`，泛型 = `GetUserAccountGeekDetailResponse`）→ 同步取 `geekDetail`（`ServerMyGeekDetailBean`）→ `buildResumeMd` 生成 Markdown（带版本标记 `在线简历导出` + 格式版本 1，含基本信息/期望职位/工作/教育/项目/培训/专业技能）→ 写 `简历MMddHHmmss.md` 到 Downloads/Android/BOSS2/。
+   - **导入简历**: 列出该目录 `.md` → 校验头（`# 在线简历导出` + `## 基本信息` + `格式版本: 1`）→ `parseResumeMd` 解析各段 → 先请求在线简历拿现有条目 ID → `GeekUpdateBaseInfoRequest`(extra_map=userDescription/professionalSkill) 更新基本/技能 → 依次删除旧的工作/教育/项目/期望/培训（`WorkExpDeleteRequest`/`GeekDeleteEducationExpRequest`/`GeekDeleteProjectExpRequest`/`DeleteJobIntentRequest`/`TrainingExpDeleteRequest`）→ 再保存新条目（`WorkExpSaveRequest`/`EduExpUpdateRequest`/`GeekUpdateProjectExpRequest`/`GeekUpdateExpectPositionRequest`/`TrainingExpSaveRequest`）→ Toast 汇总各段成功数。
+   - **保存回调**: 所有增删改请求共用一个 `ExportSaveCallback`（继承 `net/bosszhipin/base/b`，泛型 = `HttpResponse`，`onSuccess`→`notifySaveLoaded` / `onFailed`→`notifySaveFailed`），`newReq(cls)` 反射构造（先试 `(Lcom/twl/http/callback/a;)V` 构造，`NoSuchMethodException` 时回退 `(Lnet/bosszhipin/base/b;)V`——`DeleteJobIntentRequest` 只提供后者）。请求字段全部经 `extra_map` 传入（`setExtraMap`）。
+   - **踩坑记录**: 手写回调的 `onSuccess(Lhg0/a;)V` 必须声明 `.registers 2`（带 this+参数至少 2 寄存器），写 `.registers 1` 会被 smali 报错并**静默丢弃该类**（`smali.jar assemble` 仍返回成功，回调直接缺失）。
 
 ### 代码架构（正确路径）
 
@@ -365,6 +370,8 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
   - `ExportDetailCallback` 泛型 = `F1GeekGetJobDetailBatchResponse`（详情）
   - `ExportChatCallback` 继承 `ChatSendCallback`（发送回调），`onComplete(Z,Object,Object)V` 调 `ExportHelper.reportSendResult(Z,Object,Object)V`
   - `ExportCreateFriendCallback` 继承 `net/bosszhipin/base/b`，泛型 = `GeekCreateFriendResponse`（建联回调），`onSuccess(Lhg0/a;)V` 解析 `response.relation` → `notifyCreateFriendSuccess`，`onFailed(Lcom/twl/http/error/a;)V` → `notifyCreateFriendFailed`
+  - `ExportResumeCallback` 继承 `net/bosszhipin/base/b`，泛型 = `GetUserAccountGeekDetailResponse`（在线简历详情回调），`onSuccess` → `notifyResumeLoaded`，`onFailed` → `notifyResumeFailed`
+  - `ExportSaveCallback` 继承 `net/bosszhipin/base/b`，泛型 = `HttpResponse`（简历增删改通用保存回调），`onSuccess` → `notifySaveLoaded`，`onFailed` → `notifySaveFailed`
 - 注入点: `GeekJobRecommendFragment` / `MainActivity.onCreate`（classes6 锚点注入 `ExportHelper.attach`）/ `GetDiscoverHomeFragment`（classes7，发现页宿主）。`build_v6.py` 完成注入 + 替换/新增 DEX + zipalign + V1/V2 签名。
 
 ### 关键实现路径（每个功能怎么做对）
@@ -404,7 +411,9 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 - `ExportCallback` 泛型 = `GeekF1GetJobListResponse`
 - `ExportDetailCallback` 泛型 = `F1GeekGetJobDetailBatchResponse`
 - `ExportCreateFriendCallback` 泛型 = `GeekCreateFriendResponse`
-写错泛型 → 响应按错误类型解析 → 数据恒 null。`ExportCreateFriendCallback` 泛型信息在 builder 直接 d8 反编译时会丢失，必须手写 smali 并在 `scripts/build_classes10.sh` 中合并（`SRC_CB_SMALI` 拷贝步骤）。
+- `ExportResumeCallback` 泛型 = `GetUserAccountGeekDetailResponse`
+- `ExportSaveCallback` 泛型 = `HttpResponse`
+写错泛型 → 响应按错误类型解析 → 数据恒 null。`ExportCreateFriendCallback`/`ExportResumeCallback`/`ExportSaveCallback` 泛型信息在 builder 直接 d8 反编译时会丢失，必须手写 smali 并在 `scripts/build_classes10.sh` 中合并（`SRC_CB_SMALI` 拷贝步骤）。手写回调的 `onSuccess(Lhg0/a;)V` 必须 `.registers 2`，写 1 会被 smali 静默丢弃。
 
 `parseResponse` 已重写: 先调用 `com.twl.http.callback.b.d(response)` 得到报文 JSON 并 `notifyRawJson`/`notifyDetailRawJson` 回传 ExportHelper，再按原逻辑解析（code/zpData 提取 + Gson + hg0/a 包装）。详情回调链上 `mCallback` 位于 `com/twl/http/client/a`（请求基类），不要在 `com/twl/http/callback/a` 上找它。
 
@@ -418,6 +427,8 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 6. **数量输入框**: 点击导出弹 AlertDialog + EditText，默认 15，1~75 校验，确定后按 count 导出
 7. **双文档输出**: Markdown（人类可读，含 `<details>` 全字段表）+ TXT（完整报文，每职位含列表字段 + 详情字段）
 8. **分页**: page=1..N，hasMore=false 或连续 3 页无新增停止，上限=输入框条数
+9. **在线简历导出**: `GetUserAccountGeekDetailRequest` 无参构造 → 反射设 `mCallback`(在 `com/twl/http/client/a`) + `request`(在 `com/twl/http/callback/a`) → `execute()` → `ExportResumeCallback` 回调 hg0/a 的 `a` 字段即响应 → 取 `geekDetail` → `buildResumeMd` 输出 Markdown（版本标记 `在线简历导出`/`格式版本: 1`）
+10. **在线简历导入**: 校验头 → `parseResumeMd` → 更新基本/技能(`GeekUpdateBaseInfoRequest`) → 删旧条目 → 存新条目。所有增删改用 `ExportSaveCallback`，`newReq` 先试 `(Lcom/twl/http/callback/a;)V` 构造再回退 `(Lnet/bosszhipin/base/b;)V`（`DeleteJobIntentRequest` 仅后者），参数全走 `extra_map`
 
 验证: `adb logcat -s ExportHelper`，正常看到 `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `details collected=N/M` → 导出成功路径含 `.md`、`.txt` 与 `Curl[第1条职位名].txt` 三个文件。
 
@@ -451,6 +462,8 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 `adb logcat -s ExportHelper`:
 - 导出: `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `.md`/`.txt`/`Curl[第1条职位名].txt` 写出
 - curl 收集: `collectCurl LIST len=...` / `collectCurl DETAIL len=...` / `notifyRawJson len=...` / `notifyDetailRawJson len=...`
+- 简历导出: `resume detail request not ok done=.. err=..`（失败时）→ Toast「简历已导出: .../简历MMddHHmmss.md」
+- 简历导入: `import baseinfo result=true/false` → 各 `save*Exp error:`（单条失败时）→ Toast「导入完成: 工作 X/Y, 教育 X/Y, 项目 X/Y, 培训 X/Y, 期望 成功/失败」
 - 沟通: `batch send start total=N` → `batch send role=.. myId=..` → `batch send create friend request friendId=..` → `batch send create friend ok friendId=..`（失败/超时会跳过该职位）→ `batch send fill contact from relation friendId=..` → `batch send save contact DB friendId=..` → `batch send refresh contacts V() friendId=..` → `batch send longlink connected=true` → `batch send ok friendId=...` → `reportSendResult ok=...` → 消息列表可见该会话
 - Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 1 条）→ Toast「Curl报文已保存: .../Curl[第1条职位名].txt」
 
@@ -465,11 +478,18 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 | `src/export2/smali/.../ExportDetailCallback.smali` | 手写详情回调 (泛型=F1GeekGetJobDetailBatchResponse, 捕获原始 JSON) |
 | `src/export2/smali/.../ExportChatCallback.smali` | 手写发送回调 (继承 ChatSendCallback, onComplete→reportSendResult) |
 | `src/export2/smali/.../ExportCreateFriendCallback.smali` | 手写建联回调 (继承 base/b, 泛型=GeekCreateFriendResponse, onSuccess/onFailed→notifyCreateFriend*) |
+| `src/export2/smali/.../ExportResumeCallback.smali` | 手写简历详情回调 (继承 base/b, 泛型=GetUserAccountGeekDetailResponse, onSuccess/onFailed→notifyResume*) |
+| `src/export2/smali/.../ExportSaveCallback.smali` | 手写简历保存回调 (继承 base/b, 泛型=HttpResponse, onSuccess/onFailed→notifySave*) |
 | `research/.../classes9/net/bosszhipin/api/GeekCreateFriendRequest.smali` | 建联请求类 (求职者端 POST zpgeek/app/friend/add; 构造 (callback,false) 走 Geek 请求体) |
 | `research/.../classes9/net/bosszhipin/api/GeekCreateFriendResponse.smali` | 建联响应类 (字段 `relation` = ServerAddFriendBean) |
 | `research/.../classes9/net/bosszhipin/api/bean/ServerAddFriendBean.smali` | relation bean (friendId/getName/getCompany/getPositionName/getSalaryDesc 等全字段 getter) |
 | `research/.../classes9/GeekF1GetJobListRequest.smali` | 列表请求类 |
 | `research/.../classes9/GeekF1GetJobListResponse.smali` | 列表响应类 (jobList/hasMore) |
+| `research/.../classes9/net/bosszhipin/api/GetUserAccountGeekDetailRequest.smali` | 在线简历详情请求 (GET, 无参构造, 泛型=GetUserAccountGeekDetailResponse) |
+| `research/.../classes9/net/bosszhipin/api/GetUserAccountGeekDetailResponse.smali` | 简历详情响应 (字段 `geekDetail` = ServerMyGeekDetailBean) |
+| `research/.../classes9/net/bosszhipin/api/bean/user/ServerMyGeekDetailBean.smali` | 简历详情 bean (workExperienceList/eduExperienceList/projectExperienceList/trainingExpList/expectPositionList/userInfo 等) |
+| `research/.../classes9/net/bosszhipin/api/WorkExpSaveRequest.smali` | 工作经历保存请求 (extra_map 传参) |
+| `research/.../classes9/net/bosszhipin/api/DeleteJobIntentRequest.smali` | 期望职位删除请求 (**仅 `(Lnet/bosszhipin/base/b;)V` 构造**) |
 | `research/.../classes7/F1GeekGetJobDetailBatchRequest.smali` | 详情批量请求类 (getJobDetailRequest/jobQueryBannerRequest) |
 | `research/.../classes7/GListViewModel.smali` | 界面 VM (m/n/z 字段) |
 | `research/.../classes7/GeekF1ProListFragment.smali` | 职位列表 Fragment (字段 `e` 持有 GListViewModel) |

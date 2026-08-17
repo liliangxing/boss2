@@ -1,4 +1,4 @@
-.class Lcom/hpbr/bosszhipin/export2/ExportHelper$12;
+.class Lcom/hpbr/bosszhipin/export2/ExportHelper$13;
 .super Ljava/lang/Object;
 .source "ExportHelper.java"
 
@@ -30,8 +30,8 @@
         }
     .end annotation
 
-    .line 1690
-    iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
+    .line 1696
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$13;->val$activity:Landroid/app/Activity;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
@@ -43,11 +43,11 @@
 .method public onClick(Landroid/view/View;)V
     .registers 2
 
-    .line 1693
-    iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
+    .line 1699
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$13;->val$activity:Landroid/app/Activity;
 
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->exportResumeMd(Landroid/app/Activity;)V
-    invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1700(Landroid/app/Activity;)V
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->importResumeMd(Landroid/app/Activity;)V
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1800(Landroid/app/Activity;)V
 
     return-void
 .end method
