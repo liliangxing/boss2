@@ -119,15 +119,15 @@ public class ExportHelper {
             final TextView btn = new TextView(activity);
             btn.setText("\u5BFC\u51FA");
             btn.setTextColor(Color.WHITE);
-            btn.setTextSize(19.8f);
+            btn.setTextSize(15.84f);
             btn.setGravity(Gravity.CENTER);
-            btn.setPadding(dp(activity, 18), dp(activity, 7), dp(activity, 18), dp(activity, 7));
+            btn.setPadding(dp(activity, 14.4f), dp(activity, 5.6f), dp(activity, 14.4f), dp(activity, 5.6f));
 
             GradientDrawable bg = new GradientDrawable();
             bg.setColor(0xB3000000);
-            bg.setCornerRadius(dp(activity, 21.6f));
+            bg.setCornerRadius(dp(activity, 17.28f));
             btn.setBackground(bg);
-            btn.setElevation(dp(activity, 3.6f));
+            btn.setElevation(dp(activity, 2.88f));
             if (Build.VERSION.SDK_INT >= 21) {
                 btn.setZ(100f);
             }
@@ -135,11 +135,11 @@ public class ExportHelper {
             final TextView chatBtn = new TextView(activity);
             chatBtn.setText("\u6C9F\u901A");
             chatBtn.setTextColor(Color.WHITE);
-            chatBtn.setTextSize(19.8f);
+            chatBtn.setTextSize(15.84f);
             chatBtn.setGravity(Gravity.CENTER);
-            chatBtn.setPadding(dp(activity, 18), dp(activity, 7), dp(activity, 18), dp(activity, 7));
+            chatBtn.setPadding(dp(activity, 14.4f), dp(activity, 5.6f), dp(activity, 14.4f), dp(activity, 5.6f));
             chatBtn.setBackground(bg);
-            chatBtn.setElevation(dp(activity, 3.6f));
+            chatBtn.setElevation(dp(activity, 2.88f));
             if (Build.VERSION.SDK_INT >= 21) {
                 chatBtn.setZ(100f);
             }
@@ -147,21 +147,21 @@ public class ExportHelper {
             final TextView curlBtn = new TextView(activity);
             curlBtn.setText("Curl");
             curlBtn.setTextColor(Color.WHITE);
-            curlBtn.setTextSize(19.8f);
+            curlBtn.setTextSize(15.84f);
             curlBtn.setGravity(Gravity.CENTER);
-            curlBtn.setPadding(dp(activity, 18), dp(activity, 7), dp(activity, 18), dp(activity, 7));
+            curlBtn.setPadding(dp(activity, 14.4f), dp(activity, 5.6f), dp(activity, 14.4f), dp(activity, 5.6f));
             curlBtn.setBackground(bg);
-            curlBtn.setElevation(dp(activity, 3.6f));
+            curlBtn.setElevation(dp(activity, 2.88f));
             if (Build.VERSION.SDK_INT >= 21) {
                 curlBtn.setZ(100f);
             }
 
             View dragBar = new View(activity);
-            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 108), dp(activity, 18));
-            dbp.setMargins(0, 0, 0, dp(activity, 10.8f));
+            LinearLayout.LayoutParams dbp = new LinearLayout.LayoutParams(dp(activity, 86.4f), dp(activity, 14.4f));
+            dbp.setMargins(0, 0, 0, dp(activity, 8.64f));
             GradientDrawable dbg = new GradientDrawable();
             dbg.setColor(0xB3000000);
-            dbg.setCornerRadius(dp(activity, 9));
+            dbg.setCornerRadius(dp(activity, 7.2f));
             dragBar.setBackground(dbg);
 
             LinearLayout btnGroup = new LinearLayout(activity);
@@ -170,11 +170,11 @@ public class ExportHelper {
             btnGroup.addView(dragBar, dbp);
             LinearLayout.LayoutParams gb2 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb2.setMargins(0, 0, 0, dp(activity, 5.4f));
+            gb2.setMargins(0, 0, 0, dp(activity, 4.32f));
             btnGroup.addView(chatBtn, gb2);
             LinearLayout.LayoutParams gb3 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            gb3.setMargins(0, 0, 0, dp(activity, 5.4f));
+            gb3.setMargins(0, 0, 0, dp(activity, 4.32f));
             btnGroup.addView(btn, gb3);
             btnGroup.addView(curlBtn, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -1503,25 +1503,30 @@ public class ExportHelper {
                         toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u7B2C1\u6761\u65E0\u6709\u6548ID");
                         return;
                     }
-                    Object req = buildListRequest(1);
-                    String fullUrl = buildFullUrl(req);
-                    if (fullUrl == null || fullUrl.isEmpty()) {
-                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u65E0\u6CD5\u6784\u9020\u8BF7\u6C42URL");
+                    PageResult pr = requestPage("", 1);
+                    if (pr == null || pr.resp == null) {
+                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u63A5\u53E3\u65E0\u54CD\u5E94\u6216\u8BF7\u6C42\u5931\u8D25");
                         return;
                     }
-                    Map<String, String> headers = buildHeadersMap(req);
-                    String cookie = readCookie(fullUrl);
-                    String body = httpGet(fullUrl, headers, cookie);
-                    if (body == null) {
-                        toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u8BF7\u6C42\u65E0\u54CD\u5E94\u6216\u72B6\u6001\u7801\u975E200");
-                        return;
+                    log("curl verify: key=" + key + " id=" + id + " feedCount=" + pr.feedCount);
+                    boolean found = false;
+                    if (pr.cards != null) {
+                        for (Object card : pr.cards) {
+                            String cid = readFieldSafe(card, "encryptJobId", "");
+                            if (cid.isEmpty()) {
+                                cid = readFieldSafe(card, "jobId", "");
+                            }
+                            if (id.equals(cid)) {
+                                found = true;
+                                break;
+                            }
+                        }
                     }
-                    log("curl verify: key=" + key + " id=" + id + " respLen=" + body.length());
-                    if (body.contains(id)) {
+                    if (found) {
                         log("curl verify RESULT: SUCCESS key=" + key + " id=" + id);
                         toastMain(activity, "Curl\u9A8C\u8BC1\u6210\u529F: \u8FD4\u56DE\u6570\u636E\u4E0E\u7B2C1\u6761\u543B\u5408");
                     } else {
-                        log("curl verify RESULT: FAIL key=" + key + " id=" + id);
+                        log("curl verify RESULT: FAIL key=" + key + " id=" + id + " feedCount=" + pr.feedCount);
                         toastMain(activity, "Curl\u9A8C\u8BC1\u5931\u8D25: \u8FD4\u56DE\u6570\u636E\u672A\u5305\u542B\u7B2C1\u6761[" + key + "]=" + id);
                     }
                 } catch (Throwable t) {
@@ -1746,12 +1751,72 @@ public class ExportHelper {
                     } catch (Throwable ignored) {
                     }
                     if (ok) {
+                        int role = 0;
+                        try {
+                            Object roleEnum = Class.forName("com.hpbr.bosszhipin.data.manager.r")
+                                    .getMethod("E").invoke(null);
+                            if (roleEnum != null) {
+                                Object rv = roleEnum.getClass().getMethod("get").invoke(roleEnum);
+                                if (rv instanceof Integer) {
+                                    role = ((Integer) rv).intValue();
+                                }
+                            }
+                        } catch (Throwable tr) {
+                            log("reportSendResult role resolve error: " + tr.getMessage());
+                        }
+                        if (chatBean != null) {
+                            try {
+                                Method gm = Class.forName("message.handler.g").getMethod("m",
+                                        chatBean.getClass(), contact.getClass(), boolean.class);
+                                Object lastText = gm.invoke(null, chatBean, contact, Boolean.FALSE);
+                                if (lastText != null) {
+                                    try {
+                                        contact.getClass().getField("lastChatText").set(contact, lastText);
+                                    } catch (Throwable ignored) {
+                                    }
+                                }
+                            } catch (Throwable tg) {
+                                log("reportSendResult handler_g.m error: " + tg.getMessage());
+                            }
+                            long now = System.currentTimeMillis();
+                            try {
+                                chatBean.getClass().getField("time").set(chatBean, Long.valueOf(now));
+                            } catch (Throwable ignored) {
+                            }
+                            try {
+                                chatBean.getClass().getField("id").set(chatBean, Long.valueOf(0L));
+                            } catch (Throwable ignored) {
+                            }
+                            try {
+                                contact.getClass().getField("lastChatStatus").set(contact, Integer.valueOf(2));
+                            } catch (Throwable ignored) {
+                            }
+                            try {
+                                contact.getClass().getField("lastChatTime").set(contact, Long.valueOf(now));
+                            } catch (Throwable ignored) {
+                            }
+                            try {
+                                contact.getClass().getField("updateTime").set(contact, Long.valueOf(now));
+                            } catch (Throwable ignored) {
+                            }
+                        }
                         try {
                             Object cm = Class.forName("com.hpbr.bosszhipin.data.manager.ContactManager")
                                     .getMethod("v").invoke(null);
                             if (cm != null) {
-                                cm.getClass().getMethod("C", contact.getClass(), int.class).invoke(cm, contact, 0);
+                                cm.getClass().getMethod("C", contact.getClass(), int.class).invoke(cm, contact, role);
                                 log("reportSendResult update contact friendId=" + friendId);
+                                if (chatBean != null) {
+                                    try {
+                                        Object nj0 = Class.forName("nj0.f").getMethod("r").invoke(null);
+                                        if (nj0 != null) {
+                                            nj0.getClass().getMethod("C", chatBean.getClass()).invoke(nj0, chatBean);
+                                            log("reportSendResult save message to db friendId=" + friendId);
+                                        }
+                                    } catch (Throwable tn) {
+                                        log("reportSendResult nj0.a.C error: " + tn.getMessage());
+                                    }
+                                }
                                 try {
                                     cm.getClass().getMethod("V").invoke(cm);
                                     log("reportSendResult trigger refreshContacts V() ok");

@@ -41,85 +41,86 @@
 
 # virtual methods
 .method public run()V
-    .registers 13
+    .registers 15
 
-    const-string v0, "jobId"
+    const-string v0, " feedCount="
 
-    const-string v1, ""
+    const-string v1, " id="
 
     const-string v2, "encryptJobId"
 
-    const-string v3, " id="
+    const-string v3, ""
 
-    const-string v4, "Curl\u9a8c\u8bc1\u5931\u8d25: \u8fd4\u56de\u6570\u636e\u672a\u5305\u542b\u7b2c1\u6761["
-
-    const-string v5, "curl verify RESULT: SUCCESS key="
-
-    const-string v6, "curl verify RESULT: FAIL key="
-
-    const-string v7, "curl verify: key="
+    const-string v4, "curl verify: key="
 
     .line 1490
-    :try_start_10
-    iget-object v8, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
+    :try_start_a
+    iget-object v5, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->collectFromScreen(Landroid/app/Activity;)Ljava/util/List;
-    invoke-static {v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1000(Landroid/app/Activity;)Ljava/util/List;
+    invoke-static {v5}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1000(Landroid/app/Activity;)Ljava/util/List;
 
-    move-result-object v8
+    move-result-object v5
 
-    if-eqz v8, :cond_e8
+    if-eqz v5, :cond_102
 
     .line 1491
-    invoke-interface {v8}, Ljava/util/List;->size()I
+    invoke-interface {v5}, Ljava/util/List;->size()I
 
-    move-result v9
+    move-result v6
 
-    const/4 v10, 0x1
+    const/4 v7, 0x1
 
-    if-ge v9, v10, :cond_21
+    if-ge v6, v7, :cond_1b
 
-    goto/16 :goto_e8
+    goto/16 :goto_102
 
-    :cond_21
-    const/4 v9, 0x0
+    :cond_1b
+    const/4 v6, 0x0
 
     .line 1495
-    invoke-interface {v8, v9}, Ljava/util/List;->get(I)Ljava/lang/Object;
+    invoke-interface {v5, v6}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
-    move-result-object v8
+    move-result-object v5
 
     .line 1496
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-    invoke-static {v8, v2, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1700(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    invoke-static {v5, v2, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1700(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
-    move-result-object v9
+    move-result-object v8
 
     .line 1498
-    invoke-virtual {v9}, Ljava/lang/String;->isEmpty()Z
+    invoke-virtual {v8}, Ljava/lang/String;->isEmpty()Z
 
-    move-result v11
+    move-result v9
+    :try_end_28
+    .catchall {:try_start_a .. :try_end_28} :catchall_10a
 
-    if-eqz v11, :cond_35
+    const-string v10, "jobId"
+
+    if-eqz v9, :cond_32
 
     .line 1499
+    :try_start_2c
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-    invoke-static {v8, v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1700(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    invoke-static {v5, v10, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1700(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
-    move-result-object v9
+    move-result-object v8
 
-    goto :goto_36
+    move-object v5, v10
 
-    :cond_35
-    move-object v0, v2
+    goto :goto_33
+
+    :cond_32
+    move-object v5, v2
 
     .line 1502
-    :goto_36
-    invoke-virtual {v9}, Ljava/lang/String;->isEmpty()Z
+    :goto_33
+    invoke-virtual {v8}, Ljava/lang/String;->isEmpty()Z
 
-    move-result v1
+    move-result v9
 
-    if-eqz v1, :cond_44
+    if-eqz v9, :cond_41
 
     .line 1503
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
@@ -132,115 +133,127 @@
     return-void
 
     .line 1506
-    :cond_44
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildListRequest(I)Ljava/lang/Object;
-    invoke-static {v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1800(I)Ljava/lang/Object;
+    :cond_41
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->requestPage(Ljava/lang/String;I)Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;
+    invoke-static {v3, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1800(Ljava/lang/String;I)Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;
 
-    move-result-object v1
+    move-result-object v9
+
+    if-eqz v9, :cond_fa
 
     .line 1507
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildFullUrl(Ljava/lang/Object;)Ljava/lang/String;
-    invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1900(Ljava/lang/Object;)Ljava/lang/String;
+    iget-object v11, v9, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->resp:Ljava/lang/Object;
 
-    move-result-object v2
+    if-nez v11, :cond_4d
 
-    if-eqz v2, :cond_e0
+    goto/16 :goto_fa
 
-    .line 1508
-    invoke-virtual {v2}, Ljava/lang/String;->isEmpty()Z
+    .line 1511
+    :cond_4d
+    new-instance v11, Ljava/lang/StringBuilder;
 
-    move-result v8
+    invoke-direct {v11, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    if-eqz v8, :cond_56
+    invoke-virtual {v11, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    goto/16 :goto_e0
+    invoke-virtual {v11, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1512
-    :cond_56
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildHeadersMap(Ljava/lang/Object;)Ljava/util/Map;
-    invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2000(Ljava/lang/Object;)Ljava/util/Map;
+    invoke-virtual {v11, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    move-result-object v1
+    invoke-virtual {v11, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1513
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->readCookie(Ljava/lang/String;)Ljava/lang/String;
-    invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2100(Ljava/lang/String;)Ljava/lang/String;
+    iget v4, v9, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->feedCount:I
 
-    move-result-object v8
+    invoke-virtual {v11, v4}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 
-    .line 1514
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->httpGet(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;
-    invoke-static {v2, v1, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2200(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;
+    invoke-virtual {v11}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
-    move-result-object v1
-
-    if-nez v1, :cond_6c
-
-    .line 1516
-    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
-
-    const-string v1, "Curl\u9a8c\u8bc1\u5931\u8d25: \u8bf7\u6c42\u65e0\u54cd\u5e94\u6216\u72b6\u6001\u7801\u975e200"
-
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
-    invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1600(Landroid/app/Activity;Ljava/lang/String;)V
-
-    return-void
-
-    .line 1519
-    :cond_6c
-    new-instance v2, Ljava/lang/StringBuilder;
-
-    invoke-direct {v2, v7}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-
-    invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v2, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    const-string v7, " respLen="
-
-    invoke-virtual {v2, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v1}, Ljava/lang/String;->length()I
-
-    move-result v7
-
-    invoke-virtual {v2, v7}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v2
+    move-result-object v4
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
-    invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
+    invoke-static {v4}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    .line 1520
-    invoke-virtual {v1, v9}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+    .line 1513
+    iget-object v4, v9, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->cards:Ljava/util/List;
 
-    move-result v1
+    if-eqz v4, :cond_93
 
-    if-eqz v1, :cond_b1
+    .line 1514
+    iget-object v4, v9, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->cards:Ljava/util/List;
 
-    .line 1521
-    new-instance v1, Ljava/lang/StringBuilder;
+    invoke-interface {v4}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
-    invoke-direct {v1, v5}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    move-result-object v4
 
-    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    :cond_74
+    invoke-interface {v4}, Ljava/util/Iterator;->hasNext()Z
 
-    invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    move-result v11
 
-    invoke-virtual {v1, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    if-eqz v11, :cond_93
 
-    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-interface {v4}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+
+    move-result-object v11
+
+    .line 1515
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    invoke-static {v11, v2, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1700(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v12
+
+    .line 1516
+    invoke-virtual {v12}, Ljava/lang/String;->isEmpty()Z
+
+    move-result v13
+
+    if-eqz v13, :cond_8c
+
+    .line 1517
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    invoke-static {v11, v10, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1700(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v12
+
+    .line 1519
+    :cond_8c
+    invoke-virtual {v8, v12}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v11
+
+    if-eqz v11, :cond_74
+
+    goto :goto_94
+
+    :cond_93
+    const/4 v7, 0x0
+
+    :goto_94
+    if-eqz v7, :cond_b9
+
+    .line 1526
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v2, "curl verify RESULT: SUCCESS key="
+
+    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v0
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    .line 1522
+    .line 1527
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
 
     const-string v1, "Curl\u9a8c\u8bc1\u6210\u529f: \u8fd4\u56de\u6570\u636e\u4e0e\u7b2c1\u6761\u543b\u5408"
@@ -248,57 +261,71 @@
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
     invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1600(Landroid/app/Activity;Ljava/lang/String;)V
 
-    goto/16 :goto_12d
+    goto/16 :goto_147
 
-    .line 1524
-    :cond_b1
-    new-instance v1, Ljava/lang/StringBuilder;
-
-    invoke-direct {v1, v6}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-
-    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v1, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v1
-
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
-    invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
-
-    .line 1525
-    iget-object v1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
-
+    .line 1529
+    :cond_b9
     new-instance v2, Ljava/lang/StringBuilder;
 
-    invoke-direct {v2, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v3, "curl verify RESULT: FAIL key="
+
+    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v2, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v2, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    const-string v0, "]="
+    iget v0, v9, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->feedCount:I
 
-    invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v2, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 
     invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v0
 
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
-    invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1600(Landroid/app/Activity;Ljava/lang/String;)V
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    goto :goto_12d
-
-    .line 1509
-    :cond_e0
-    :goto_e0
+    .line 1530
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
 
-    const-string v1, "Curl\u9a8c\u8bc1\u5931\u8d25: \u65e0\u6cd5\u6784\u9020\u8bf7\u6c42URL"
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v2, "Curl\u9a8c\u8bc1\u5931\u8d25: \u8fd4\u56de\u6570\u636e\u672a\u5305\u542b\u7b2c1\u6761["
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    const-string v2, "]="
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
+    invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1600(Landroid/app/Activity;Ljava/lang/String;)V
+
+    goto :goto_147
+
+    .line 1508
+    :cond_fa
+    :goto_fa
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
+
+    const-string v1, "Curl\u9a8c\u8bc1\u5931\u8d25: \u63a5\u53e3\u65e0\u54cd\u5e94\u6216\u8bf7\u6c42\u5931\u8d25"
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
     invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1600(Landroid/app/Activity;Ljava/lang/String;)V
@@ -306,23 +333,23 @@
     return-void
 
     .line 1492
-    :cond_e8
-    :goto_e8
+    :cond_102
+    :goto_102
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
 
     const-string v1, "Curl\u9a8c\u8bc1\u5931\u8d25: \u5f53\u524d\u5217\u8868\u4e3a\u7a7a"
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
     invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1600(Landroid/app/Activity;Ljava/lang/String;)V
-    :try_end_ef
-    .catchall {:try_start_10 .. :try_end_ef} :catchall_f0
+    :try_end_109
+    .catchall {:try_start_2c .. :try_end_109} :catchall_10a
 
     return-void
 
-    :catchall_f0
+    :catchall_10a
     move-exception v0
 
-    .line 1528
+    .line 1533
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "verifyCurl error: "
@@ -342,7 +369,7 @@
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    .line 1529
+    .line 1534
     iget-object v1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
 
     new-instance v2, Ljava/lang/StringBuilder;
@@ -378,6 +405,6 @@
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1600(Landroid/app/Activity;Ljava/lang/String;)V
 
-    :goto_12d
+    :goto_147
     return-void
 .end method
