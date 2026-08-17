@@ -83,6 +83,11 @@ public class ExportHelper {
     private static volatile Object sDetailResponse;
     private static volatile String sDetailRawJson;
 
+    private static volatile CountDownLatch sCreateLatch;
+    private static volatile boolean sCreateOk;
+    private static volatile String sCreateError;
+    private static volatile Object sCreateRelation;
+
     private static final List<String> sCurlList = new ArrayList<String>();
 
     private static volatile Activity sAttachActivity;
@@ -559,6 +564,13 @@ public class ExportHelper {
         }
         log("batch send role=" + role + " myId=" + myId);
 
+        Object relation = createFriendAndWait(job, bossId);
+        if (relation == null) {
+            log("batch send create friend failed/skip friendId=" + bossId);
+            return false;
+        }
+        log("batch send create friend ok friendId=" + bossId);
+
         Object contactBean = null;
         try {
             Method mU = contactManagerClass.getMethod("U", long.class, int.class, int.class);
@@ -588,6 +600,31 @@ public class ExportHelper {
         }
 
         try {
+            Method mF = contactBeanClass.getMethod("fromServerGeekAddFriendBean",
+                    Class.forName("net.bosszhipin.api.bean.ServerAddFriendBean"), long.class, int.class);
+            contactBean = mF.invoke(contactBean, relation, myId, role);
+            log("batch send fill contact from relation friendId=" + bossId);
+        } catch (Throwable t) {
+            log("batch send fromServerGeekAddFriendBean error: " + t.getMessage());
+        }
+        try {
+            setBooleanField(contactBean, "isNeedComplete", false);
+        } catch (Throwable ignored) {
+        }
+        try {
+            contactManagerClass.getMethod("G", contactBeanClass, int.class).invoke(contactManager, contactBean, role);
+            log("batch send save contact DB friendId=" + bossId);
+        } catch (Throwable t) {
+            log("batch send ContactManager.G error: " + t.getMessage());
+        }
+        try {
+            contactManagerClass.getMethod("V").invoke(contactManager);
+            log("batch send refresh contacts V() friendId=" + bossId);
+        } catch (Throwable t) {
+            log("batch send refresh V() error: " + t.getMessage());
+        }
+
+        try {
             Method mA = handlerDClass.getMethod("a", contactBeanClass);
             Object target = mA.invoke(null, contactBean);
             if (target == null) {
@@ -607,6 +644,94 @@ public class ExportHelper {
         } catch (Throwable t) {
             log("batch send invoke error: " + t);
             return false;
+        }
+    }
+
+    private static final long CREATE_FRIEND_TIMEOUT_MS = 15000L;
+
+    private static Object createFriendAndWait(Object job, long bossId) {
+        sCreateLatch = new CountDownLatch(1);
+        sCreateOk = false;
+        sCreateError = null;
+        sCreateRelation = null;
+        try {
+            Class<?> callbackIface = Class.forName("com.twl.http.callback.a");
+            Class<?> cbClass = Class.forName("com.hpbr.bosszhipin.export2.ExportCreateFriendCallback");
+            Class<?> reqClass = Class.forName("net.bosszhipin.api.GeekCreateFriendRequest");
+            Object callback = cbClass.newInstance();
+            Object request = reqClass.getConstructor(callbackIface, boolean.class)
+                    .newInstance(callback, Boolean.FALSE);
+            setStringField(request, "friendId", String.valueOf(bossId));
+            setStringField(request, "jobId", longToStr(job, "jobId"));
+            setStringField(request, "expectId", longToStr(job, "expectId"));
+            setStringField(request, "lid", readFieldSafe(job, "lid", ""));
+            setStringField(request, "securityId", readFieldSafe(job, "securityId", ""));
+            setIntField(request, "entrance", 9);
+            setStringField(request, "greeting", null);
+            setIntField(request, "applyJobDirectly", 0);
+            setIntField(request, "startChatProcessExpGroup", 0);
+            log("batch send create friend request friendId=" + bossId + " jobId=" + readLongField(job, "jobId")
+                    + " securityId=" + readFieldSafe(job, "securityId", "") + " lid=" + readFieldSafe(job, "lid", ""));
+            Class<?> hg0c = Class.forName("hg0.c");
+            hg0c.getMethod("d", Class.forName("com.twl.http.client.a")).invoke(null, request);
+            boolean done = sCreateLatch.await(CREATE_FRIEND_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            if (!done) {
+                log("batch send create friend timeout friendId=" + bossId);
+                return null;
+            }
+            if (!sCreateOk) {
+                log("batch send create friend failed friendId=" + bossId + " err=" + sCreateError);
+                return null;
+            }
+            return sCreateRelation;
+        } catch (Throwable t) {
+            log("batch send createFriendAndWait error: " + t);
+            return null;
+        }
+    }
+
+    private static String longToStr(Object o, String name) {
+        long v = readLongField(o, name);
+        return v > 0 ? String.valueOf(v) : null;
+    }
+
+    public static void notifyCreateFriendSuccess(Object hg0a) {
+        try {
+            Object resp = hg0a.getClass().getField("a").get(hg0a);
+            if (resp != null) {
+                Object relation = resp.getClass().getField("relation").get(resp);
+                if (relation != null) {
+                    sCreateRelation = relation;
+                    sCreateOk = true;
+                } else {
+                    sCreateError = "relation is null";
+                }
+            } else {
+                sCreateError = "response is null";
+            }
+        } catch (Throwable t) {
+            sCreateError = "parse error: " + t.getMessage();
+        }
+        CountDownLatch l = sCreateLatch;
+        if (l != null) {
+            l.countDown();
+        }
+    }
+
+    public static void notifyCreateFriendFailed(String msg) {
+        sCreateError = (msg == null || msg.isEmpty()) ? "create friend failed" : msg;
+        CountDownLatch l = sCreateLatch;
+        if (l != null) {
+            l.countDown();
+        }
+    }
+
+    private static void setBooleanField(Object o, String name, boolean v) {
+        try {
+            Field f = o.getClass().getField(name);
+            f.set(o, Boolean.valueOf(v));
+        } catch (Throwable t) {
+            log("setBooleanField " + name + " error: " + t.getMessage());
         }
     }
 

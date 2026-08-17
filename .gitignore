@@ -6,6 +6,7 @@
 build_work/
 *.dex
 *.apk.idsig
+parts/
 
 # 临时文件
 *.pyc

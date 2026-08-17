@@ -95,20 +95,21 @@ python3 scripts/build.py --input boss2_v1.apk --output boss2_v5.apk
 python3 scripts/verify.py boss2_v5.apk
 ```
 
-10 项全部 OK 即正确:
+11 项全部 OK 即正确:
 
 | # | 检查项 | 期望值 |
 |---|--------|--------|
-| 1 | V1 签名 | META-INF/MANIFEST.MF + .RSA 存在 |
-| 2 | V2 签名 | 包含 `APK Sig Block 42` |
+| 1 | V2 签名 | 包含 `APK Sig Block 42` |
+| 2 | V1 签名 | META-INF/MANIFEST.MF + .RSA 存在 |
 | 3 | libyzwg.so | lib/arm64-v8a/libyzwg.so 存在 |
 | 4 | 比较补丁 | 0x1E9B0 = 0x6B00001F |
 | 5 | abort GOT | 0x441ED8 = 0x0 |
 | 6 | _exit GOT | 0x441EF0 = 0x0 |
-| 7 | BuildConfig | classes8.dex 包含 `com.hpbr.bosszhipin.BuildConfig` |
-| 8 | PMS hook | classes3.dex 包含 PmsHookHelper + FakeSign + signingInfo |
-| 9 | YZWG 加载器 | classes9.dex 包含 SoLoader + yzwg |
-| 10 | XLog 密钥 | classes3.dex 不包含 `bd3949bcb962ffb9` |
+| 7 | 0x1EC8C 原始 | 0x97FFF529 (保持 BL _exit，不要改) |
+| 8 | BuildConfig | classes8.dex 包含 `com.hpbr.bosszhipin.BuildConfig` |
+| 9 | PMS hook | classes3.dex 包含 PmsHookHelper + FakeSign + signingInfo |
+| 10 | YZWG 加载器 | classes9.dex 包含 SoLoader + yzwg |
+| 11 | XLog 密钥 | classes3.dex 不包含 `bd3949bcb962ffb9` |
 
 ---
 
@@ -345,14 +346,14 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v6.apk`（md5 `80b2ca94a0f254a3493b7aba588b341e`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验）。构建与部署见下方「构建与部署（当前版本）」。
+> 当前最新构建产物 `boss2_v6.apk`（md5 `fef9a9a1a9e7b22f92b1110b45e61a98`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情+curl 报文）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验）。构建与部署见下方「构建与部署（当前版本）」。
 
 ### 功能清单（v6）
 
 1. **悬浮按钮组**: 「沟通」「导出」「Curl」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部加了一条 `dragBar`（60x10dp 白色圆角条），**只有拖动条能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
    - **踩坑记录**: dragBar 必须 `btnGroup.addView(dragBar, 固定dp的LayoutParams)` 直接传入固定尺寸。若先 `setLayoutParams(dp)` 再 `addView(view, wrap_content)` 会把参数覆盖为 WRAP_CONTENT，普通 `View` 在 LinearLayout 中 WRAP_CONTENT 会被 `getDefaultSize` 按 `AT_MOST` 测量成父容器满尺寸 → 白色半透明条铺满屏幕并拦截所有触摸（用户反馈"白色透明遮罩一大片 + 按钮拖不动"）。
 2. **导出**: 点击弹数量输入框（默认 15、最大 75）→ 分页拉取推荐职位 + 逐职位请求详情 → 同时写 Markdown + TXT 到 MediaStore Downloads。TXT 末尾附 `===== 请求报文 (curl/Bash) =====` 段，含本次导出所有列表/详情请求的完整 curl 命令。
-3. **沟通**: 弹批量对话框选职位 → 反射长连接接口批量发送 → 每个职位 Toast「发送成功/失败: 姓名」。发送成功后消息列表可见该会话（闭环原理见「聊天记录如何显示出来」）。
+3. **沟通**: 弹批量对话框选职位 → **每个职位先 HTTP 建联**（`GeekCreateFriendRequest` → POST `zpgeek/app/friend/add`，15s 同步等待）→ 建联成功用 relation（`ServerAddFriendBean`）全字段填充 ContactBean 并存库 → 再走反射长连接接口发送 → 每个职位 Toast「发送成功/失败: 姓名」。发送成功后消息列表可见该会话，且头像/公司/岗位/薪资齐全（闭环原理见「聊天记录如何显示出来」）。
 4. **Curl 验证**: 校验**第 1 条**职位（上一版第 16 条跨页、page 固定 2 导致误判，已改回第一页第一条）。收集屏幕列表第 1 条的 `encryptJobId`/`jobId`，按 curl 报文的 URL/headers/Cookie 实际 GET 列表接口，返回数据包含该 ID 则 Toast「Curl验证成功: 返回数据与第1条吻合」，否则失败。
 
 ### 代码架构（正确路径）
@@ -363,6 +364,7 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
   - `ExportCallback` 泛型 = `GeekF1GetJobListResponse`（列表）
   - `ExportDetailCallback` 泛型 = `F1GeekGetJobDetailBatchResponse`（详情）
   - `ExportChatCallback` 继承 `ChatSendCallback`（发送回调），`onComplete(Z,Object,Object)V` 调 `ExportHelper.reportSendResult(Z,Object,Object)V`
+  - `ExportCreateFriendCallback` 继承 `net/bosszhipin/base/b`，泛型 = `GeekCreateFriendResponse`（建联回调），`onSuccess(Lhg0/a;)V` 解析 `response.relation` → `notifyCreateFriendSuccess`，`onFailed(Lcom/twl/http/error/a;)V` → `notifyCreateFriendFailed`
 - 注入点: `GeekJobRecommendFragment` / `MainActivity.onCreate`（classes6 锚点注入 `ExportHelper.attach`）/ `GetDiscoverHomeFragment`（classes7，发现页宿主）。`build_v6.py` 完成注入 + 替换/新增 DEX + zipalign + V1/V2 签名。
 
 ### 关键实现路径（每个功能怎么做对）
@@ -395,13 +397,14 @@ python3 scripts/build_v6.py --input boss2_v5.apk --output boss2_v6.apk
 
 ```
 ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → smali
-  → 合并手写 ExportCallback.smali + ExportDetailCallback.smali + ExportChatCallback.smali → smali.jar assemble → classes10.dex
+  → 合并手写 ExportCallback.smali + ExportDetailCallback.smali + ExportChatCallback.smali + ExportCreateFriendCallback.smali → smali.jar assemble → classes10.dex
 ```
 
-**关键**: 两个手写回调的泛型必须写对:
+**关键**: 手写回调的泛型必须写对:
 - `ExportCallback` 泛型 = `GeekF1GetJobListResponse`
 - `ExportDetailCallback` 泛型 = `F1GeekGetJobDetailBatchResponse`
-写错泛型 → 响应按错误类型解析 → 数据恒 null。
+- `ExportCreateFriendCallback` 泛型 = `GeekCreateFriendResponse`
+写错泛型 → 响应按错误类型解析 → 数据恒 null。`ExportCreateFriendCallback` 泛型信息在 builder 直接 d8 反编译时会丢失，必须手写 smali 并在 `scripts/build_classes10.sh` 中合并（`SRC_CB_SMALI` 拷贝步骤）。
 
 `parseResponse` 已重写: 先调用 `com.twl.http.callback.b.d(response)` 得到报文 JSON 并 `notifyRawJson`/`notifyDetailRawJson` 回传 ExportHelper，再按原逻辑解析（code/zpData 提取 + Gson + hg0/a 包装）。详情回调链上 `mCallback` 位于 `com/twl/http/client/a`（请求基类），不要在 `com/twl/http/callback/a` 上找它。
 
@@ -420,7 +423,7 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 
 ### 聊天记录如何显示出来（消息列表闭环，已修复）
 
-发送消息后「消息」页能看到该会话的关键：**ContactBean 三字段完整 + 触发列表刷新**。根因是补丁 newInstance 的 ContactBean 只填 `friendId/friendSource/friendName`，缺 `myId`（当前登录 uid）与 `myRole`，而列表/写库查询均按 `myId=当前uid AND myRole=?` 过滤 → 落库存在但查不到。
+发送消息后「消息」页能看到**完整会话**（头像/公司/岗位/薪资齐全）的关键：**先 HTTP 建联拿 relation 全字段填充 ContactBean → 落库 → 刷新列表 → 再发送**。早期版本只补 `myId/myRole` 三字段即可见，但列表项是畸形会话（friendName 空、头像/公司/岗位缺失、红感叹号、点击即消失），因为列表渲染依赖 ContactBean 的展示字段。
 
 **数据链路**（`research/smali_all`）:
 - 消息页 = `chat/contact/fragment/ContactsFragment.smali`，实现 `ContactManager$f`；`observeContacts()` 观察 `ContactManager.S()`（LiveData `a`）等三个源
@@ -428,22 +431,25 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 - 数据源: `te/l`（F2ContactClassifyHelper）→ `dx/a.r().j()` 全量联系人缓存 → `refreshGroup` → 分类写 `te/c.d`
 - DB 查询条件: `ContactDaoImpl.insertOrUpdateAllField`/`queryIdByFriendId` 用 `friendId=? AND myId=当前uid AND myRole=?`；`getAllContactList(I)` 用 `myId=当前uid AND myRole=?`
 
-**正确做法**（`ExportHelper.sendOneContact` + `reportSendResult`）:
+**正确做法**（`ExportHelper.sendOneContact`）:
 1. 发送前解析 `role = com.hpbr.bosszhipin.data.manager.r.E().get()`，`myId = r.A()`（= `AccountHelper.getUid()`，见 `classes2/com/bszp/kernel/account/AccountHelper.smali`）
-2. `ContactManager.U(bossId, role, friendSource)` —— 第二参数传 **role**（正常链路 ChatCommon 同款）；U 查缓存，null 则 newInstance 并补设 `myId`/`myRole`（reuse 分支也要修正，防缓存遗留 myId=0）
-3. 发送成功后 `ContactManager.C(contact, 0)` 更新会话 + `ContactManager.V()`（= refreshContacts）触发 LiveData `a` post → 列表刷新。**仅调 `C` 不会刷新列表**（只加 friendId 进 fragment 的 `B` 集合）
+2. **先建联**：`createFriendAndWait(job, bossId)` —— `new GeekCreateFriendRequest(callback, false)`（第二参 false 走 Geek 请求体，对应求职者端 `zpgeek/app/friend/add`；BOSS 端是 `zpjob/chat/add/friend`，见 `i10/k.smali`）→ 设 `friendId/jobId/expectId/lid/securityId`、`entrance=9`、`greeting=null`、`applyJobDirectly=0`、`startChatProcessExpGroup=0` → `hg0.c.d(request)` 发送 → CountDownLatch 15s 同步等待。成功回调 `ExportCreateFriendCallback.onSuccess` → `notifyCreateFriendSuccess` 解析 `response.relation`（`ServerAddFriendBean`）存 `sCreateRelation`；失败/超时 → 该职位**跳过，不发送**
+3. **全字段填充**：`ContactBean.fromServerGeekAddFriendBean(relation, myId, role)` 反射调用，把 relation 的 friendName/头像/company/positionName/salaryDesc/expectId/jobIntentId 等约 30 个字段填进 ContactBean（含 myId/myRole）→ `setBooleanField(contactBean, "isNeedComplete", false)` 避免"需完善"态；无缓存时 `ContactManager.U(bossId, role, friendSource)` 查/建（reuse 分支也补 myId/myRole，防缓存遗留 myId=0）
+4. `ContactManager.G(contact, role)` 落库 + `ContactManager.V()`（= refreshContacts）触发 LiveData `a` post → 列表刷新。**仅调 `C` 不会刷新列表**（只加 friendId 进 fragment 的 `B` 集合）
+5. 再发送：`message.handler.d.a(contactBean)` 取 target → `message.handler.c.J(target, msg, 1, ExportChatCallback, 0, 0L)`，返回非 null 即入队成功 → `reportSendResult` Toast
 
 **验证**（真机 `adb logcat -s ExportHelper`）:
 - `batch send role=.. myId=..`（必须非 0）
-- `batch send new ContactBean friendId=.. myId=.. myRole=..`
-- `reportSendResult trigger refreshContacts V() ok`
+- `batch send create friend request friendId=.. jobId=.. securityId=.. lid=..` → `batch send create friend ok friendId=..`（失败见 `batch send create friend failed friendId=.. err=..` / `create friend timeout`，该职位会跳过）
+- `batch send fill contact from relation friendId=..` → `batch send save contact DB friendId=..` → `batch send refresh contacts V() friendId=..`
+- `batch send longlink connected=true` → `batch send ok friendId=..` → `reportSendResult ok=..`
 
 ### 验证（真机）
 
 `adb logcat -s ExportHelper`:
 - 导出: `user choose export count=N` → `request page=1` → `jobList size=15` → `detail progress 1/N` → `.md`/`.txt` 写出
 - curl 收集: `collectCurl LIST len=...` / `collectCurl DETAIL len=...`
-- 沟通: `batch send role=.. myId=..` → `batch send longlink connected=true` → `batch send ok friendId=...` → `notifySendStart` → `reportSendResult ok=...` → `reportSendResult trigger refreshContacts V() ok` → 消息列表可见该会话
+- 沟通: `batch send role=.. myId=..` → `batch send create friend request friendId=..` → `batch send create friend ok friendId=..`（失败/超时会跳过该职位）→ `batch send fill contact from relation friendId=..` → `batch send save contact DB friendId=..` → `batch send refresh contacts V() friendId=..` → `batch send longlink connected=true` → `batch send ok friendId=...` → `reportSendResult ok=...` → 消息列表可见该会话
 - Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 1 条）
 
 ### 参考文件
@@ -456,6 +462,10 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 | `src/export2/smali/.../ExportCallback.smali` | 手写列表回调 (泛型=GeekF1GetJobListResponse, 捕获原始 JSON) |
 | `src/export2/smali/.../ExportDetailCallback.smali` | 手写详情回调 (泛型=F1GeekGetJobDetailBatchResponse, 捕获原始 JSON) |
 | `src/export2/smali/.../ExportChatCallback.smali` | 手写发送回调 (继承 ChatSendCallback, onComplete→reportSendResult) |
+| `src/export2/smali/.../ExportCreateFriendCallback.smali` | 手写建联回调 (继承 base/b, 泛型=GeekCreateFriendResponse, onSuccess/onFailed→notifyCreateFriend*) |
+| `research/.../classes9/net/bosszhipin/api/GeekCreateFriendRequest.smali` | 建联请求类 (求职者端 POST zpgeek/app/friend/add; 构造 (callback,false) 走 Geek 请求体) |
+| `research/.../classes9/net/bosszhipin/api/GeekCreateFriendResponse.smali` | 建联响应类 (字段 `relation` = ServerAddFriendBean) |
+| `research/.../classes9/net/bosszhipin/api/bean/ServerAddFriendBean.smali` | relation bean (friendId/getName/getCompany/getPositionName/getSalaryDesc 等全字段 getter) |
 | `research/.../classes9/GeekF1GetJobListRequest.smali` | 列表请求类 |
 | `research/.../classes9/GeekF1GetJobListResponse.smali` | 列表响应类 (jobList/hasMore) |
 | `research/.../classes7/F1GeekGetJobDetailBatchRequest.smali` | 详情批量请求类 (getJobDetailRequest/jobQueryBannerRequest) |
@@ -480,7 +490,7 @@ bash scripts/build_classes10.sh
 # 2. 从 v5 重打 v6（注入 classes6/7 锚点 + 替换 DEX + 添加 classes10 + zipalign + V1/V2 签名）
 python3 scripts/build_v6.py --input downloads/boss2_v5.apk --output boss2_v6.apk
 
-# 3. 验证 10 项全部 PASSED
+# 3. 验证 11 项全部 PASSED
 python3 scripts/verify.py boss2_v6.apk
 ```
 
@@ -491,4 +501,4 @@ split -b 20M boss2_v6.apk boss2_v6_part_
 md5sum boss2_v6_part_* > parts.md5   # 合并校验: cat boss2_v6_part_* | md5sum 应与整包一致
 ```
 
-部署: 在 `/workspace/boss2` 起 `python3 -m http.server 8080`（后台常驻），分段/`parts.md5` 放同目录。下载地址: `https://8080-1085837e71e955d9.monkeycode-ai.online/boss2_v6.apk`（curl 直接下载整包）。
+部署: 在 `/workspace/boss2` 起 `python3 /tmp/opencode/download_server.py 8080`（后台常驻，支持 Range 断点续传），分段/`parts.md5` 放同目录 `parts/`。下载地址: `https://8080-0e6eb8d98b97f3bf.monkeycode-ai.online/boss2_v6.apk`（curl 直接下载整包）。

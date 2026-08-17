@@ -12,6 +12,8 @@
 
 
 # static fields
+.field private static final CREATE_FRIEND_TIMEOUT_MS:J = 0x3a98L
+
 .field private static final DEFAULT_COUNT:I = 0xf
 
 .field private static final MAX_BATCH_MSG_LEN:I = 0x1f4
@@ -29,6 +31,14 @@
 .field private static final sAttachLock:Ljava/lang/Object;
 
 .field private static volatile sAttached:Z = false
+
+.field private static volatile sCreateError:Ljava/lang/String; = null
+
+.field private static volatile sCreateLatch:Ljava/util/concurrent/CountDownLatch; = null
+
+.field private static volatile sCreateOk:Z = false
+
+.field private static volatile sCreateRelation:Ljava/lang/Object; = null
 
 .field private static final sCurlList:Ljava/util/List;
     .annotation system Ldalvik/annotation/Signature;
@@ -85,14 +95,14 @@
 .method static constructor <clinit>()V
     .registers 2
 
-    .line 86
+    .line 91
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
 
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurlList:Ljava/util/List;
 
-    .line 90
+    .line 95
     new-instance v0, Landroid/os/Handler;
 
     invoke-static {}, Landroid/os/Looper;->getMainLooper()Landroid/os/Looper;
@@ -105,27 +115,27 @@
 
     const-string v0, ""
 
-    .line 92
+    .line 97
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurrentFilterCode:Ljava/lang/String;
 
-    .line 94
+    .line 99
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sSceneId:Ljava/lang/String;
 
-    .line 95
+    .line 100
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sSourceText:Ljava/lang/String;
 
-    .line 96
+    .line 101
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sTopContentId:Ljava/lang/String;
 
-    .line 97
+    .line 102
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sExtendParams:Ljava/lang/String;
 
     const/4 v0, 0x0
 
-    .line 98
+    .line 103
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
 
-    .line 100
+    .line 105
     new-instance v0, Ljava/lang/Object;
 
     invoke-direct {v0}, Ljava/lang/Object;-><init>()V
@@ -134,7 +144,7 @@
 
     const/4 v0, 0x0
 
-    .line 101
+    .line 106
     sput-boolean v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sAttached:Z
 
     return-void
@@ -354,7 +364,7 @@
 
     if-eqz p3, :cond_14
 
-    .line 1301
+    .line 1426
     invoke-virtual {p3}, Ljava/lang/String;->isEmpty()Z
 
     move-result v0
@@ -373,7 +383,7 @@
 
     aput-object p3, v0, p2
 
-    .line 1302
+    .line 1427
     invoke-virtual {p0, p1, v0}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     :cond_14
@@ -390,7 +400,7 @@
     :cond_3
     const-string v0, "jobDetailResponse"
 
-    .line 2320
+    .line 2445
     invoke-static {p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v0
@@ -399,7 +409,7 @@
 
     const-string v0, "bossJobDetailResponse"
 
-    .line 2322
+    .line 2447
     invoke-static {p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v0
@@ -409,7 +419,7 @@
 
     const-string p1, "| \u8be6\u60c5 | (\u65e0\u8be6\u60c5\u6570\u636e) |\n"
 
-    .line 2325
+    .line 2450
     invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     return-void
@@ -417,7 +427,7 @@
     :cond_19
     const-string p1, "| securityId | "
 
-    .line 2328
+    .line 2453
     invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string p1, "securityId"
@@ -440,7 +450,7 @@
 
     const-string v2, "bossBaseInfo"
 
-    .line 2330
+    .line 2455
     invoke-static {v0, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v2
@@ -451,7 +461,7 @@
 
     const-string v4, "| \u7528\u4eba\u5355\u4f4d | "
 
-    .line 2332
+    .line 2457
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-static {v2, v3, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
@@ -468,7 +478,7 @@
 
     const-string v4, "| BOSS\u59d3\u540d | "
 
-    .line 2333
+    .line 2458
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "name"
@@ -487,7 +497,7 @@
 
     const-string v4, "| BOSS\u804c\u4f4d | "
 
-    .line 2334
+    .line 2459
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "title"
@@ -506,7 +516,7 @@
 
     const-string v4, "| bossId | "
 
-    .line 2335
+    .line 2460
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "bossId"
@@ -525,7 +535,7 @@
 
     const-string v4, "| \u6d3b\u8dc3\u6807\u7b7e | "
 
-    .line 2336
+    .line 2461
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "bossBehaviorLabels"
@@ -544,7 +554,7 @@
 
     const-string v4, "| \u8ba4\u8bc1\u72b6\u6001 | "
 
-    .line 2337
+    .line 2462
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "certStatus"
@@ -564,7 +574,7 @@
     :cond_b8
     const-string v2, "jobBaseInfo"
 
-    .line 2340
+    .line 2465
     invoke-static {v0, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v2
@@ -573,7 +583,7 @@
 
     const-string v4, "| \u804c\u4f4d\u540d | "
 
-    .line 2342
+    .line 2467
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "jobName"
@@ -592,7 +602,7 @@
 
     const-string v4, "| jobId | "
 
-    .line 2343
+    .line 2468
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "jobId"
@@ -611,7 +621,7 @@
 
     const-string v4, "| \u85aa\u8d44 | "
 
-    .line 2344
+    .line 2469
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "salaryDesc"
@@ -630,7 +640,7 @@
 
     const-string v4, "| \u7ecf\u9a8c | "
 
-    .line 2345
+    .line 2470
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "experienceName"
@@ -649,7 +659,7 @@
 
     const-string v4, "| \u5b66\u5386 | "
 
-    .line 2346
+    .line 2471
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "degreeName"
@@ -668,7 +678,7 @@
 
     const-string v4, "| \u5730\u5740 | "
 
-    .line 2347
+    .line 2472
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "address"
@@ -687,7 +697,7 @@
 
     const-string v4, "| \u53d1\u5e03\u65f6\u95f4 | "
 
-    .line 2348
+    .line 2473
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "jobPubTimeDesc"
@@ -706,7 +716,7 @@
 
     const-string v4, "| \u804c\u4f4d\u63cf\u8ff0 | "
 
-    .line 2349
+    .line 2474
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "jobDesc"
@@ -725,35 +735,35 @@
 
     const-string v4, "jobSkillLabelDesc"
 
-    .line 2350
+    .line 2475
     invoke-static {v2, v4, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v4
 
     const-string v5, "jobSkills"
 
-    .line 2351
+    .line 2476
     invoke-static {v2, v5, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v5
 
     const-string v6, "jobDescHighlights"
 
-    .line 2352
+    .line 2477
     invoke-static {v2, v6, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v6
 
     const-string v7, "requiredSkills"
 
-    .line 2353
+    .line 2478
     invoke-static {v2, v7, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v2
 
     const-string v7, "| \u5173\u952e\u8bcd/\u6280\u80fd | "
 
-    .line 2354
+    .line 2479
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     new-instance v7, Ljava/lang/StringBuilder;
@@ -791,7 +801,7 @@
     :cond_1af
     const-string v2, "brandComInfo"
 
-    .line 2357
+    .line 2482
     invoke-static {v0, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v0
@@ -800,7 +810,7 @@
 
     const-string v2, "| \u516c\u53f8 | "
 
-    .line 2359
+    .line 2484
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-static {v0, v3, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
@@ -817,7 +827,7 @@
 
     const-string v2, "| \u884c\u4e1a | "
 
-    .line 2360
+    .line 2485
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "industryName"
@@ -836,7 +846,7 @@
 
     const-string v2, "| \u89c4\u6a21 | "
 
-    .line 2361
+    .line 2486
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "scaleName"
@@ -855,7 +865,7 @@
 
     const-string v2, "| \u878d\u8d44\u9636\u6bb5 | "
 
-    .line 2362
+    .line 2487
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "stageName"
@@ -886,12 +896,12 @@
     :cond_3
     const-string v0, "\n[\u8be6\u60c5\u9875\u4fe1\u606f]\n"
 
-    .line 2247
+    .line 2372
     invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v0, "jobDetailResponse"
 
-    .line 2248
+    .line 2373
     invoke-static {p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v0
@@ -900,7 +910,7 @@
 
     const-string v0, "bossJobDetailResponse"
 
-    .line 2250
+    .line 2375
     invoke-static {p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v0
@@ -910,7 +920,7 @@
 
     const-string p1, "(\u65e0\u8be6\u60c5\u6570\u636e)\n"
 
-    .line 2253
+    .line 2378
     invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     return-void
@@ -918,7 +928,7 @@
     :cond_1e
     const-string p1, "[securityId] "
 
-    .line 2256
+    .line 2381
     invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string p1, "securityId"
@@ -937,7 +947,7 @@
 
     const-string v2, "bossBaseInfo"
 
-    .line 2258
+    .line 2383
     invoke-static {v0, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v2
@@ -954,12 +964,12 @@
 
     const-string v7, "[\u7528\u4eba\u5355\u4f4d\uff08BOSS\uff09]\n"
 
-    .line 2260
+    .line 2385
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "name="
 
-    .line 2261
+    .line 2386
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "name"
@@ -974,7 +984,7 @@
 
     const-string v7, "bossId="
 
-    .line 2262
+    .line 2387
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "bossId"
@@ -989,7 +999,7 @@
 
     const-string v7, "title="
 
-    .line 2263
+    .line 2388
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "title"
@@ -1002,7 +1012,7 @@
 
     invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2264
+    .line 2389
     invoke-virtual {p0, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-static {v2, v5, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
@@ -1013,7 +1023,7 @@
 
     invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2265
+    .line 2390
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-static {v2, v3, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
@@ -1026,7 +1036,7 @@
 
     const-string v7, "bossBehaviorLabels="
 
-    .line 2266
+    .line 2391
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "bossBehaviorLabels"
@@ -1041,7 +1051,7 @@
 
     const-string v7, "activeTimeDesc="
 
-    .line 2267
+    .line 2392
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "activeTimeDesc"
@@ -1056,7 +1066,7 @@
 
     const-string v7, "certStatus="
 
-    .line 2268
+    .line 2393
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "certStatus"
@@ -1071,7 +1081,7 @@
 
     const-string v7, "bossDesc="
 
-    .line 2269
+    .line 2394
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "bossDesc"
@@ -1087,7 +1097,7 @@
     :cond_d9
     const-string v2, "jobBaseInfo"
 
-    .line 2272
+    .line 2397
     invoke-static {v0, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v2
@@ -1096,12 +1106,12 @@
 
     const-string v7, "[\u804c\u4f4d\u4fe1\u606f]\n"
 
-    .line 2274
+    .line 2399
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobId="
 
-    .line 2275
+    .line 2400
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobId"
@@ -1116,7 +1126,7 @@
 
     const-string v7, "jobName="
 
-    .line 2276
+    .line 2401
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobName"
@@ -1131,7 +1141,7 @@
 
     const-string v7, "jobType="
 
-    .line 2277
+    .line 2402
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobType"
@@ -1146,7 +1156,7 @@
 
     const-string v7, "salaryDesc="
 
-    .line 2278
+    .line 2403
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "salaryDesc"
@@ -1161,7 +1171,7 @@
 
     const-string v7, "experienceName="
 
-    .line 2279
+    .line 2404
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "experienceName"
@@ -1176,7 +1186,7 @@
 
     const-string v7, "degreeName="
 
-    .line 2280
+    .line 2405
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "degreeName"
@@ -1191,7 +1201,7 @@
 
     const-string v7, "address="
 
-    .line 2281
+    .line 2406
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "address"
@@ -1206,7 +1216,7 @@
 
     const-string v7, "jobPubTimeDesc="
 
-    .line 2282
+    .line 2407
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobPubTimeDesc"
@@ -1221,7 +1231,7 @@
 
     const-string v7, "deadLine="
 
-    .line 2283
+    .line 2408
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "deadLine"
@@ -1236,7 +1246,7 @@
 
     const-string v7, "jobDesc="
 
-    .line 2284
+    .line 2409
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobDesc"
@@ -1251,7 +1261,7 @@
 
     const-string v7, "jobDescHighlights="
 
-    .line 2285
+    .line 2410
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobDescHighlights"
@@ -1266,7 +1276,7 @@
 
     const-string v7, "jobSkills="
 
-    .line 2286
+    .line 2411
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobSkills"
@@ -1281,7 +1291,7 @@
 
     const-string v7, "distanceDesc="
 
-    .line 2287
+    .line 2412
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "distanceDesc"
@@ -1296,7 +1306,7 @@
 
     const-string v7, "jobValidStatus="
 
-    .line 2288
+    .line 2413
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "jobValidStatus"
@@ -1311,17 +1321,17 @@
 
     const-string v7, "[jobBaseInfo \u5168\u5b57\u6bb5]\n"
 
-    .line 2289
+    .line 2414
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v7, "  "
 
-    .line 2290
+    .line 2415
     invoke-static {p0, v2, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dumpObjectFields(Ljava/lang/StringBuilder;Ljava/lang/Object;Ljava/lang/String;)V
 
     const-string v8, "salaryWelfareInfo"
 
-    .line 2291
+    .line 2416
     invoke-static {v2, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v8
@@ -1330,16 +1340,16 @@
 
     const-string v9, "[\u85aa\u8d44\u798f\u5229\u6a21\u5757]\n"
 
-    .line 2293
+    .line 2418
     invoke-virtual {p0, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2294
+    .line 2419
     invoke-static {p0, v8, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dumpObjectFields(Ljava/lang/StringBuilder;Ljava/lang/Object;Ljava/lang/String;)V
 
     :cond_1ee
     const-string v8, "jobTemplateModule"
 
-    .line 2296
+    .line 2421
     invoke-static {v2, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v2
@@ -1348,16 +1358,16 @@
 
     const-string v8, "[\u804c\u4f4d\u6a21\u677f\u6a21\u5757]\n"
 
-    .line 2298
+    .line 2423
     invoke-virtual {p0, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2299
+    .line 2424
     invoke-static {p0, v2, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dumpObjectFields(Ljava/lang/StringBuilder;Ljava/lang/Object;Ljava/lang/String;)V
 
     :cond_1fe
     const-string v2, "brandComInfo"
 
-    .line 2303
+    .line 2428
     invoke-static {v0, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
 
     move-result-object v0
@@ -1366,10 +1376,10 @@
 
     const-string v2, "[\u516c\u53f8\u4fe1\u606f]\n"
 
-    .line 2305
+    .line 2430
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2306
+    .line 2431
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-static {v0, v3, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
@@ -1382,7 +1392,7 @@
 
     const-string v2, "comName="
 
-    .line 2307
+    .line 2432
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "comName"
@@ -1395,7 +1405,7 @@
 
     invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2308
+    .line 2433
     invoke-virtual {p0, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-static {v0, v5, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
@@ -1408,7 +1418,7 @@
 
     const-string v2, "industryName="
 
-    .line 2309
+    .line 2434
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "industryName"
@@ -1423,7 +1433,7 @@
 
     const-string v2, "scaleName="
 
-    .line 2310
+    .line 2435
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "scaleName"
@@ -1438,7 +1448,7 @@
 
     const-string v2, "stageName="
 
-    .line 2311
+    .line 2436
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "stageName"
@@ -1453,7 +1463,7 @@
 
     const-string v2, "brandCertificate="
 
-    .line 2312
+    .line 2437
     invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v2, "brandCertificate"
@@ -1483,7 +1493,7 @@
 
     if-eqz v2, :cond_f
 
-    .line 107
+    .line 112
     invoke-virtual/range {p1 .. p1}, Landroid/view/View;->getContext()Landroid/content/Context;
 
     move-result-object v4
@@ -1500,19 +1510,19 @@
 
     return-void
 
-    .line 110
+    .line 115
     :cond_16
     sget-object v5, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sAttachLock:Ljava/lang/Object;
 
     monitor-enter v5
 
-    .line 111
+    .line 116
     :try_start_19
     sget-boolean v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sAttached:Z
 
     if-eqz v0, :cond_1f
 
-    .line 112
+    .line 117
     monitor-exit v5
 
     return-void
@@ -1520,10 +1530,10 @@
     :cond_1f
     const/4 v6, 0x1
 
-    .line 114
+    .line 119
     sput-boolean v6, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sAttached:Z
 
-    .line 115
+    .line 120
     monitor-exit v5
     :try_end_23
     .catchall {:try_start_19 .. :try_end_23} :catchall_249
@@ -1537,14 +1547,14 @@
     :cond_28
     move-object/from16 v0, p2
 
-    .line 116
+    .line 121
     :goto_2a
     sput-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurrentFilterCode:Ljava/lang/String;
 
-    .line 117
+    .line 122
     sput-object v1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sAttachActivity:Landroid/app/Activity;
 
-    .line 119
+    .line 124
     :try_start_2e
     new-instance v5, Landroid/widget/TextView;
 
@@ -1552,27 +1562,27 @@
 
     const-string v0, "\u5bfc\u51fa"
 
-    .line 120
+    .line 125
     invoke-virtual {v5, v0}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
     const/4 v0, -0x1
 
-    .line 121
+    .line 126
     invoke-virtual {v5, v0}, Landroid/widget/TextView;->setTextColor(I)V
 
     const v7, 0x417d70a4    # 15.84f
 
-    .line 122
+    .line 127
     invoke-virtual {v5, v7}, Landroid/widget/TextView;->setTextSize(F)V
 
     const/16 v8, 0x11
 
-    .line 123
+    .line 128
     invoke-virtual {v5, v8}, Landroid/widget/TextView;->setGravity(I)V
 
     const v9, 0x41666666    # 14.4f
 
-    .line 124
+    .line 129
     invoke-static {v1, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v10
@@ -1593,19 +1603,19 @@
 
     invoke-virtual {v5, v10, v12, v13, v14}, Landroid/widget/TextView;->setPadding(IIII)V
 
-    .line 126
+    .line 131
     new-instance v10, Landroid/graphics/drawable/GradientDrawable;
 
     invoke-direct {v10}, Landroid/graphics/drawable/GradientDrawable;-><init>()V
 
     const/high16 v12, -0x4d000000
 
-    .line 127
+    .line 132
     invoke-virtual {v10, v12}, Landroid/graphics/drawable/GradientDrawable;->setColor(I)V
 
     const v13, 0x418a3d71    # 17.28f
 
-    .line 128
+    .line 133
     invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v13
@@ -1614,12 +1624,12 @@
 
     invoke-virtual {v10, v13}, Landroid/graphics/drawable/GradientDrawable;->setCornerRadius(F)V
 
-    .line 129
+    .line 134
     invoke-virtual {v5, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
 
     const v13, 0x403851ec    # 2.88f
 
-    .line 130
+    .line 135
     invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v14
@@ -1628,7 +1638,7 @@
 
     invoke-virtual {v5, v14}, Landroid/widget/TextView;->setElevation(F)V
 
-    .line 131
+    .line 136
     sget v14, Landroid/os/Build$VERSION;->SDK_INT:I
 
     const/high16 v15, 0x42c80000    # 100.0f
@@ -1637,10 +1647,10 @@
 
     if-lt v14, v4, :cond_8e
 
-    .line 132
+    .line 137
     invoke-virtual {v5, v15}, Landroid/widget/TextView;->setZ(F)V
 
-    .line 135
+    .line 140
     :cond_8e
     new-instance v14, Landroid/widget/TextView;
 
@@ -1648,19 +1658,19 @@
 
     const-string v6, "\u6c9f\u901a"
 
-    .line 136
+    .line 141
     invoke-virtual {v14, v6}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
-    .line 137
+    .line 142
     invoke-virtual {v14, v0}, Landroid/widget/TextView;->setTextColor(I)V
 
-    .line 138
+    .line 143
     invoke-virtual {v14, v7}, Landroid/widget/TextView;->setTextSize(F)V
 
-    .line 139
+    .line 144
     invoke-virtual {v14, v8}, Landroid/widget/TextView;->setGravity(I)V
 
-    .line 140
+    .line 145
     invoke-static {v1, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v6
@@ -1679,10 +1689,10 @@
 
     invoke-virtual {v14, v6, v12, v8, v9}, Landroid/widget/TextView;->setPadding(IIII)V
 
-    .line 141
+    .line 146
     invoke-virtual {v14, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
 
-    .line 142
+    .line 147
     invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v6
@@ -1691,15 +1701,15 @@
 
     invoke-virtual {v14, v6}, Landroid/widget/TextView;->setElevation(F)V
 
-    .line 143
+    .line 148
     sget v6, Landroid/os/Build$VERSION;->SDK_INT:I
 
     if-lt v6, v4, :cond_c6
 
-    .line 144
+    .line 149
     invoke-virtual {v14, v15}, Landroid/widget/TextView;->setZ(F)V
 
-    .line 147
+    .line 152
     :cond_c6
     new-instance v6, Landroid/widget/TextView;
 
@@ -1707,23 +1717,23 @@
 
     const-string v8, "Curl"
 
-    .line 148
+    .line 153
     invoke-virtual {v6, v8}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
-    .line 149
+    .line 154
     invoke-virtual {v6, v0}, Landroid/widget/TextView;->setTextColor(I)V
 
-    .line 150
+    .line 155
     invoke-virtual {v6, v7}, Landroid/widget/TextView;->setTextSize(F)V
 
     const/16 v0, 0x11
 
-    .line 151
+    .line 156
     invoke-virtual {v6, v0}, Landroid/widget/TextView;->setGravity(I)V
 
     const v0, 0x41666666    # 14.4f
 
-    .line 152
+    .line 157
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v7
@@ -1742,10 +1752,10 @@
 
     invoke-virtual {v6, v7, v8, v9, v0}, Landroid/widget/TextView;->setPadding(IIII)V
 
-    .line 153
+    .line 158
     invoke-virtual {v6, v10}, Landroid/widget/TextView;->setBackground(Landroid/graphics/drawable/Drawable;)V
 
-    .line 154
+    .line 159
     invoke-static {v1, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v0
@@ -1754,21 +1764,21 @@
 
     invoke-virtual {v6, v0}, Landroid/widget/TextView;->setElevation(F)V
 
-    .line 155
+    .line 160
     sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
 
     if-lt v0, v4, :cond_103
 
-    .line 156
+    .line 161
     invoke-virtual {v6, v15}, Landroid/widget/TextView;->setZ(F)V
 
-    .line 159
+    .line 164
     :cond_103
     new-instance v4, Landroid/view/View;
 
     invoke-direct {v4, v1}, Landroid/view/View;-><init>(Landroid/content/Context;)V
 
-    .line 160
+    .line 165
     new-instance v0, Landroid/widget/LinearLayout$LayoutParams;
 
     const v7, 0x42accccd    # 86.4f
@@ -1787,7 +1797,7 @@
 
     const v7, 0x410a3d71    # 8.64f
 
-    .line 161
+    .line 166
     invoke-static {v1, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v7
@@ -1796,19 +1806,19 @@
 
     invoke-virtual {v0, v8, v8, v8, v7}, Landroid/widget/LinearLayout$LayoutParams;->setMargins(IIII)V
 
-    .line 162
+    .line 167
     new-instance v7, Landroid/graphics/drawable/GradientDrawable;
 
     invoke-direct {v7}, Landroid/graphics/drawable/GradientDrawable;-><init>()V
 
     const/high16 v9, -0x4d000000
 
-    .line 163
+    .line 168
     invoke-virtual {v7, v9}, Landroid/graphics/drawable/GradientDrawable;->setColor(I)V
 
     const v9, 0x40e66666    # 7.2f
 
-    .line 164
+    .line 169
     invoke-static {v1, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v9
@@ -1817,26 +1827,26 @@
 
     invoke-virtual {v7, v9}, Landroid/graphics/drawable/GradientDrawable;->setCornerRadius(F)V
 
-    .line 165
+    .line 170
     invoke-virtual {v4, v7}, Landroid/view/View;->setBackground(Landroid/graphics/drawable/Drawable;)V
 
-    .line 167
+    .line 172
     new-instance v7, Landroid/widget/LinearLayout;
 
     invoke-direct {v7, v1}, Landroid/widget/LinearLayout;-><init>(Landroid/content/Context;)V
 
     const/4 v9, 0x1
 
-    .line 168
+    .line 173
     invoke-virtual {v7, v9}, Landroid/widget/LinearLayout;->setOrientation(I)V
 
-    .line 169
+    .line 174
     invoke-virtual {v7, v9}, Landroid/widget/LinearLayout;->setGravity(I)V
 
-    .line 170
+    .line 175
     invoke-virtual {v7, v4, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
-    .line 171
+    .line 176
     new-instance v0, Landroid/widget/LinearLayout$LayoutParams;
 
     const/4 v9, -0x2
@@ -1845,51 +1855,51 @@
 
     const v10, 0x408a3d71    # 4.32f
 
-    .line 173
+    .line 178
     invoke-static {v1, v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v11
 
     invoke-virtual {v0, v8, v8, v8, v11}, Landroid/widget/LinearLayout$LayoutParams;->setMargins(IIII)V
 
-    .line 174
+    .line 179
     invoke-virtual {v7, v14, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
-    .line 175
+    .line 180
     new-instance v0, Landroid/widget/LinearLayout$LayoutParams;
 
     invoke-direct {v0, v9, v9}, Landroid/widget/LinearLayout$LayoutParams;-><init>(II)V
 
-    .line 177
+    .line 182
     invoke-static {v1, v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v10
 
     invoke-virtual {v0, v8, v8, v8, v10}, Landroid/widget/LinearLayout$LayoutParams;->setMargins(IIII)V
 
-    .line 178
+    .line 183
     invoke-virtual {v7, v5, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
-    .line 179
+    .line 184
     new-instance v0, Landroid/widget/LinearLayout$LayoutParams;
 
     invoke-direct {v0, v9, v9}, Landroid/widget/LinearLayout$LayoutParams;-><init>(II)V
 
     invoke-virtual {v7, v6, v0}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
-    .line 182
+    .line 187
     new-instance v10, Landroid/widget/FrameLayout$LayoutParams;
 
     invoke-direct {v10, v9, v9}, Landroid/widget/FrameLayout$LayoutParams;-><init>(II)V
 
     const v0, 0x800055
 
-    .line 185
+    .line 190
     iput v0, v10, Landroid/widget/FrameLayout$LayoutParams;->gravity:I
 
     const/high16 v0, 0x41800000    # 16.0f
 
-    .line 186
+    .line 191
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v0
@@ -1904,7 +1914,7 @@
     :try_end_190
     .catchall {:try_start_2e .. :try_end_190} :catchall_20d
 
-    .line 190
+    .line 195
     :try_start_190
     invoke-virtual/range {p0 .. p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
 
@@ -1914,12 +1924,12 @@
 
     move-result-object v0
 
-    .line 191
+    .line 196
     instance-of v8, v0, Landroid/view/ViewGroup;
 
     if-eqz v8, :cond_1b5
 
-    .line 192
+    .line 197
     check-cast v0, Landroid/view/ViewGroup;
     :try_end_19e
     .catchall {:try_start_190 .. :try_end_19e} :catchall_1a1
@@ -1931,7 +1941,7 @@
     :catchall_1a1
     move-exception v0
 
-    .line 195
+    .line 200
     :try_start_1a2
     new-instance v8, Ljava/lang/StringBuilder;
 
@@ -1955,12 +1965,12 @@
     :goto_1b7
     if-nez v16, :cond_1d4
 
-    .line 198
+    .line 203
     instance-of v0, v2, Landroid/view/ViewGroup;
 
     if-eqz v0, :cond_1c2
 
-    .line 199
+    .line 204
     move-object/from16 v16, v2
 
     check-cast v16, Landroid/view/ViewGroup;
@@ -1970,7 +1980,7 @@
     :cond_1c2
     if-eqz v2, :cond_1d4
 
-    .line 200
+    .line 205
     invoke-virtual/range {p1 .. p1}, Landroid/view/View;->getParent()Landroid/view/ViewParent;
 
     move-result-object v0
@@ -1979,7 +1989,7 @@
 
     if-eqz v0, :cond_1d4
 
-    .line 201
+    .line 206
     invoke-virtual/range {p1 .. p1}, Landroid/view/View;->getParent()Landroid/view/ViewParent;
 
     move-result-object v0
@@ -1996,21 +2006,21 @@
 
     const-string v0, "\u5bfc\u51fa\u6302\u8f7d\u5931\u8d25: \u672a\u627e\u5230\u5bb9\u5668"
 
-    .line 205
+    .line 210
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->toast(Landroid/content/Context;Ljava/lang/String;)V
 
     return-void
 
-    .line 208
+    .line 213
     :cond_1de
     invoke-virtual {v0, v7, v10}, Landroid/view/ViewGroup;->addView(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V
 
     const-string v0, "\u5bfc\u51fa\u529f\u80fd\u5df2\u52a0\u8f7d, \u6309\u94ae\u5728\u53f3\u4e0b\u89d2"
 
-    .line 209
+    .line 214
     invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->toast(Landroid/content/Context;Ljava/lang/String;)V
 
-    .line 211
+    .line 216
     new-instance v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;
 
     invoke-direct {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;-><init>(Landroid/app/Activity;)V
@@ -2025,21 +2035,21 @@
 
     new-array v2, v2, [Z
 
-    .line 220
+    .line 225
     new-instance v3, Lcom/hpbr/bosszhipin/export2/ExportHelper$2;
 
     invoke-direct {v3, v0, v7, v2, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper$2;-><init>([FLandroid/widget/LinearLayout;[ZLandroid/app/Activity;)V
 
     invoke-virtual {v4, v3}, Landroid/view/View;->setOnTouchListener(Landroid/view/View$OnTouchListener;)V
 
-    .line 248
+    .line 253
     new-instance v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$3;
 
     invoke-direct {v0, v1, v5}, Lcom/hpbr/bosszhipin/export2/ExportHelper$3;-><init>(Landroid/app/Activity;Landroid/widget/TextView;)V
 
     invoke-virtual {v5, v0}, Landroid/widget/TextView;->setOnClickListener(Landroid/view/View$OnClickListener;)V
 
-    .line 259
+    .line 264
     new-instance v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$4;
 
     invoke-direct {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper$4;-><init>(Landroid/app/Activity;)V
@@ -2053,7 +2063,7 @@
     :catchall_20d
     move-exception v0
 
-    .line 270
+    .line 275
     new-instance v2, Ljava/lang/StringBuilder;
 
     const-string v3, "attach error: "
@@ -2072,7 +2082,7 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 271
+    .line 276
     new-instance v2, Ljava/lang/StringBuilder;
 
     const-string v3, "\u5bfc\u51fa\u6302\u8f7d\u5f02\u5e38: "
@@ -2111,7 +2121,7 @@
     :catchall_249
     move-exception v0
 
-    .line 115
+    .line 120
     :try_start_24a
     monitor-exit v5
     :try_end_24b
@@ -2133,7 +2143,7 @@
 
     const/4 v4, 0x0
 
-    .line 1391
+    .line 1516
     :try_start_9
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -2149,14 +2159,14 @@
 
     new-array v6, v4, [Ljava/lang/Object;
 
-    .line 1392
+    .line 1517
     invoke-virtual {v5, p0, v6}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v5
 
     if-eqz v5, :cond_22
 
-    .line 1394
+    .line 1519
     invoke-virtual {v5}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v3
@@ -2174,7 +2184,7 @@
     :catchall_24
     move-exception v5
 
-    .line 1397
+    .line 1522
     :try_start_25
     new-instance v6, Ljava/lang/StringBuilder;
 
@@ -2199,7 +2209,7 @@
     :goto_39
     const/4 v5, 0x0
 
-    .line 1401
+    .line 1526
     :try_start_3a
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -2215,7 +2225,7 @@
 
     new-array v7, v4, [Ljava/lang/Object;
 
-    .line 1402
+    .line 1527
     invoke-virtual {v6, p0, v7}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
@@ -2227,7 +2237,7 @@
     :catchall_4d
     move-exception p0
 
-    .line 1404
+    .line 1529
     :try_start_4e
     new-instance v6, Ljava/lang/StringBuilder;
 
@@ -2258,7 +2268,7 @@
     :try_start_65
     const-string v2, "hg0.o"
 
-    .line 1410
+    .line 1535
     invoke-static {v2}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v2
@@ -2269,7 +2279,7 @@
 
     new-array v8, v7, [Ljava/lang/Class;
 
-    .line 1411
+    .line 1536
     const-class v9, Ljava/lang/String;
 
     aput-object v9, v8, v4
@@ -2292,14 +2302,14 @@
 
     aput-object p0, v6, v10
 
-    .line 1412
+    .line 1537
     invoke-virtual {v2, v5, v6}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
 
     if-eqz p0, :cond_a4
 
-    .line 1414
+    .line 1539
     invoke-virtual {p0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object p0
@@ -2311,7 +2321,7 @@
     :catchall_90
     move-exception p0
 
-    .line 1417
+    .line 1542
     :try_start_91
     new-instance v2, Ljava/lang/StringBuilder;
 
@@ -2337,7 +2347,7 @@
     :catchall_a5
     move-exception p0
 
-    .line 1421
+    .line 1546
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "buildFullUrl error: "
@@ -2375,14 +2385,14 @@
 
     const-string v0, "buildHeadersMap getHeaders error: "
 
-    .line 1427
+    .line 1552
     new-instance v1, Ljava/util/HashMap;
 
     invoke-direct {v1}, Ljava/util/HashMap;-><init>()V
 
     const/4 v2, 0x0
 
-    .line 1431
+    .line 1556
     :try_start_8
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -2398,7 +2408,7 @@
 
     new-array v4, v2, [Ljava/lang/Object;
 
-    .line 1432
+    .line 1557
     invoke-virtual {v3, p0, v4}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
@@ -2410,7 +2420,7 @@
     :catchall_1b
     move-exception p0
 
-    .line 1434
+    .line 1559
     :try_start_1c
     new-instance v3, Ljava/lang/StringBuilder;
 
@@ -2435,7 +2445,7 @@
 
     return-object v1
 
-    .line 1439
+    .line 1564
     :cond_33
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -2451,17 +2461,17 @@
 
     new-array v3, v2, [Ljava/lang/Object;
 
-    .line 1440
+    .line 1565
     invoke-virtual {v0, p0, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
 
-    .line 1441
+    .line 1566
     instance-of v3, v0, Ljava/util/Set;
 
     if-eqz v3, :cond_a9
 
-    .line 1442
+    .line 1567
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v3
@@ -2480,7 +2490,7 @@
 
     move-result-object v3
 
-    .line 1443
+    .line 1568
     check-cast v0, Ljava/util/Set;
 
     invoke-interface {v0}, Ljava/util/Set;->iterator()Ljava/util/Iterator;
@@ -2503,13 +2513,13 @@
 
     goto :goto_60
 
-    .line 1447
+    .line 1572
     :cond_6d
     invoke-virtual {v4}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v4
 
-    .line 1448
+    .line 1573
     invoke-virtual {v4}, Ljava/lang/String;->isEmpty()Z
 
     move-result v6
@@ -2531,7 +2541,7 @@
 
     aput-object v4, v6, v2
 
-    .line 1451
+    .line 1576
     invoke-virtual {v3, p0, v6}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v6
@@ -2540,7 +2550,7 @@
 
     goto :goto_60
 
-    .line 1455
+    .line 1580
     :cond_8b
     invoke-virtual {v6}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
@@ -2555,7 +2565,7 @@
     :catchall_93
     move-exception p0
 
-    .line 1459
+    .line 1584
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v2, "buildHeadersMap error: "
@@ -2590,58 +2600,58 @@
 
     const-string v1, "net.bosszhipin.api.GeekF1GetJobListRequest"
 
-    .line 1148
+    .line 1273
     invoke-static {v1}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v1
 
-    .line 1149
+    .line 1274
     invoke-virtual {v1}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
 
     move-result-object v1
 
     const-string v2, "com.twl.http.client.a"
 
-    .line 1151
+    .line 1276
     invoke-static {v2}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v2
 
     const-string v3, "extra_map"
 
-    .line 1152
+    .line 1277
     invoke-virtual {v2, v3}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v2
 
-    .line 1153
+    .line 1278
     invoke-virtual {v2, v1}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v3
 
-    .line 1155
+    .line 1280
     instance-of v4, v3, Ljava/util/Map;
 
     if-eqz v4, :cond_23
 
-    .line 1156
+    .line 1281
     check-cast v3, Ljava/util/Map;
 
     goto :goto_2b
 
-    .line 1158
+    .line 1283
     :cond_23
     new-instance v3, Ljava/util/HashMap;
 
     invoke-direct {v3}, Ljava/util/HashMap;-><init>()V
 
-    .line 1159
+    .line 1284
     invoke-virtual {v2, v1, v3}, Ljava/lang/reflect/Field;->set(Ljava/lang/Object;Ljava/lang/Object;)V
 
     :goto_2b
     const-string v2, "page"
 
-    .line 1161
+    .line 1286
     invoke-static {p0}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
 
     move-result-object v4
@@ -2652,24 +2662,24 @@
 
     const-string v4, "15"
 
-    .line 1162
+    .line 1287
     invoke-interface {v3, v2, v4}, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
     const-string v2, "sortType"
 
     const-string v4, "1"
 
-    .line 1163
+    .line 1288
     invoke-interface {v3, v2, v4}, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
     const-string v2, "expectPosition"
 
     const-string v4, "0"
 
-    .line 1164
+    .line 1289
     invoke-interface {v3, v2, v4}, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 1169
+    .line 1294
     sget-object v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
 
     const-string v4, ""
@@ -2678,7 +2688,7 @@
 
     if-eqz v2, :cond_fe
 
-    .line 1171
+    .line 1296
     :try_start_51
     invoke-virtual {v2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -2690,7 +2700,7 @@
 
     move-result-object v2
 
-    .line 1172
+    .line 1297
     sget-object v7, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
 
     invoke-virtual {v2, v7}, Ljava/lang/reflect/Field;->getLong(Ljava/lang/Object;)J
@@ -2704,7 +2714,7 @@
     :catchall_62
     move-exception v2
 
-    .line 1174
+    .line 1299
     new-instance v7, Ljava/lang/StringBuilder;
 
     const-string v8, "vm field m error: "
@@ -2723,7 +2733,7 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1177
+    .line 1302
     :goto_78
     :try_start_78
     sget-object v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
@@ -2738,7 +2748,7 @@
 
     move-result-object v2
 
-    .line 1178
+    .line 1303
     sget-object v7, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
 
     invoke-virtual {v2, v7}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
@@ -2747,7 +2757,7 @@
 
     if-eqz v2, :cond_a7
 
-    .line 1180
+    .line 1305
     invoke-virtual {v2}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v2
@@ -2759,7 +2769,7 @@
     :catchall_91
     move-exception v2
 
-    .line 1183
+    .line 1308
     new-instance v7, Ljava/lang/StringBuilder;
 
     const-string v8, "vm field n error: "
@@ -2781,7 +2791,7 @@
     :cond_a7
     move-object v2, v4
 
-    .line 1186
+    .line 1311
     :goto_a8
     :try_start_a8
     sget-object v7, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
@@ -2796,7 +2806,7 @@
 
     move-result-object v7
 
-    .line 1187
+    .line 1312
     sget-object v8, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
 
     invoke-virtual {v7, v8}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
@@ -2807,7 +2817,7 @@
 
     const-string v8, "s20.b"
 
-    .line 1189
+    .line 1314
     invoke-static {v8}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v8
@@ -2838,14 +2848,14 @@
 
     const/4 v7, 0x0
 
-    .line 1190
+    .line 1315
     invoke-virtual {v8, v7, v9}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v7
 
     if-eqz v7, :cond_fa
 
-    .line 1192
+    .line 1317
     invoke-virtual {v7}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v4
@@ -2857,7 +2867,7 @@
     :catchall_e4
     move-exception v7
 
-    .line 1196
+    .line 1321
     new-instance v8, Ljava/lang/StringBuilder;
 
     const-string v9, "vm filterParams error: "
@@ -2892,7 +2902,7 @@
     :goto_ff
     const-string v7, "expectId"
 
-    .line 1199
+    .line 1324
     invoke-static {v5, v6}, Ljava/lang/String;->valueOf(J)Ljava/lang/String;
 
     move-result-object v8
@@ -2901,7 +2911,7 @@
 
     if-eqz v4, :cond_115
 
-    .line 1200
+    .line 1325
     invoke-virtual {v4}, Ljava/lang/String;->isEmpty()Z
 
     move-result v7
@@ -2910,13 +2920,13 @@
 
     const-string v7, "encryptExpectId"
 
-    .line 1201
+    .line 1326
     invoke-interface {v3, v7, v4}, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
     :cond_115
     if-eqz v2, :cond_122
 
-    .line 1203
+    .line 1328
     invoke-virtual {v2}, Ljava/lang/String;->isEmpty()Z
 
     move-result v7
@@ -2925,10 +2935,10 @@
 
     const-string v7, "filterParams"
 
-    .line 1204
+    .line 1329
     invoke-interface {v3, v7, v2}, Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 1206
+    .line 1331
     :cond_122
     new-instance v3, Ljava/lang/StringBuilder;
 
@@ -2965,7 +2975,7 @@
     :try_start_14b
     const-string v2, "LIST"
 
-    .line 1210
+    .line 1335
     new-instance v3, Ljava/lang/StringBuilder;
 
     invoke-direct {v3, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -2985,7 +2995,7 @@
     :catchall_15d
     move-exception p0
 
-    .line 1212
+    .line 1337
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v2, "collectCurl list error: "
@@ -3025,14 +3035,14 @@
         }
     .end annotation
 
-    .line 1950
+    .line 2075
     new-instance p2, Ljava/lang/StringBuilder;
 
     const/high16 v0, 0x100000
 
     invoke-direct {p2, v0}, Ljava/lang/StringBuilder;-><init>(I)V
 
-    .line 1951
+    .line 2076
     new-instance v0, Ljava/text/SimpleDateFormat;
 
     const-string v1, "yyyy-MM-dd HH:mm:ss"
@@ -3051,7 +3061,7 @@
 
     const/4 v1, 0x0
 
-    .line 1953
+    .line 2078
     invoke-interface {p0, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object v2
@@ -3066,10 +3076,10 @@
 
     aput-object v6, v5, v1
 
-    .line 1954
+    .line 2079
     invoke-static {v2, v3, v5}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
-    .line 1957
+    .line 2082
     invoke-interface {p1}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object v2
@@ -3097,17 +3107,17 @@
     :cond_3e
     const-string v2, "# \u63a8\u8350\u804c\u4f4d\n\n> \u5bfc\u51fa\u65f6\u95f4\uff1a"
 
-    .line 1963
+    .line 2088
     invoke-virtual {p2, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1964
+    .line 2089
     invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v0, "  \n> \u804c\u4f4d\u603b\u6570\uff1a"
 
     invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1965
+    .line 2090
     invoke-interface {p0}, Ljava/util/List;->size()I
 
     move-result v0
@@ -3118,7 +3128,7 @@
 
     invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1966
+    .line 2091
     invoke-virtual {p2, v3}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 
     const-string v0, " \u6761  \n> \u6570\u636e\u6765\u6e90\uff1aBOSS\u76f4\u8058 \u00b7 \u63a8\u8350\u804c\u4f4d\u5217\u8868 + \u804c\u4f4d\u8be6\u60c5\n\n---\n\n"
@@ -3129,7 +3139,7 @@
 
     const/4 v2, 0x1
 
-    .line 1971
+    .line 2096
     :goto_61
     invoke-interface {p0}, Ljava/util/List;->size()I
 
@@ -3137,12 +3147,12 @@
 
     if-ge v0, v3, :cond_1a5
 
-    .line 1972
+    .line 2097
     invoke-interface {p0, v0}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object v3
 
-    .line 1973
+    .line 2098
     invoke-interface {p1}, Ljava/util/List;->size()I
 
     move-result v5
@@ -3161,7 +3171,7 @@
     :goto_77
     const-string v6, "## "
 
-    .line 1974
+    .line 2099
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
@@ -3178,7 +3188,7 @@
 
     aput-object v8, v7, v1
 
-    .line 1975
+    .line 2100
     invoke-static {v3, v6, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v6
@@ -3203,7 +3213,7 @@
 
     aput-object v10, v9, v11
 
-    .line 1976
+    .line 2101
     invoke-static {v3, v7, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v7
@@ -3220,7 +3230,7 @@
 
     aput-object v12, v10, v4
 
-    .line 1977
+    .line 2102
     invoke-static {v3, v9, v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v9
@@ -3241,15 +3251,15 @@
 
     aput-object v12, v8, v11
 
-    .line 1978
+    .line 2103
     invoke-static {v3, v10, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v8
 
-    .line 1979
+    .line 2104
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1980
+    .line 2105
     invoke-virtual {v7}, Ljava/lang/String;->isEmpty()Z
 
     move-result v6
@@ -3258,7 +3268,7 @@
 
     const-string v6, " \u3000("
 
-    .line 1981
+    .line 2106
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -3270,10 +3280,10 @@
     :cond_e0
     const-string v6, "\n\n"
 
-    .line 1983
+    .line 2108
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1984
+    .line 2109
     invoke-virtual {v9}, Ljava/lang/String;->isEmpty()Z
 
     move-result v6
@@ -3289,12 +3299,12 @@
     :cond_f1
     const-string v6, "**"
 
-    .line 1985
+    .line 2110
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1986
+    .line 2111
     invoke-virtual {v8}, Ljava/lang/String;->isEmpty()Z
 
     move-result v6
@@ -3303,7 +3313,7 @@
 
     const-string v6, " \u00b7 "
 
-    .line 1987
+    .line 2112
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -3311,13 +3321,13 @@
     :cond_107
     const-string v6, "**\n\n"
 
-    .line 1989
+    .line 2114
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     :cond_10c
     const-string v6, "<details>\n<summary>\u67e5\u770b\u5168\u90e8\u5b57\u6bb5 (\u5171 "
 
-    .line 1991
+    .line 2116
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-static {v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->countFields(Ljava/lang/Object;)I
@@ -3332,15 +3342,15 @@
 
     const-string v6, "| \u5b57\u6bb5\u540d | \u5b57\u6bb5\u503c |\n"
 
-    .line 1992
+    .line 2117
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v6, "|--------|--------|\n"
 
-    .line 1993
+    .line 2118
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1995
+    .line 2120
     new-instance v6, Ljava/util/IdentityHashMap;
 
     invoke-direct {v6}, Ljava/util/IdentityHashMap;-><init>()V
@@ -3349,7 +3359,7 @@
 
     move-result-object v6
 
-    .line 1996
+    .line 2121
     invoke-virtual {v3}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v7
@@ -3358,7 +3368,7 @@
 
     move-result-object v7
 
-    .line 1997
+    .line 2122
     invoke-interface {v7}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object v7
@@ -3376,20 +3386,20 @@
 
     check-cast v8, Ljava/lang/reflect/Field;
 
-    .line 1999
+    .line 2124
     :try_start_148
     invoke-virtual {v8, v3}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v9
 
-    .line 2000
+    .line 2125
     invoke-static {v9, v1, v6}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->formatValue(Ljava/lang/Object;ILjava/util/Set;)Ljava/lang/String;
 
     move-result-object v9
 
     const-string v10, "| "
 
-    .line 2001
+    .line 2126
     invoke-virtual {p2, v10}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {v8}, Ljava/lang/reflect/Field;->getName()Ljava/lang/String;
@@ -3415,7 +3425,7 @@
     :catchall_16a
     const-string v9, "| "
 
-    .line 2003
+    .line 2128
     invoke-virtual {p2, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {v8}, Ljava/lang/reflect/Field;->getName()Ljava/lang/String;
@@ -3433,38 +3443,38 @@
     :cond_17c
     const-string v3, "</details>\n\n"
 
-    .line 2006
+    .line 2131
     invoke-virtual {p2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     if-eqz v5, :cond_19a
 
     const-string v3, "<details>\n<summary>\u8be6\u60c5\u9875\u4fe1\u606f (\u8be6\u60c5\u9875\u7cbe\u9009)</summary>\n\n"
 
-    .line 2009
+    .line 2134
     invoke-virtual {p2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v3, "| \u5b57\u6bb5 | \u5185\u5bb9 |\n"
 
-    .line 2010
+    .line 2135
     invoke-virtual {p2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v3, "|--------|--------|\n"
 
-    .line 2011
+    .line 2136
     invoke-virtual {p2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2012
+    .line 2137
     invoke-static {p2, v5}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->appendDetailMarkdown(Ljava/lang/StringBuilder;Ljava/lang/Object;)V
 
     const-string v3, "</details>\n\n"
 
-    .line 2013
+    .line 2138
     invoke-virtual {p2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     :cond_19a
     const-string v3, "---\n\n"
 
-    .line 2016
+    .line 2141
     invoke-virtual {p2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     add-int/lit8 v2, v2, 0x1
@@ -3473,13 +3483,13 @@
 
     goto/16 :goto_61
 
-    .line 2020
+    .line 2145
     :cond_1a5
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurlList:Ljava/util/List;
 
     monitor-enter p0
 
-    .line 2021
+    .line 2146
     :try_start_1a8
     invoke-interface {p0}, Ljava/util/List;->isEmpty()Z
 
@@ -3489,10 +3499,10 @@
 
     const-string p1, "# \u8bf7\u6c42\u62a5\u6587 (curl/Bash)\n\n"
 
-    .line 2022
+    .line 2147
     invoke-virtual {p2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2023
+    .line 2148
     invoke-interface {p0}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p1
@@ -3512,7 +3522,7 @@
 
     const-string v1, "```bash\n"
 
-    .line 2024
+    .line 2149
     invoke-virtual {p2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -3523,19 +3533,19 @@
 
     goto :goto_1b7
 
-    .line 2026
+    .line 2151
     :cond_1d1
     sget-object p1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurlList:Ljava/util/List;
 
     invoke-interface {p1}, Ljava/util/List;->clear()V
 
-    .line 2028
+    .line 2153
     :cond_1d6
     monitor-exit p0
     :try_end_1d7
     .catchall {:try_start_1a8 .. :try_end_1d7} :catchall_1dc
 
-    .line 2029
+    .line 2154
     invoke-virtual {p2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object p0
@@ -3545,7 +3555,7 @@
     :catchall_1dc
     move-exception p1
 
-    .line 2028
+    .line 2153
     :try_start_1dd
     monitor-exit p0
     :try_end_1de
@@ -3577,14 +3587,14 @@
         }
     .end annotation
 
-    .line 2186
+    .line 2311
     new-instance p2, Ljava/lang/StringBuilder;
 
     const/high16 v0, 0x100000
 
     invoke-direct {p2, v0}, Ljava/lang/StringBuilder;-><init>(I)V
 
-    .line 2187
+    .line 2312
     new-instance v0, Ljava/text/SimpleDateFormat;
 
     const-string v1, "yyyy-MM-dd HH:mm:ss"
@@ -3603,17 +3613,17 @@
 
     const-string v1, "# \u63a8\u8350\u804c\u4f4d\u5b8c\u6574\u62a5\u6587\n\n\u5bfc\u51fa\u65f6\u95f4\uff1a"
 
-    .line 2189
+    .line 2314
     invoke-virtual {p2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2190
+    .line 2315
     invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v0, "\n\u804c\u4f4d\u603b\u6570\uff1a"
 
     invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2191
+    .line 2316
     invoke-interface {p0}, Ljava/util/List;->size()I
 
     move-result v0
@@ -3628,7 +3638,7 @@
 
     const/4 v1, 0x0
 
-    .line 2194
+    .line 2319
     :goto_34
     invoke-interface {p0}, Ljava/util/List;->size()I
 
@@ -3636,12 +3646,12 @@
 
     if-ge v1, v2, :cond_136
 
-    .line 2195
+    .line 2320
     invoke-interface {p0, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object v2
 
-    .line 2196
+    .line 2321
     invoke-interface {p1}, Ljava/util/List;->size()I
 
     move-result v3
@@ -3668,7 +3678,7 @@
 
     aput-object v7, v6, v0
 
-    .line 2197
+    .line 2322
     invoke-static {v2, v4, v6}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v4
@@ -3693,7 +3703,7 @@
 
     aput-object v8, v7, v9
 
-    .line 2198
+    .line 2323
     invoke-static {v2, v6, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v6
@@ -3710,7 +3720,7 @@
 
     aput-object v9, v8, v5
 
-    .line 2199
+    .line 2324
     invoke-static {v2, v7, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v5
@@ -3719,12 +3729,12 @@
 
     const-string v8, ""
 
-    .line 2200
+    .line 2325
     invoke-static {v2, v7, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v7
 
-    .line 2201
+    .line 2326
     invoke-virtual {v7}, Ljava/lang/String;->isEmpty()Z
 
     move-result v8
@@ -3735,7 +3745,7 @@
 
     const-string v8, ""
 
-    .line 2202
+    .line 2327
     invoke-static {v2, v7, v8}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v7
@@ -3743,7 +3753,7 @@
     :cond_93
     const-string v8, "===== \u7b2c "
 
-    .line 2205
+    .line 2330
     invoke-virtual {p2, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     add-int/lit8 v1, v1, 0x1
@@ -3756,12 +3766,12 @@
 
     const-string v8, "[\u804c\u4f4d] "
 
-    .line 2206
+    .line 2331
     invoke-virtual {p2, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2207
+    .line 2332
     invoke-virtual {v6}, Ljava/lang/String;->isEmpty()Z
 
     move-result v4
@@ -3770,7 +3780,7 @@
 
     const-string v4, " ("
 
-    .line 2208
+    .line 2333
     invoke-virtual {p2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -3782,12 +3792,12 @@
     :cond_bd
     const-string v4, "\n"
 
-    .line 2210
+    .line 2335
     invoke-virtual {p2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v4, "[\u516c\u53f8] "
 
-    .line 2211
+    .line 2336
     invoke-virtual {p2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -3798,7 +3808,7 @@
 
     const-string v4, "[securityId] "
 
-    .line 2212
+    .line 2337
     invoke-virtual {p2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p2, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -3807,7 +3817,7 @@
 
     invoke-virtual {p2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2214
+    .line 2339
     new-instance v4, Ljava/util/IdentityHashMap;
 
     invoke-direct {v4}, Ljava/util/IdentityHashMap;-><init>()V
@@ -3816,7 +3826,7 @@
 
     move-result-object v4
 
-    .line 2215
+    .line 2340
     invoke-virtual {v2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v5
@@ -3827,10 +3837,10 @@
 
     const-string v6, "[\u804c\u4f4d\u5b57\u6bb5]\n"
 
-    .line 2216
+    .line 2341
     invoke-virtual {p2, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2217
+    .line 2342
     invoke-interface {v5}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object v5
@@ -3848,18 +3858,18 @@
 
     check-cast v6, Ljava/lang/reflect/Field;
 
-    .line 2219
+    .line 2344
     :try_start_102
     invoke-virtual {v6, v2}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v7
 
-    .line 2220
+    .line 2345
     invoke-static {v7, v0, v4}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->formatValue(Ljava/lang/Object;ILjava/util/Set;)Ljava/lang/String;
 
     move-result-object v7
 
-    .line 2221
+    .line 2346
     invoke-virtual {v6}, Ljava/lang/reflect/Field;->getName()Ljava/lang/String;
 
     move-result-object v8
@@ -3880,7 +3890,7 @@
 
     goto :goto_f6
 
-    .line 2223
+    .line 2348
     :catchall_11f
     invoke-virtual {v6}, Ljava/lang/reflect/Field;->getName()Ljava/lang/String;
 
@@ -3894,24 +3904,24 @@
 
     goto :goto_f6
 
-    .line 2227
+    .line 2352
     :cond_12c
     invoke-static {p2, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->appendDetailTxt(Ljava/lang/StringBuilder;Ljava/lang/Object;)V
 
     const-string v2, "\n\n"
 
-    .line 2228
+    .line 2353
     invoke-virtual {p2, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     goto/16 :goto_34
 
-    .line 2231
+    .line 2356
     :cond_136
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurlList:Ljava/util/List;
 
     monitor-enter p0
 
-    .line 2232
+    .line 2357
     :try_start_139
     invoke-interface {p0}, Ljava/util/List;->isEmpty()Z
 
@@ -3921,10 +3931,10 @@
 
     const-string p1, "===== \u8bf7\u6c42\u62a5\u6587 (curl/Bash) =====\n\n"
 
-    .line 2233
+    .line 2358
     invoke-virtual {p2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2234
+    .line 2359
     invoke-interface {p0}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p1
@@ -3942,7 +3952,7 @@
 
     check-cast v0, Ljava/lang/String;
 
-    .line 2235
+    .line 2360
     invoke-virtual {p2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string v0, "\n"
@@ -3951,19 +3961,19 @@
 
     goto :goto_148
 
-    .line 2237
+    .line 2362
     :cond_15d
     sget-object p1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurlList:Ljava/util/List;
 
     invoke-interface {p1}, Ljava/util/List;->clear()V
 
-    .line 2239
+    .line 2364
     :cond_162
     monitor-exit p0
     :try_end_163
     .catchall {:try_start_139 .. :try_end_163} :catchall_168
 
-    .line 2240
+    .line 2365
     invoke-virtual {p2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object p0
@@ -3973,7 +3983,7 @@
     :catchall_168
     move-exception p1
 
-    .line 2239
+    .line 2364
     :try_start_169
     monitor-exit p0
     :try_end_16a
@@ -4004,7 +4014,7 @@
 
     const/4 v3, 0x0
 
-    .line 1316
+    .line 1441
     :try_start_7
     invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -4020,7 +4030,7 @@
 
     new-array v5, v3, [Ljava/lang/Object;
 
-    .line 1317
+    .line 1442
     invoke-virtual {v4, p1, v5}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v2
@@ -4032,7 +4042,7 @@
     :catchall_1a
     move-exception v4
 
-    .line 1319
+    .line 1444
     :try_start_1b
     new-instance v5, Ljava/lang/StringBuilder;
 
@@ -4057,7 +4067,7 @@
     :try_end_31
     .catchall {:try_start_1b .. :try_end_31} :catchall_1a0
 
-    .line 1324
+    .line 1449
     :try_start_31
     invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -4073,14 +4083,14 @@
 
     new-array v6, v3, [Ljava/lang/Object;
 
-    .line 1325
+    .line 1450
     invoke-virtual {v5, p1, v6}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v5
 
     if-eqz v5, :cond_72
 
-    .line 1327
+    .line 1452
     invoke-virtual {v5}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v6
@@ -4095,14 +4105,14 @@
 
     new-array v7, v3, [Ljava/lang/Object;
 
-    .line 1328
+    .line 1453
     invoke-virtual {v6, v5, v7}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v5
 
     if-eqz v5, :cond_72
 
-    .line 1330
+    .line 1455
     invoke-virtual {v5}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v4
@@ -4114,7 +4124,7 @@
     :catchall_5e
     move-exception v5
 
-    .line 1334
+    .line 1459
     :try_start_5f
     new-instance v6, Ljava/lang/StringBuilder;
 
@@ -4132,14 +4142,14 @@
 
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1337
+    .line 1462
     :cond_72
     :goto_72
     invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildFullUrl(Ljava/lang/Object;)Ljava/lang/String;
 
     move-result-object v1
 
-    .line 1339
+    .line 1464
     new-instance v5, Ljava/lang/StringBuilder;
 
     new-instance v6, Ljava/lang/StringBuilder;
@@ -4166,7 +4176,7 @@
 
     const-string p2, "curl \'"
 
-    .line 1340
+    .line 1465
     invoke-virtual {v5, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {v5, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -4177,7 +4187,7 @@
 
     const-string p2, "  -X "
 
-    .line 1341
+    .line 1466
     invoke-virtual {v5, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {v5, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -4186,12 +4196,12 @@
 
     invoke-virtual {v5, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1343
+    .line 1468
     invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildHeadersMap(Ljava/lang/Object;)Ljava/util/Map;
 
     move-result-object p1
 
-    .line 1344
+    .line 1469
     invoke-interface {p1}, Ljava/util/Map;->entrySet()Ljava/util/Set;
 
     move-result-object p1
@@ -4214,7 +4224,7 @@
 
     check-cast p2, Ljava/util/Map$Entry;
 
-    .line 1345
+    .line 1470
     invoke-interface {p2}, Ljava/util/Map$Entry;->getKey()Ljava/lang/Object;
 
     move-result-object v0
@@ -4232,7 +4242,7 @@
     :cond_d3
     const-string v0, "  -H \'"
 
-    .line 1348
+    .line 1473
     invoke-virtual {v5, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-interface {p2}, Ljava/util/Map$Entry;->getKey()Ljava/lang/Object;
@@ -4261,13 +4271,13 @@
 
     goto :goto_ba
 
-    .line 1351
+    .line 1476
     :cond_f5
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readCookie(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p1
 
-    .line 1352
+    .line 1477
     invoke-virtual {p1}, Ljava/lang/String;->isEmpty()Z
 
     move-result p2
@@ -4276,7 +4286,7 @@
 
     const-string p2, "  -H \'Cookie: "
 
-    .line 1353
+    .line 1478
     invoke-virtual {v5, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {v5, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -4292,7 +4302,7 @@
 
     if-eqz v2, :cond_142
 
-    .line 1359
+    .line 1484
     :try_start_110
     invoke-virtual {v2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -4308,14 +4318,14 @@
 
     new-array v0, v3, [Ljava/lang/Object;
 
-    .line 1360
+    .line 1485
     invoke-virtual {p2, v2, v0}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p2
 
     if-eqz p2, :cond_142
 
-    .line 1362
+    .line 1487
     invoke-virtual {p2}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object p1
@@ -4327,7 +4337,7 @@
     :catchall_129
     move-exception p2
 
-    .line 1365
+    .line 1490
     :try_start_12a
     new-instance v0, Ljava/lang/StringBuilder;
 
@@ -4353,7 +4363,7 @@
     :goto_142
     const-string p2, "GET"
 
-    .line 1368
+    .line 1493
     invoke-virtual {p2, v4}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 
     move-result p2
@@ -4368,12 +4378,12 @@
 
     const-string p2, "  -H \'Content-Type: application/x-www-form-urlencoded\' \\\n"
 
-    .line 1369
+    .line 1494
     invoke-virtual {v5, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     const-string p2, "  --data \'"
 
-    .line 1370
+    .line 1495
     invoke-virtual {v5, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {v5, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -4384,7 +4394,7 @@
 
     goto :goto_171
 
-    .line 1372
+    .line 1497
     :cond_163
     invoke-virtual {v5}, Ljava/lang/StringBuilder;->length()I
 
@@ -4396,10 +4406,10 @@
 
     const-string p1, "\n"
 
-    .line 1373
+    .line 1498
     invoke-virtual {v5, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1376
+    .line 1501
     :goto_171
     sget-object p1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCurlList:Ljava/util/List;
 
@@ -4407,7 +4417,7 @@
     :try_end_174
     .catchall {:try_start_12a .. :try_end_174} :catchall_1a0
 
-    .line 1377
+    .line 1502
     :try_start_174
     invoke-virtual {v5}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
@@ -4415,12 +4425,12 @@
 
     invoke-interface {p1, p2}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
-    .line 1378
+    .line 1503
     monitor-exit p1
     :try_end_17c
     .catchall {:try_start_174 .. :try_end_17c} :catchall_19d
 
-    .line 1379
+    .line 1504
     :try_start_17c
     new-instance p1, Ljava/lang/StringBuilder;
 
@@ -4455,7 +4465,7 @@
     :catchall_19d
     move-exception p0
 
-    .line 1378
+    .line 1503
     :try_start_19e
     monitor-exit p1
     :try_end_19f
@@ -4469,7 +4479,7 @@
     :catchall_1a0
     move-exception p0
 
-    .line 1381
+    .line 1506
     new-instance p1, Ljava/lang/StringBuilder;
 
     const-string p2, "collectCurl error: "
@@ -4516,7 +4526,7 @@
 
     const-string v5, "  collect: field d not found in "
 
-    .line 943
+    .line 1068
     :try_start_c
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -4530,7 +4540,7 @@
 
     if-nez v6, :cond_30
 
-    .line 945
+    .line 1070
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1, v5}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -4553,7 +4563,7 @@
 
     return-void
 
-    .line 948
+    .line 1073
     :cond_30
     invoke-virtual {v6, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
@@ -4563,12 +4573,12 @@
 
     const-string p0, "  collect: helper(d) is null"
 
-    .line 950
+    .line 1075
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
 
-    .line 953
+    .line 1078
     :cond_3c
     new-instance v5, Ljava/lang/StringBuilder;
 
@@ -4590,7 +4600,7 @@
 
     invoke-static {v4}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 954
+    .line 1079
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v4
@@ -4603,7 +4613,7 @@
 
     if-nez v4, :cond_77
 
-    .line 956
+    .line 1081
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -4626,7 +4636,7 @@
 
     return-void
 
-    .line 959
+    .line 1084
     :cond_77
     invoke-virtual {v4, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
@@ -4636,12 +4646,12 @@
 
     const-string p0, "  collect: adapter(e) is null"
 
-    .line 961
+    .line 1086
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
 
-    .line 964
+    .line 1089
     :cond_83
     new-instance v3, Ljava/lang/StringBuilder;
 
@@ -4663,7 +4673,7 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 965
+    .line 1090
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v2
@@ -4680,17 +4690,17 @@
 
     new-array v3, v4, [Ljava/lang/Object;
 
-    .line 966
+    .line 1091
     invoke-virtual {v2, p0, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
 
-    .line 967
+    .line 1092
     instance-of v2, p0, Ljava/util/List;
 
     if-nez v2, :cond_ce
 
-    .line 968
+    .line 1093
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -4701,7 +4711,7 @@
 
     goto :goto_c3
 
-    .line 969
+    .line 1094
     :cond_bb
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -4718,16 +4728,16 @@
 
     move-result-object p0
 
-    .line 968
+    .line 1093
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
 
-    .line 972
+    .line 1097
     :cond_ce
     check-cast p0, Ljava/util/List;
 
-    .line 973
+    .line 1098
     new-instance v1, Ljava/lang/StringBuilder;
 
     invoke-direct {v1, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -4744,7 +4754,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 974
+    .line 1099
     invoke-interface {p0}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p0
@@ -4767,7 +4777,7 @@
 
     goto :goto_e7
 
-    .line 980
+    .line 1105
     :cond_f4
     :try_start_f4
     invoke-virtual {v0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -4784,14 +4794,14 @@
 
     new-array v2, v4, [Ljava/lang/Object;
 
-    .line 981
+    .line 1106
     invoke-virtual {v1, v0, v2}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
     :try_end_106
     .catchall {:try_start_f4 .. :try_end_106} :catchall_106
 
-    .line 985
+    .line 1110
     :catchall_106
     :try_start_106
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->extractJobFromFeed(Ljava/lang/Object;)Ljava/lang/Object;
@@ -4800,12 +4810,12 @@
 
     if-eqz v0, :cond_e7
 
-    .line 987
+    .line 1112
     invoke-interface {p1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
     goto :goto_e7
 
-    .line 990
+    .line 1115
     :cond_110
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -4834,7 +4844,7 @@
     :catchall_129
     move-exception p0
 
-    .line 992
+    .line 1117
     new-instance p1, Ljava/lang/StringBuilder;
 
     const-string v0, "collectFromDiscoverFragment error: "
@@ -4881,7 +4891,7 @@
 
     const-string v5, "  collect geek: get viewModel(e) error: "
 
-    .line 1002
+    .line 1127
     :try_start_c
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -4899,7 +4909,7 @@
 
     if-eqz v6, :cond_52
 
-    .line 1005
+    .line 1130
     :try_start_1a
     invoke-virtual {v6, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
@@ -4907,7 +4917,7 @@
 
     sput-object v6, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sViewModel:Ljava/lang/Object;
 
-    .line 1006
+    .line 1131
     new-instance v6, Ljava/lang/StringBuilder;
 
     invoke-direct {v6, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -4945,7 +4955,7 @@
     :catchall_3e
     move-exception v4
 
-    .line 1008
+    .line 1133
     :try_start_3f
     new-instance v6, Ljava/lang/StringBuilder;
 
@@ -4963,7 +4973,7 @@
 
     invoke-static {v4}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1011
+    .line 1136
     :cond_52
     :goto_52
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -4978,7 +4988,7 @@
 
     if-nez v4, :cond_76
 
-    .line 1013
+    .line 1138
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -5001,7 +5011,7 @@
 
     return-void
 
-    .line 1016
+    .line 1141
     :cond_76
     invoke-virtual {v4, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
@@ -5011,12 +5021,12 @@
 
     const-string p0, "  collect geek: adapter(K) is null"
 
-    .line 1018
+    .line 1143
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
 
-    .line 1021
+    .line 1146
     :cond_82
     new-instance v3, Ljava/lang/StringBuilder;
 
@@ -5038,7 +5048,7 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1022
+    .line 1147
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v2
@@ -5055,17 +5065,17 @@
 
     new-array v3, v4, [Ljava/lang/Object;
 
-    .line 1023
+    .line 1148
     invoke-virtual {v2, p0, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
 
-    .line 1024
+    .line 1149
     instance-of v2, p0, Ljava/util/List;
 
     if-nez v2, :cond_cb
 
-    .line 1025
+    .line 1150
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -5074,7 +5084,7 @@
 
     goto :goto_c0
 
-    .line 1026
+    .line 1151
     :cond_b8
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -5091,16 +5101,16 @@
 
     move-result-object p0
 
-    .line 1025
+    .line 1150
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
 
-    .line 1029
+    .line 1154
     :cond_cb
     check-cast p0, Ljava/util/List;
 
-    .line 1030
+    .line 1155
     new-instance v1, Ljava/lang/StringBuilder;
 
     invoke-direct {v1, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -5117,7 +5127,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1031
+    .line 1156
     invoke-interface {p0}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p0
@@ -5138,7 +5148,7 @@
 
     goto :goto_e4
 
-    .line 1035
+    .line 1160
     :cond_f1
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->extractGeekItem(Ljava/lang/Object;)Ljava/lang/Object;
 
@@ -5146,12 +5156,12 @@
 
     if-eqz v0, :cond_e4
 
-    .line 1037
+    .line 1162
     invoke-interface {p1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
     goto :goto_e4
 
-    .line 1040
+    .line 1165
     :cond_fb
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -5180,7 +5190,7 @@
     :catchall_114
     move-exception p0
 
-    .line 1042
+    .line 1167
     new-instance p1, Ljava/lang/StringBuilder;
 
     const-string v0, "collectFromGeekListFragment error: "
@@ -5224,12 +5234,12 @@
 
     const-string v3, "collectFromScreen start, activity="
 
-    .line 859
+    .line 984
     new-instance v4, Ljava/util/ArrayList;
 
     invoke-direct {v4}, Ljava/util/ArrayList;-><init>()V
 
-    .line 861
+    .line 986
     :try_start_d
     new-instance v5, Ljava/lang/StringBuilder;
 
@@ -5255,7 +5265,7 @@
 
     const/4 v3, 0x0
 
-    .line 864
+    .line 989
     :try_start_25
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -5280,7 +5290,7 @@
     :catchall_36
     move-exception v5
 
-    .line 866
+    .line 991
     :try_start_37
     new-instance v6, Ljava/lang/StringBuilder;
 
@@ -5308,12 +5318,12 @@
     :try_start_4d
     const-string v5, "androidx.fragment.app.FragmentActivity"
 
-    .line 870
+    .line 995
     invoke-static {v5}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v5
 
-    .line 871
+    .line 996
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v6
@@ -5324,7 +5334,7 @@
 
     if-eqz v5, :cond_83
 
-    .line 872
+    .line 997
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v5
@@ -5350,7 +5360,7 @@
     :catchall_6f
     move-exception p0
 
-    .line 875
+    .line 1000
     :try_start_70
     new-instance v0, Ljava/lang/StringBuilder;
 
@@ -5374,12 +5384,12 @@
 
     const-string p0, "collectFromScreen: no supportFragmentManager available"
 
-    .line 879
+    .line 1004
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-object v4
 
-    .line 882
+    .line 1007
     :cond_8b
     invoke-static {v2, v4, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dumpFragmentTree(Ljava/lang/Object;Ljava/util/List;I)V
     :try_end_8e
@@ -5390,7 +5400,7 @@
     :catchall_8f
     move-exception p0
 
-    .line 884
+    .line 1009
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "collectFromScreen error: "
@@ -5409,7 +5419,7 @@
 
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 886
+    .line 1011
     :goto_a5
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -5435,7 +5445,7 @@
 .method private static countFields(Ljava/lang/Object;)I
     .registers 1
 
-    .line 2033
+    .line 2158
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object p0
@@ -5451,6 +5461,344 @@
     return p0
 .end method
 
+.method private static createFriendAndWait(Ljava/lang/Object;J)Ljava/lang/Object;
+    .registers 21
+
+    move-object/from16 v0, p0
+
+    move-wide/from16 v1, p1
+
+    const-string v3, "expectId"
+
+    const-string v4, "securityId"
+
+    const-string v5, "lid"
+
+    const-string v6, "jobId"
+
+    const-string v7, ""
+
+    const-string v8, "batch send create friend failed friendId="
+
+    const-string v9, "batch send create friend timeout friendId="
+
+    const-string v10, "batch send create friend request friendId="
+
+    .line 653
+    new-instance v11, Ljava/util/concurrent/CountDownLatch;
+
+    const/4 v12, 0x1
+
+    invoke-direct {v11, v12}, Ljava/util/concurrent/CountDownLatch;-><init>(I)V
+
+    sput-object v11, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateLatch:Ljava/util/concurrent/CountDownLatch;
+
+    const/4 v11, 0x0
+
+    .line 654
+    sput-boolean v11, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateOk:Z
+
+    const/4 v13, 0x0
+
+    .line 655
+    sput-object v13, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateError:Ljava/lang/String;
+
+    .line 656
+    sput-object v13, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateRelation:Ljava/lang/Object;
+
+    :try_start_24
+    const-string v14, "com.twl.http.callback.a"
+
+    .line 658
+    invoke-static {v14}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+
+    move-result-object v14
+
+    const-string v15, "com.hpbr.bosszhipin.export2.ExportCreateFriendCallback"
+
+    .line 659
+    invoke-static {v15}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+
+    move-result-object v15
+
+    const-string v16, "net.bosszhipin.api.GeekCreateFriendRequest"
+
+    .line 660
+    invoke-static/range {v16 .. v16}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+
+    move-result-object v13
+
+    .line 661
+    invoke-virtual {v15}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
+
+    move-result-object v15
+
+    const/4 v12, 0x2
+
+    move-object/from16 v17, v8
+
+    new-array v8, v12, [Ljava/lang/Class;
+
+    aput-object v14, v8, v11
+
+    .line 662
+    sget-object v14, Ljava/lang/Boolean;->TYPE:Ljava/lang/Class;
+
+    const/16 v16, 0x1
+
+    aput-object v14, v8, v16
+
+    invoke-virtual {v13, v8}, Ljava/lang/Class;->getConstructor([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
+
+    move-result-object v8
+
+    new-array v12, v12, [Ljava/lang/Object;
+
+    aput-object v15, v12, v11
+
+    sget-object v13, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
+
+    aput-object v13, v12, v16
+
+    .line 663
+    invoke-virtual {v8, v12}, Ljava/lang/reflect/Constructor;->newInstance([Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v8
+
+    const-string v12, "friendId"
+
+    .line 664
+    invoke-static/range {p1 .. p2}, Ljava/lang/String;->valueOf(J)Ljava/lang/String;
+
+    move-result-object v13
+
+    invoke-static {v8, v12, v13}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 665
+    invoke-static {v0, v6}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->longToStr(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v12
+
+    invoke-static {v8, v6, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 666
+    invoke-static {v0, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->longToStr(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v12
+
+    invoke-static {v8, v3, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 667
+    invoke-static {v0, v5, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v3
+
+    invoke-static {v8, v5, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 668
+    invoke-static {v0, v4, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v3
+
+    invoke-static {v8, v4, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+
+    const-string v3, "entrance"
+
+    const/16 v12, 0x9
+
+    .line 669
+    invoke-static {v8, v3, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
+
+    const-string v3, "greeting"
+
+    const/4 v12, 0x0
+
+    .line 670
+    invoke-static {v8, v3, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+
+    const-string v3, "applyJobDirectly"
+
+    .line 671
+    invoke-static {v8, v3, v11}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
+
+    const-string v3, "startChatProcessExpGroup"
+
+    .line 672
+    invoke-static {v8, v3, v11}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
+
+    .line 673
+    new-instance v3, Ljava/lang/StringBuilder;
+
+    invoke-direct {v3, v10}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v3, v1, v2}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    const-string v10, " jobId="
+
+    invoke-virtual {v3, v10}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-static {v0, v6}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readLongField(Ljava/lang/Object;Ljava/lang/String;)J
+
+    move-result-wide v12
+
+    invoke-virtual {v3, v12, v13}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    const-string v6, " securityId="
+
+    invoke-virtual {v3, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    .line 674
+    invoke-static {v0, v4, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v4
+
+    invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    const-string v4, " lid="
+
+    invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-static {v0, v5, v7}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v3, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    .line 673
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    const-string v0, "hg0.c"
+
+    .line 675
+    invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+
+    move-result-object v0
+
+    const-string v3, "d"
+
+    const/4 v4, 0x1
+
+    new-array v5, v4, [Ljava/lang/Class;
+
+    const-string v6, "com.twl.http.client.a"
+
+    .line 676
+    invoke-static {v6}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+
+    move-result-object v6
+
+    aput-object v6, v5, v11
+
+    invoke-virtual {v0, v3, v5}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+
+    move-result-object v0
+
+    new-array v3, v4, [Ljava/lang/Object;
+
+    aput-object v8, v3, v11
+
+    const/4 v4, 0x0
+
+    invoke-virtual {v0, v4, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    .line 677
+    sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateLatch:Ljava/util/concurrent/CountDownLatch;
+
+    sget-object v3, Ljava/util/concurrent/TimeUnit;->MILLISECONDS:Ljava/util/concurrent/TimeUnit;
+
+    const-wide/16 v4, 0x3a98
+
+    invoke-virtual {v0, v4, v5, v3}, Ljava/util/concurrent/CountDownLatch;->await(JLjava/util/concurrent/TimeUnit;)Z
+
+    move-result v0
+
+    if-nez v0, :cond_102
+
+    .line 679
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    invoke-direct {v0, v9}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0, v1, v2}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    return-object v1
+
+    .line 682
+    :cond_102
+    sget-boolean v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateOk:Z
+
+    if-nez v0, :cond_123
+
+    .line 683
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    move-object/from16 v3, v17
+
+    invoke-direct {v0, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0, v1, v2}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    const-string v1, " err="
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    sget-object v1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateError:Ljava/lang/String;
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    return-object v1
+
+    .line 686
+    :cond_123
+    sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateRelation:Ljava/lang/Object;
+    :try_end_125
+    .catchall {:try_start_24 .. :try_end_125} :catchall_126
+
+    return-object v0
+
+    :catchall_126
+    move-exception v0
+
+    .line 688
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    const-string v2, "batch send createFriendAndWait error: "
+
+    invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    const/4 v1, 0x0
+
+    return-object v1
+.end method
+
 .method private static doExport(Landroid/app/Activity;I)Ljava/lang/String;
     .registers 15
     .annotation system Ldalvik/annotation/Throws;
@@ -5459,25 +5807,25 @@
         }
     .end annotation
 
-    .line 705
+    .line 830
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
 
-    .line 706
+    .line 831
     new-instance v1, Ljava/util/HashSet;
 
     invoke-direct {v1}, Ljava/util/HashSet;-><init>()V
 
-    .line 708
+    .line 833
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setupScreenConditions(Landroid/app/Activity;)V
 
-    .line 710
+    .line 835
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->collectFromScreen(Landroid/app/Activity;)Ljava/util/List;
 
     move-result-object v2
 
-    .line 711
+    .line 836
     invoke-interface {v2}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object v2
@@ -5493,23 +5841,23 @@
 
     move-result-object v3
 
-    .line 712
+    .line 837
     invoke-static {v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->jobKey(Ljava/lang/Object;)Ljava/lang/String;
 
     move-result-object v4
 
     if-eqz v4, :cond_28
 
-    .line 714
+    .line 839
     invoke-interface {v1, v4}, Ljava/util/Set;->add(Ljava/lang/Object;)Z
 
-    .line 716
+    .line 841
     :cond_28
     invoke-interface {v0, v3}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
     goto :goto_15
 
-    .line 718
+    .line 843
     :cond_2c
     new-instance v2, Ljava/lang/StringBuilder;
 
@@ -5529,7 +5877,7 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 720
+    .line 845
     invoke-static {}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->getApiUrl()Ljava/lang/String;
 
     move-result-object v2
@@ -5547,7 +5895,7 @@
     :goto_4a
     if-eqz v5, :cond_ef
 
-    .line 726
+    .line 851
     invoke-interface {v0}, Ljava/util/List;->size()I
 
     move-result v5
@@ -5558,7 +5906,7 @@
 
     if-gt v6, v5, :cond_ef
 
-    .line 727
+    .line 852
     new-instance v5, Ljava/lang/StringBuilder;
 
     const-string v8, "request page="
@@ -5579,19 +5927,19 @@
 
     invoke-static {v5}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 728
+    .line 853
     invoke-static {v2, v6}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->requestPageWithRetry(Ljava/lang/String;I)Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;
 
     move-result-object v5
 
     if-nez v5, :cond_8d
 
-    .line 730
+    .line 855
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageError:Ljava/lang/String;
 
     if-eqz p0, :cond_8a
 
-    .line 731
+    .line 856
     new-instance p0, Ljava/lang/StringBuilder;
 
     const-string p1, "\u5bfc\u51fa\u5931\u8d25: "
@@ -5613,13 +5961,13 @@
 
     return-object p0
 
-    .line 736
+    .line 861
     :cond_8d
     iget-object v8, v5, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->resp:Ljava/lang/Object;
 
     if-eqz v8, :cond_c1
 
-    .line 737
+    .line 862
     iget-object v8, v5, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->cards:Ljava/util/List;
 
     invoke-interface {v8}, Ljava/util/List;->iterator()Ljava/util/Iterator;
@@ -5639,7 +5987,7 @@
 
     move-result-object v10
 
-    .line 738
+    .line 863
     invoke-interface {v0}, Ljava/util/List;->size()I
 
     move-result v11
@@ -5648,7 +5996,7 @@
 
     goto :goto_c2
 
-    .line 741
+    .line 866
     :cond_a9
     invoke-static {v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->jobKey(Ljava/lang/Object;)Ljava/lang/String;
 
@@ -5656,7 +6004,7 @@
 
     if-eqz v11, :cond_b6
 
-    .line 742
+    .line 867
     invoke-interface {v1, v11}, Ljava/util/Set;->contains(Ljava/lang/Object;)Z
 
     move-result v12
@@ -5668,10 +6016,10 @@
     :cond_b6
     if-eqz v11, :cond_bb
 
-    .line 746
+    .line 871
     invoke-interface {v1, v11}, Ljava/util/Set;->add(Ljava/lang/Object;)Z
 
-    .line 748
+    .line 873
     :cond_bb
     invoke-interface {v0, v10}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
@@ -5686,10 +6034,10 @@
     :goto_c2
     add-int/lit8 v6, v6, 0x1
 
-    .line 753
+    .line 878
     iget-boolean v8, v5, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->hasMore:Z
 
-    .line 754
+    .line 879
     iget-object v5, v5, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->cards:Ljava/util/List;
 
     invoke-interface {v5}, Ljava/util/List;->isEmpty()Z
@@ -5717,7 +6065,7 @@
 
     const-string v1, "3 consecutive no-new pages, stop"
 
-    .line 757
+    .line 882
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     goto :goto_ef
@@ -5728,7 +6076,7 @@
 
     const-wide/16 v9, 0x12c
 
-    .line 765
+    .line 890
     :try_start_e1
     invoke-static {v9, v10}, Ljava/lang/Thread;->sleep(J)V
     :try_end_e4
@@ -5736,7 +6084,7 @@
 
     goto :goto_ec
 
-    .line 767
+    .line 892
     :catch_e5
     invoke-static {}, Ljava/lang/Thread;->currentThread()Ljava/lang/Thread;
 
@@ -5750,7 +6098,7 @@
 
     goto/16 :goto_4a
 
-    .line 772
+    .line 897
     :cond_ef
     :goto_ef
     invoke-interface {v0}, Ljava/util/List;->isEmpty()Z
@@ -5763,7 +6111,7 @@
 
     return-object p0
 
-    .line 775
+    .line 900
     :cond_f8
     invoke-interface {v0}, Ljava/util/List;->size()I
 
@@ -5771,7 +6119,7 @@
 
     if-le v1, p1, :cond_108
 
-    .line 776
+    .line 901
     new-instance v1, Ljava/util/ArrayList;
 
     invoke-interface {v0, v3, p1}, Ljava/util/List;->subList(II)Ljava/util/List;
@@ -5782,7 +6130,7 @@
 
     move-object v0, v1
 
-    .line 779
+    .line 904
     :cond_108
     new-instance p1, Ljava/util/ArrayList;
 
@@ -5790,7 +6138,7 @@
 
     const/4 v1, 0x0
 
-    .line 781
+    .line 906
     :goto_10e
     invoke-interface {v0}, Ljava/util/List;->size()I
 
@@ -5800,7 +6148,7 @@
 
     if-ge v3, v2, :cond_158
 
-    .line 782
+    .line 907
     invoke-interface {v0, v3}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object v2
@@ -5809,14 +6157,14 @@
 
     move-result-object v2
 
-    .line 783
+    .line 908
     invoke-interface {p1, v2}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
     if-eqz v2, :cond_125
 
     add-int/lit8 v1, v1, 0x1
 
-    .line 787
+    .line 912
     :cond_125
     new-instance v2, Ljava/lang/StringBuilder;
 
@@ -5850,7 +6198,7 @@
 
     const-wide/16 v4, 0xc8
 
-    .line 789
+    .line 914
     :try_start_14c
     invoke-static {v4, v5}, Ljava/lang/Thread;->sleep(J)V
     :try_end_14f
@@ -5858,7 +6206,7 @@
 
     goto :goto_10e
 
-    .line 791
+    .line 916
     :catch_150
     invoke-static {}, Ljava/lang/Thread;->currentThread()Ljava/lang/Thread;
 
@@ -5868,7 +6216,7 @@
 
     goto :goto_10e
 
-    .line 794
+    .line 919
     :cond_158
     new-instance v2, Ljava/lang/StringBuilder;
 
@@ -5892,22 +6240,22 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 796
+    .line 921
     invoke-static {v0, p1, p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildMarkdown(Ljava/util/List;Ljava/util/List;Landroid/content/Context;)Ljava/lang/String;
 
     move-result-object v2
 
-    .line 797
+    .line 922
     invoke-static {v0, p1, p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildTxt(Ljava/util/List;Ljava/util/List;Landroid/content/Context;)Ljava/lang/String;
 
     move-result-object p1
 
-    .line 798
+    .line 923
     invoke-static {p0, v0, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->writeMarkdownFile(Landroid/content/Context;Ljava/util/List;Ljava/lang/String;)Ljava/io/File;
 
     move-result-object v2
 
-    .line 799
+    .line 924
     invoke-static {p0, v0, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->writeTxtFile(Landroid/content/Context;Ljava/util/List;Ljava/lang/String;)Ljava/io/File;
 
     move-result-object p0
@@ -5920,7 +6268,7 @@
 
     return-object p0
 
-    .line 803
+    .line 928
     :cond_18a
     new-instance p1, Ljava/lang/StringBuilder;
 
@@ -5950,7 +6298,7 @@
 
     const-string v0, " (\u8be6\u60c5 "
 
-    .line 805
+    .line 930
     invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p1, v1}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
@@ -5962,7 +6310,7 @@
     :cond_1b5
     const-string v0, "\n"
 
-    .line 807
+    .line 932
     invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     if-eqz v2, :cond_1c1
@@ -5981,7 +6329,7 @@
 
     if-eqz p0, :cond_1d2
 
-    .line 809
+    .line 934
     invoke-virtual {p1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p0}, Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
@@ -5990,7 +6338,7 @@
 
     invoke-virtual {p1, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 811
+    .line 936
     :cond_1d2
     invoke-virtual {p1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
@@ -6002,7 +6350,7 @@
 .method private static dp(Landroid/content/Context;F)I
     .registers 2
 
-    .line 2576
+    .line 2701
     invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
 
     move-result-object p0
@@ -6047,7 +6395,7 @@
 
     return-void
 
-    .line 897
+    .line 1022
     :cond_8
     new-instance v0, Ljava/lang/StringBuilder;
 
@@ -6062,14 +6410,14 @@
 
     const-string v3, "  "
 
-    .line 899
+    .line 1024
     invoke-virtual {v0, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     add-int/lit8 v2, v2, 0x1
 
     goto :goto_f
 
-    .line 902
+    .line 1027
     :cond_19
     :try_start_19
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -6086,12 +6434,12 @@
 
     new-array v3, v1, [Ljava/lang/Object;
 
-    .line 903
+    .line 1028
     invoke-virtual {v2, p0, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v2
 
-    .line 904
+    .line 1029
     instance-of v3, v2, Ljava/util/List;
     :try_end_2d
     .catchall {:try_start_19 .. :try_end_2d} :catchall_14a
@@ -6100,7 +6448,7 @@
 
     if-nez v3, :cond_64
 
-    .line 905
+    .line 1030
     :try_start_31
     new-instance p1, Ljava/lang/StringBuilder;
 
@@ -6130,7 +6478,7 @@
 
     goto :goto_59
 
-    .line 906
+    .line 1031
     :cond_51
     invoke-virtual {v2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -6147,16 +6495,16 @@
 
     move-result-object p0
 
-    .line 905
+    .line 1030
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
 
-    .line 909
+    .line 1034
     :cond_64
     check-cast v2, Ljava/util/List;
 
-    .line 910
+    .line 1035
     new-instance v3, Ljava/lang/StringBuilder;
 
     invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
@@ -6191,7 +6539,7 @@
 
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 911
+    .line 1036
     invoke-interface {v2}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p0
@@ -6210,7 +6558,7 @@
 
     if-nez v2, :cond_b4
 
-    .line 913
+    .line 1038
     new-instance v2, Ljava/lang/StringBuilder;
 
     invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
@@ -6229,7 +6577,7 @@
 
     goto :goto_93
 
-    .line 916
+    .line 1041
     :cond_b4
     invoke-virtual {v2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -6239,7 +6587,7 @@
 
     move-result-object v3
 
-    .line 917
+    .line 1042
     new-instance v4, Ljava/lang/StringBuilder;
 
     invoke-direct {v4}, Ljava/lang/StringBuilder;-><init>()V
@@ -6260,14 +6608,14 @@
 
     const-string v4, "com.hpbr.bosszhipin.get.GetDiscoverFragment"
 
-    .line 918
+    .line 1043
     invoke-virtual {v3, v4}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 
     move-result v4
 
     if-eqz v4, :cond_f2
 
-    .line 919
+    .line 1044
     new-instance v4, Ljava/lang/StringBuilder;
 
     invoke-direct {v4}, Ljava/lang/StringBuilder;-><init>()V
@@ -6284,20 +6632,20 @@
 
     invoke-static {v4}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 920
+    .line 1045
     invoke-static {v2, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->collectFromDiscoverFragment(Ljava/lang/Object;Ljava/util/List;)V
 
     :cond_f2
     const-string v4, "com.hpbr.bosszhipin.module_geek.component.f1.GeekF1ProListFragment"
 
-    .line 922
+    .line 1047
     invoke-virtual {v3, v4}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 
     move-result v3
 
     if-eqz v3, :cond_111
 
-    .line 923
+    .line 1048
     new-instance v3, Ljava/lang/StringBuilder;
 
     invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
@@ -6314,12 +6662,12 @@
 
     invoke-static {v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 924
+    .line 1049
     invoke-static {v2, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->collectFromGeekListFragment(Ljava/lang/Object;Ljava/util/List;)V
     :try_end_111
     .catchall {:try_start_31 .. :try_end_111} :catchall_14a
 
-    .line 927
+    .line 1052
     :cond_111
     :try_start_111
     invoke-virtual {v2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -6336,7 +6684,7 @@
 
     new-array v4, v1, [Ljava/lang/Object;
 
-    .line 928
+    .line 1053
     invoke-virtual {v3, v2, v4}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v2
@@ -6345,7 +6693,7 @@
 
     add-int/lit8 v3, p2, 0x1
 
-    .line 930
+    .line 1055
     invoke-static {v2, p1, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dumpFragmentTree(Ljava/lang/Object;Ljava/util/List;I)V
     :try_end_12a
     .catchall {:try_start_111 .. :try_end_12a} :catchall_12c
@@ -6355,7 +6703,7 @@
     :catchall_12c
     move-exception v2
 
-    .line 933
+    .line 1058
     :try_start_12d
     new-instance v3, Ljava/lang/StringBuilder;
 
@@ -6386,7 +6734,7 @@
     :catchall_14a
     move-exception p0
 
-    .line 937
+    .line 1062
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1}, Ljava/lang/StringBuilder;-><init>()V
@@ -6420,7 +6768,7 @@
 
     return-void
 
-    .line 2370
+    .line 2495
     :cond_3
     invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -6430,7 +6778,7 @@
 
     move-result-object v0
 
-    .line 2371
+    .line 2496
     array-length v1, v0
 
     const/4 v2, 0x0
@@ -6442,20 +6790,20 @@
 
     aget-object v4, v0, v3
 
-    .line 2373
+    .line 2498
     :try_start_12
     invoke-virtual {v4, p1}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v5
 
-    .line 2374
+    .line 2499
     invoke-virtual {v4}, Ljava/lang/reflect/Field;->getName()Ljava/lang/String;
 
     move-result-object v4
 
     if-nez v5, :cond_29
 
-    .line 2376
+    .line 2501
     invoke-virtual {p0, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -6466,7 +6814,7 @@
 
     goto/16 :goto_c7
 
-    .line 2377
+    .line 2502
     :cond_29
     instance-of v6, v5, Ljava/util/List;
     :try_end_2b
@@ -6476,11 +6824,11 @@
 
     if-eqz v6, :cond_75
 
-    .line 2378
+    .line 2503
     :try_start_2f
     check-cast v5, Ljava/util/List;
 
-    .line 2379
+    .line 2504
     invoke-virtual {p0, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
@@ -6499,7 +6847,7 @@
 
     invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2380
+    .line 2505
     invoke-interface {v5}, Ljava/util/List;->size()I
 
     move-result v4
@@ -6515,7 +6863,7 @@
     :goto_53
     if-ge v6, v4, :cond_71
 
-    .line 2382
+    .line 2507
     invoke-interface {v5, v6}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object v8
@@ -6526,7 +6874,7 @@
 
     goto :goto_62
 
-    .line 2383
+    .line 2508
     :cond_5e
     invoke-virtual {v8}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
@@ -6541,7 +6889,7 @@
 
     const-string v8, " | "
 
-    .line 2385
+    .line 2510
     invoke-virtual {p0, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     :cond_6e
@@ -6549,13 +6897,13 @@
 
     goto :goto_53
 
-    .line 2388
+    .line 2513
     :cond_71
     invoke-virtual {p0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     goto :goto_c7
 
-    .line 2389
+    .line 2514
     :cond_75
     invoke-virtual {v5}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -6571,7 +6919,7 @@
 
     if-eqz v6, :cond_97
 
-    .line 2390
+    .line 2515
     :try_start_81
     invoke-virtual {p0, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
@@ -6581,7 +6929,7 @@
 
     check-cast v5, [Ljava/lang/Object;
 
-    .line 2391
+    .line 2516
     invoke-static {v5}, Ljava/util/Arrays;->toString([Ljava/lang/Object;)Ljava/lang/String;
 
     move-result-object v4
@@ -6592,13 +6940,13 @@
 
     goto :goto_c7
 
-    .line 2393
+    .line 2518
     :cond_97
     invoke-virtual {v5}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v5
 
-    .line 2394
+    .line 2519
     invoke-virtual {v5}, Ljava/lang/String;->length()I
 
     move-result v6
@@ -6607,7 +6955,7 @@
 
     if-le v6, v9, :cond_b8
 
-    .line 2395
+    .line 2520
     new-instance v6, Ljava/lang/StringBuilder;
 
     invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
@@ -6626,7 +6974,7 @@
 
     move-result-object v5
 
-    .line 2397
+    .line 2522
     :cond_b8
     invoke-virtual {p0, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
@@ -6655,7 +7003,7 @@
 
     const-string v0, "android.permission.WRITE_EXTERNAL_STORAGE"
 
-    .line 689
+    .line 814
     sget v1, Landroid/os/Build$VERSION;->SDK_INT:I
 
     const/16 v2, 0x1d
@@ -6669,7 +7017,7 @@
     :cond_a
     const/4 v1, 0x0
 
-    .line 693
+    .line 818
     :try_start_b
     invoke-virtual {p0, v0}, Landroid/app/Activity;->checkSelfPermission(Ljava/lang/String;)I
 
@@ -6686,7 +7034,7 @@
 
     const/16 v0, 0x51
 
-    .line 697
+    .line 822
     invoke-virtual {p0, v2, v0}, Landroid/app/Activity;->requestPermissions([Ljava/lang/String;I)V
     :try_end_1b
     .catchall {:try_start_b .. :try_end_1b} :catchall_1b
@@ -6709,7 +7057,7 @@
 
     const-string v2, "\\|"
 
-    .line 2154
+    .line 2279
     invoke-virtual {p0, v1, v2}, Ljava/lang/String;->replace(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
 
     move-result-object p0
@@ -6728,7 +7076,7 @@
 
     move-result-object p0
 
-    .line 2155
+    .line 2280
     invoke-virtual {p0}, Ljava/lang/String;->length()I
 
     move-result v0
@@ -6737,7 +7085,7 @@
 
     if-le v0, v1, :cond_39
 
-    .line 2156
+    .line 2281
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
@@ -6769,7 +7117,7 @@
 
     const-string v1, "geek item -> extracted from feed ("
 
-    .line 1051
+    .line 1176
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v2
@@ -6780,7 +7128,7 @@
 
     const-string v3, "net.bosszhipin.api.bean.ServerJobCardBean"
 
-    .line 1052
+    .line 1177
     invoke-virtual {v2, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 
     move-result v3
@@ -6789,12 +7137,12 @@
 
     const-string v0, "geek item -> ServerJobCardBean"
 
-    .line 1053
+    .line 1178
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-object p0
 
-    .line 1057
+    .line 1182
     :cond_1a
     :try_start_1a
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -6809,14 +7157,14 @@
 
     if-eqz v3, :cond_41
 
-    .line 1058
+    .line 1183
     invoke-virtual {v3, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v3
 
     if-eqz v3, :cond_41
 
-    .line 1059
+    .line 1184
     new-instance v3, Ljava/lang/StringBuilder;
 
     invoke-direct {v3, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -6837,7 +7185,7 @@
 
     return-object p0
 
-    .line 1065
+    .line 1190
     :catchall_41
     :cond_41
     :try_start_41
@@ -6847,7 +7195,7 @@
 
     if-eqz p0, :cond_5c
 
-    .line 1067
+    .line 1192
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -6890,7 +7238,7 @@
 
     return-object v3
 
-    .line 1701
+    .line 1826
     :cond_a
     :try_start_a
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -6903,14 +7251,14 @@
 
     move-result-object v4
 
-    .line 1702
+    .line 1827
     invoke-virtual {v4, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v4
 
     if-eqz v4, :cond_48
 
-    .line 1704
+    .line 1829
     new-instance v5, Ljava/lang/StringBuilder;
 
     invoke-direct {v5, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -6938,7 +7286,7 @@
     :catchall_32
     move-exception v2
 
-    .line 1708
+    .line 1833
     new-instance v4, Ljava/lang/StringBuilder;
 
     const-string v5, "extract contentJobInfo error: "
@@ -6957,7 +7305,7 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1711
+    .line 1836
     :cond_48
     :try_start_48
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -6970,14 +7318,14 @@
 
     move-result-object v2
 
-    .line 1712
+    .line 1837
     invoke-virtual {v2, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v2
 
     if-eqz v2, :cond_86
 
-    .line 1714
+    .line 1839
     new-instance v4, Ljava/lang/StringBuilder;
 
     invoke-direct {v4, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -7005,7 +7353,7 @@
     :catchall_70
     move-exception v1
 
-    .line 1718
+    .line 1843
     new-instance v2, Ljava/lang/StringBuilder;
 
     const-string v4, "extract bindJobInfoFeedVO error: "
@@ -7024,7 +7372,7 @@
 
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1721
+    .line 1846
     :cond_86
     :try_start_86
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -7037,14 +7385,14 @@
 
     move-result-object v1
 
-    .line 1722
+    .line 1847
     invoke-virtual {v1, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
 
     if-eqz p0, :cond_c4
 
-    .line 1724
+    .line 1849
     new-instance v1, Ljava/lang/StringBuilder;
 
     invoke-direct {v1, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -7072,7 +7420,7 @@
     :catchall_ae
     move-exception p0
 
-    .line 1728
+    .line 1853
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "extract exposuredJobInfo error: "
@@ -7111,12 +7459,12 @@
     :goto_0
     if-eqz p0, :cond_14
 
-    .line 1076
+    .line 1201
     const-class v0, Ljava/lang/Object;
 
     if-eq p0, v0, :cond_14
 
-    .line 1078
+    .line 1203
     :try_start_6
     invoke-virtual {p0, p1}, Ljava/lang/Class;->getDeclaredField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
@@ -7124,14 +7472,14 @@
 
     const/4 v1, 0x1
 
-    .line 1079
+    .line 1204
     invoke-virtual {v0, v1}, Ljava/lang/reflect/Field;->setAccessible(Z)V
     :try_end_e
     .catchall {:try_start_6 .. :try_end_e} :catchall_f
 
     return-object v0
 
-    .line 1076
+    .line 1201
     :catchall_f
     invoke-virtual {p0}, Ljava/lang/Class;->getSuperclass()Ljava/lang/Class;
 
@@ -7165,7 +7513,7 @@
 
     return-object p0
 
-    .line 2062
+    .line 2187
     :cond_5
     instance-of v0, p0, Ljava/lang/CharSequence;
 
@@ -7185,13 +7533,13 @@
 
     goto/16 :goto_199
 
-    .line 2066
+    .line 2191
     :cond_17
     instance-of v0, p0, Ljava/util/Date;
 
     if-eqz v0, :cond_24
 
-    .line 2067
+    .line 2192
     invoke-virtual {p0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object p0
@@ -7202,13 +7550,13 @@
 
     return-object p0
 
-    .line 2069
+    .line 2194
     :cond_24
     instance-of v0, p0, Ljava/lang/Enum;
 
     if-eqz v0, :cond_33
 
-    .line 2070
+    .line 2195
     check-cast p0, Ljava/lang/Enum;
 
     invoke-virtual {p0}, Ljava/lang/Enum;->name()Ljava/lang/String;
@@ -7221,7 +7569,7 @@
 
     return-object p0
 
-    .line 2072
+    .line 2197
     :cond_33
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -7245,12 +7593,12 @@
 
     if-eqz v0, :cond_7f
 
-    .line 2073
+    .line 2198
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
 
-    .line 2074
+    .line 2199
     invoke-static {p0}, Ljava/lang/reflect/Array;->getLength(Ljava/lang/Object;)I
 
     move-result v7
@@ -7272,10 +7620,10 @@
 
     if-lez v6, :cond_5f
 
-    .line 2083
+    .line 2208
     invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2085
+    .line 2210
     :cond_5f
     invoke-static {p0, v6}, Ljava/lang/reflect/Array;->get(Ljava/lang/Object;I)Ljava/lang/Object;
 
@@ -7293,7 +7641,7 @@
 
     goto :goto_58
 
-    .line 2087
+    .line 2212
     :cond_6f
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -7309,7 +7657,7 @@
 
     return-object p0
 
-    .line 2089
+    .line 2214
     :cond_7f
     instance-of v0, p0, Ljava/util/Map;
 
@@ -7325,7 +7673,7 @@
 
     if-eqz v0, :cond_e3
 
-    .line 2090
+    .line 2215
     check-cast p0, Ljava/util/Map;
 
     invoke-interface {p0}, Ljava/util/Map;->isEmpty()Z
@@ -7338,13 +7686,13 @@
 
     return-object p0
 
-    .line 2093
+    .line 2218
     :cond_98
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0, v11}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    .line 2095
+    .line 2220
     invoke-interface {p0}, Ljava/util/Map;->entrySet()Ljava/util/Set;
 
     move-result-object p0
@@ -7372,12 +7720,12 @@
 
     if-le v6, v3, :cond_bb
 
-    .line 2097
+    .line 2222
     invoke-virtual {v0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     goto :goto_d7
 
-    .line 2100
+    .line 2225
     :cond_bb
     invoke-interface {v1}, Ljava/util/Map$Entry;->getKey()Ljava/lang/Object;
 
@@ -7405,12 +7753,12 @@
 
     goto :goto_a5
 
-    .line 2102
+    .line 2227
     :cond_d7
     :goto_d7
     invoke-virtual {v0, v10}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2103
+    .line 2228
     invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object p0
@@ -7421,13 +7769,13 @@
 
     return-object p0
 
-    .line 2105
+    .line 2230
     :cond_e3
     instance-of v0, p0, Ljava/util/Collection;
 
     if-eqz v0, :cond_12c
 
-    .line 2106
+    .line 2231
     check-cast p0, Ljava/util/Collection;
 
     invoke-interface {p0}, Ljava/util/Collection;->isEmpty()Z
@@ -7438,13 +7786,13 @@
 
     return-object v4
 
-    .line 2109
+    .line 2234
     :cond_f0
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
 
-    .line 2111
+    .line 2236
     invoke-interface {p0}, Ljava/util/Collection;->iterator()Ljava/util/Iterator;
 
     move-result-object p0
@@ -7464,7 +7812,7 @@
 
     const-string p0, ", ..."
 
-    .line 2113
+    .line 2238
     invoke-virtual {v0, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     goto :goto_11c
@@ -7472,13 +7820,13 @@
     :cond_10b
     if-lez v6, :cond_110
 
-    .line 2117
+    .line 2242
     invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     :cond_110
     add-int/lit8 v7, p1, 0x1
 
-    .line 2119
+    .line 2244
     invoke-static {v4, v7, p2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->formatValue(Ljava/lang/Object;ILjava/util/Set;)Ljava/lang/String;
 
     move-result-object v4
@@ -7489,7 +7837,7 @@
 
     goto :goto_f9
 
-    .line 2122
+    .line 2247
     :cond_11c
     :goto_11c
     new-instance p0, Ljava/lang/StringBuilder;
@@ -7511,7 +7859,7 @@
 
     if-le p1, v0, :cond_139
 
-    .line 2125
+    .line 2250
     invoke-static {p0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
 
     move-result-object p0
@@ -7522,7 +7870,7 @@
 
     return-object p0
 
-    .line 2127
+    .line 2252
     :cond_139
     invoke-interface {p2, p0}, Ljava/util/Set;->contains(Ljava/lang/Object;)Z
 
@@ -7534,16 +7882,16 @@
 
     return-object p0
 
-    .line 2130
+    .line 2255
     :cond_142
     invoke-interface {p2, p0}, Ljava/util/Set;->add(Ljava/lang/Object;)Z
 
-    .line 2131
+    .line 2256
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0, v11}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    .line 2132
+    .line 2257
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v1
@@ -7552,7 +7900,7 @@
 
     move-result-object v1
 
-    .line 2134
+    .line 2259
     invoke-interface {v1}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object v1
@@ -7576,19 +7924,19 @@
 
     if-lt v6, v4, :cond_16c
 
-    .line 2136
+    .line 2261
     invoke-virtual {v0, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     goto :goto_18a
 
-    .line 2140
+    .line 2265
     :cond_16c
     :try_start_16c
     invoke-virtual {v2, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v4
 
-    .line 2141
+    .line 2266
     invoke-virtual {v2}, Ljava/lang/reflect/Field;->getName()Ljava/lang/String;
 
     move-result-object v2
@@ -7619,15 +7967,15 @@
 
     goto :goto_156
 
-    .line 2145
+    .line 2270
     :cond_18a
     :goto_18a
     invoke-interface {p2, p0}, Ljava/util/Set;->remove(Ljava/lang/Object;)Z
 
-    .line 2146
+    .line 2271
     invoke-virtual {v0, v10}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 2147
+    .line 2272
     invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object p0
@@ -7638,7 +7986,7 @@
 
     return-object p0
 
-    .line 2064
+    .line 2189
     :cond_199
     :goto_199
     invoke-virtual {p0}, Ljava/lang/Object;->toString()Ljava/lang/String;
@@ -7665,7 +8013,7 @@
         }
     .end annotation
 
-    .line 2037
+    .line 2162
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
@@ -7673,17 +8021,17 @@
     :goto_5
     if-eqz p0, :cond_4e
 
-    .line 2038
+    .line 2163
     const-class v1, Ljava/lang/Object;
 
     if-eq p0, v1, :cond_4e
 
-    .line 2039
+    .line 2164
     invoke-virtual {p0}, Ljava/lang/Class;->getDeclaredFields()[Ljava/lang/reflect/Field;
 
     move-result-object v1
 
-    .line 2040
+    .line 2165
     array-length v2, v1
 
     const/4 v3, 0x0
@@ -7693,12 +8041,12 @@
 
     aget-object v4, v1, v3
 
-    .line 2041
+    .line 2166
     invoke-virtual {v4}, Ljava/lang/reflect/Field;->getModifiers()I
 
     move-result v5
 
-    .line 2042
+    .line 2167
     invoke-static {v5}, Ljava/lang/reflect/Modifier;->isStatic(I)Z
 
     move-result v6
@@ -7713,7 +8061,7 @@
 
     goto :goto_46
 
-    .line 2045
+    .line 2170
     :cond_26
     invoke-virtual {v4}, Ljava/lang/reflect/Field;->getName()Ljava/lang/String;
 
@@ -7744,13 +8092,13 @@
     :cond_3f
     const/4 v5, 0x1
 
-    .line 2049
+    .line 2174
     :try_start_40
     invoke-virtual {v4, v5}, Ljava/lang/reflect/Field;->setAccessible(Z)V
     :try_end_43
     .catchall {:try_start_40 .. :try_end_43} :catchall_43
 
-    .line 2052
+    .line 2177
     :catchall_43
     invoke-interface {v0, v4}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
@@ -7760,7 +8108,7 @@
 
     goto :goto_11
 
-    .line 2038
+    .line 2163
     :cond_49
     invoke-virtual {p0}, Ljava/lang/Class;->getSuperclass()Ljava/lang/Class;
 
@@ -7786,7 +8134,7 @@
 
     const/4 v2, 0x0
 
-    .line 1099
+    .line 1224
     :try_start_5
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
@@ -7794,19 +8142,19 @@
 
     const-string v4, "x0"
 
-    .line 1100
+    .line 1225
     invoke-virtual {v3, v4}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v3
 
-    .line 1101
+    .line 1226
     invoke-virtual {v3, v2}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v3
 
     if-eqz v3, :cond_30
 
-    .line 1103
+    .line 1228
     invoke-virtual {v3}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v1
@@ -7818,7 +8166,7 @@
     :catchall_1a
     move-exception v3
 
-    .line 1106
+    .line 1231
     new-instance v4, Ljava/lang/StringBuilder;
 
     const-string v5, "getApiUrl config.m.x0 error: "
@@ -7837,7 +8185,7 @@
 
     invoke-static {v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1108
+    .line 1233
     :cond_30
     :goto_30
     invoke-virtual {v1}, Ljava/lang/String;->isEmpty()Z
@@ -7846,7 +8194,7 @@
 
     if-eqz v3, :cond_62
 
-    .line 1110
+    .line 1235
     :try_start_36
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
@@ -7854,19 +8202,19 @@
 
     const-string v3, "D"
 
-    .line 1111
+    .line 1236
     invoke-virtual {v0, v3}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v0
 
-    .line 1112
+    .line 1237
     invoke-virtual {v0, v2}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_62
 
-    .line 1114
+    .line 1239
     invoke-virtual {v0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v0
@@ -7880,7 +8228,7 @@
     :catchall_4c
     move-exception v0
 
-    .line 1117
+    .line 1242
     new-instance v2, Ljava/lang/StringBuilder;
 
     const-string v3, "getApiUrl config.m.D fallback error: "
@@ -7899,7 +8247,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1120
+    .line 1245
     :cond_62
     :goto_62
     new-instance v0, Ljava/lang/StringBuilder;
@@ -7937,7 +8285,7 @@
 
     const/4 v0, 0x0
 
-    .line 1467
+    .line 1592
     :try_start_1
     new-instance v1, Ljava/net/URL;
 
@@ -7954,20 +8302,20 @@
     :try_start_c
     const-string v1, "GET"
 
-    .line 1468
+    .line 1593
     invoke-virtual {p0, v1}, Ljava/net/HttpURLConnection;->setRequestMethod(Ljava/lang/String;)V
 
     const/16 v1, 0x3a98
 
-    .line 1469
+    .line 1594
     invoke-virtual {p0, v1}, Ljava/net/HttpURLConnection;->setConnectTimeout(I)V
 
-    .line 1470
+    .line 1595
     invoke-virtual {p0, v1}, Ljava/net/HttpURLConnection;->setReadTimeout(I)V
 
     if-eqz p1, :cond_4c
 
-    .line 1472
+    .line 1597
     invoke-interface {p1}, Ljava/util/Map;->entrySet()Ljava/util/Set;
 
     move-result-object p1
@@ -7990,7 +8338,7 @@
 
     check-cast v1, Ljava/util/Map$Entry;
 
-    .line 1473
+    .line 1598
     invoke-interface {v1}, Ljava/util/Map$Entry;->getKey()Ljava/lang/Object;
 
     move-result-object v2
@@ -8005,7 +8353,7 @@
 
     goto :goto_23
 
-    .line 1476
+    .line 1601
     :cond_3c
     invoke-interface {v1}, Ljava/util/Map$Entry;->getKey()Ljava/lang/Object;
 
@@ -8026,7 +8374,7 @@
     :cond_4c
     if-eqz p2, :cond_59
 
-    .line 1479
+    .line 1604
     invoke-virtual {p2}, Ljava/lang/String;->isEmpty()Z
 
     move-result p1
@@ -8035,16 +8383,16 @@
 
     const-string p1, "Cookie"
 
-    .line 1480
+    .line 1605
     invoke-virtual {p0, p1, p2}, Ljava/net/HttpURLConnection;->setRequestProperty(Ljava/lang/String;Ljava/lang/String;)V
 
-    .line 1482
+    .line 1607
     :cond_59
     invoke-virtual {p0}, Ljava/net/HttpURLConnection;->getResponseCode()I
 
     move-result p1
 
-    .line 1483
+    .line 1608
     new-instance p2, Ljava/lang/StringBuilder;
 
     invoke-direct {p2}, Ljava/lang/StringBuilder;-><init>()V
@@ -8069,20 +8417,20 @@
 
     if-eqz p0, :cond_7a
 
-    .line 1500
+    .line 1625
     invoke-virtual {p0}, Ljava/net/HttpURLConnection;->disconnect()V
 
     :cond_7a
     return-object v0
 
-    .line 1487
+    .line 1612
     :cond_7b
     :try_start_7b
     invoke-virtual {p0}, Ljava/net/HttpURLConnection;->getInputStream()Ljava/io/InputStream;
 
     move-result-object p1
 
-    .line 1488
+    .line 1613
     new-instance p2, Ljava/io/ByteArrayOutputStream;
 
     invoke-direct {p2}, Ljava/io/ByteArrayOutputStream;-><init>()V
@@ -8091,7 +8439,7 @@
 
     new-array v1, v1, [B
 
-    .line 1491
+    .line 1616
     :goto_88
     invoke-virtual {p1, v1}, Ljava/io/InputStream;->read([B)I
 
@@ -8101,12 +8449,12 @@
 
     const/4 v3, 0x0
 
-    .line 1492
+    .line 1617
     invoke-virtual {p2, v1, v3, v2}, Ljava/io/ByteArrayOutputStream;->write([BII)V
 
     goto :goto_88
 
-    .line 1494
+    .line 1619
     :cond_93
     new-instance p1, Ljava/lang/String;
 
@@ -8122,7 +8470,7 @@
 
     if-eqz p0, :cond_a3
 
-    .line 1500
+    .line 1625
     invoke-virtual {p0}, Ljava/net/HttpURLConnection;->disconnect()V
 
     :cond_a3
@@ -8138,7 +8486,7 @@
 
     move-object p0, v0
 
-    .line 1496
+    .line 1621
     :goto_a8
     :try_start_a8
     new-instance p2, Ljava/lang/StringBuilder;
@@ -8165,7 +8513,7 @@
 
     if-eqz p0, :cond_c5
 
-    .line 1500
+    .line 1625
     invoke-virtual {p0}, Ljava/net/HttpURLConnection;->disconnect()V
 
     :cond_c5
@@ -8178,7 +8526,7 @@
 
     invoke-virtual {p0}, Ljava/net/HttpURLConnection;->disconnect()V
 
-    .line 1502
+    .line 1627
     :cond_cc
     goto :goto_ce
 
@@ -8199,7 +8547,7 @@
 
     const-string v0, "text/markdown"
 
-    .line 2541
+    .line 2666
     invoke-static {p0, p1, p2, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->insertIntoMediaStore(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/net/Uri;
 
     move-result-object p0
@@ -8215,22 +8563,22 @@
         }
     .end annotation
 
-    .line 2545
+    .line 2670
     new-instance v0, Landroid/content/ContentValues;
 
     invoke-direct {v0}, Landroid/content/ContentValues;-><init>()V
 
     const-string v1, "_display_name"
 
-    .line 2546
+    .line 2671
     invoke-virtual {v0, v1, p1}, Landroid/content/ContentValues;->put(Ljava/lang/String;Ljava/lang/String;)V
 
     const-string p1, "mime_type"
 
-    .line 2547
+    .line 2672
     invoke-virtual {v0, p1, p3}, Landroid/content/ContentValues;->put(Ljava/lang/String;Ljava/lang/String;)V
 
-    .line 2548
+    .line 2673
     new-instance p1, Ljava/lang/StringBuilder;
 
     invoke-direct {p1}, Ljava/lang/StringBuilder;-><init>()V
@@ -8251,7 +8599,7 @@
 
     invoke-virtual {v0, p3, p1}, Landroid/content/ContentValues;->put(Ljava/lang/String;Ljava/lang/String;)V
 
-    .line 2549
+    .line 2674
     invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
 
     move-result-object p1
@@ -8268,7 +8616,7 @@
 
     return-object p3
 
-    .line 2553
+    .line 2678
     :cond_35
     invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
 
@@ -8286,7 +8634,7 @@
     :try_start_40
     const-string p3, "UTF-8"
 
-    .line 2558
+    .line 2683
     invoke-virtual {p2, p3}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
 
     move-result-object p2
@@ -8295,7 +8643,7 @@
     :try_end_49
     .catchall {:try_start_40 .. :try_end_49} :catchall_4d
 
-    .line 2560
+    .line 2685
     invoke-virtual {p0}, Ljava/io/OutputStream;->close()V
 
     return-object p1
@@ -8305,7 +8653,7 @@
 
     invoke-virtual {p0}, Ljava/io/OutputStream;->close()V
 
-    .line 2561
+    .line 2686
     throw p1
 .end method
 
@@ -8323,19 +8671,19 @@
 
     const-string v1, ""
 
-    .line 818
+    .line 943
     invoke-static {p0, v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v0
 
-    .line 819
+    .line 944
     invoke-virtual {v0}, Ljava/lang/String;->isEmpty()Z
 
     move-result v2
 
     if-nez v2, :cond_21
 
-    .line 820
+    .line 945
     new-instance p0, Ljava/lang/StringBuilder;
 
     const-string v1, "e:"
@@ -8353,19 +8701,19 @@
     :cond_21
     const-string v0, "jobId"
 
-    .line 822
+    .line 947
     invoke-static {p0, v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v0
 
-    .line 823
+    .line 948
     invoke-virtual {v0}, Ljava/lang/String;->isEmpty()Z
 
     move-result v2
 
     if-nez v2, :cond_3c
 
-    .line 824
+    .line 949
     new-instance p0, Ljava/lang/StringBuilder;
 
     const-string v1, "j:"
@@ -8383,19 +8731,19 @@
     :cond_3c
     const-string v0, "jobName"
 
-    .line 826
+    .line 951
     invoke-static {p0, v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v0
 
     const-string v2, "brandName"
 
-    .line 827
+    .line 952
     invoke-static {p0, v2, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p0
 
-    .line 828
+    .line 953
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "n:"
@@ -8423,7 +8771,7 @@
     :try_start_0
     const-string v0, "ExportHelper"
 
-    .line 2588
+    .line 2713
     invoke-static {v0, p0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
     :try_end_5
     .catchall {:try_start_0 .. :try_end_5} :catchall_5
@@ -8432,10 +8780,38 @@
     return-void
 .end method
 
+.method private static longToStr(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;
+    .registers 5
+
+    .line 694
+    invoke-static {p0, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readLongField(Ljava/lang/Object;Ljava/lang/String;)J
+
+    move-result-wide p0
+
+    const-wide/16 v0, 0x0
+
+    cmp-long v2, p0, v0
+
+    if-lez v2, :cond_f
+
+    .line 695
+    invoke-static {p0, p1}, Ljava/lang/String;->valueOf(J)Ljava/lang/String;
+
+    move-result-object p0
+
+    goto :goto_10
+
+    :cond_f
+    const/4 p0, 0x0
+
+    :goto_10
+    return-object p0
+.end method
+
 .method public static notifyChatSent(Ljava/lang/String;)V
     .registers 3
 
-    .line 1753
+    .line 1878
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "notifyChatSent ok="
@@ -8453,10 +8829,141 @@
     return-void
 .end method
 
+.method public static notifyCreateFriendFailed(Ljava/lang/String;)V
+    .registers 2
+
+    if-eqz p0, :cond_8
+
+    .line 722
+    invoke-virtual {p0}, Ljava/lang/String;->isEmpty()Z
+
+    move-result v0
+
+    if-eqz v0, :cond_a
+
+    :cond_8
+    const-string p0, "create friend failed"
+
+    :cond_a
+    sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateError:Ljava/lang/String;
+
+    .line 723
+    sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateLatch:Ljava/util/concurrent/CountDownLatch;
+
+    if-eqz p0, :cond_13
+
+    .line 725
+    invoke-virtual {p0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
+
+    :cond_13
+    return-void
+.end method
+
+.method public static notifyCreateFriendSuccess(Ljava/lang/Object;)V
+    .registers 3
+
+    .line 700
+    :try_start_0
+    invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    move-result-object v0
+
+    const-string v1, "a"
+
+    invoke-virtual {v0, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
+
+    move-result-object v0
+
+    invoke-virtual {v0, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object p0
+
+    if-eqz p0, :cond_2b
+
+    .line 702
+    invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    move-result-object v0
+
+    const-string v1, "relation"
+
+    invoke-virtual {v0, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
+
+    move-result-object v0
+
+    invoke-virtual {v0, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object p0
+
+    if-eqz p0, :cond_26
+
+    .line 704
+    sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateRelation:Ljava/lang/Object;
+
+    const/4 p0, 0x1
+
+    .line 705
+    sput-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateOk:Z
+
+    goto :goto_45
+
+    :cond_26
+    const-string p0, "relation is null"
+
+    .line 707
+    sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateError:Ljava/lang/String;
+
+    goto :goto_45
+
+    :cond_2b
+    const-string p0, "response is null"
+
+    .line 710
+    sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateError:Ljava/lang/String;
+    :try_end_2f
+    .catchall {:try_start_0 .. :try_end_2f} :catchall_30
+
+    goto :goto_45
+
+    :catchall_30
+    move-exception p0
+
+    .line 713
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    const-string v1, "parse error: "
+
+    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-virtual {v0, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateError:Ljava/lang/String;
+
+    .line 715
+    :goto_45
+    sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sCreateLatch:Ljava/util/concurrent/CountDownLatch;
+
+    if-eqz p0, :cond_4c
+
+    .line 717
+    invoke-virtual {p0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
+
+    :cond_4c
+    return-void
+.end method
+
 .method public static notifyDetailFailed(Ljava/lang/String;)V
     .registers 3
 
-    .line 1905
+    .line 2030
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "notifyDetailFailed: "
@@ -8475,26 +8982,26 @@
 
     const-string p0, "detail request failed"
 
-    .line 1906
+    .line 2031
     :cond_15
     sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailError:Ljava/lang/String;
 
     const/4 p0, 0x0
 
-    .line 1907
+    .line 2032
     sput-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailOk:Z
 
     const/4 p0, 0x1
 
-    .line 1908
+    .line 2033
     sput-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailDone:Z
 
-    .line 1909
+    .line 2034
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz p0, :cond_26
 
-    .line 1910
+    .line 2035
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
     invoke-virtual {p0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
@@ -8506,7 +9013,7 @@
 .method public static notifyDetailRawJson(Ljava/lang/String;)V
     .registers 5
 
-    .line 1741
+    .line 1866
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "notifyDetailRawJson len="
@@ -8537,7 +9044,7 @@
 
     if-eqz p0, :cond_3b
 
-    .line 1743
+    .line 1868
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v2, "notifyDetailRawJson body="
@@ -8570,7 +9077,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1745
+    .line 1870
     :cond_3b
     sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailRawJson:Ljava/lang/String;
 
@@ -8588,7 +9095,7 @@
 
     if-eqz p0, :cond_48
 
-    .line 1884
+    .line 2009
     :try_start_7
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -8600,14 +9107,14 @@
 
     move-result-object v3
 
-    .line 1885
+    .line 2010
     invoke-virtual {v3, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v3
 
     sput-object v3, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailResponse:Ljava/lang/Object;
 
-    .line 1886
+    .line 2011
     new-instance v3, Ljava/lang/StringBuilder;
 
     invoke-direct {v3, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -8626,7 +9133,7 @@
 
     invoke-virtual {v3, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1887
+    .line 2012
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailResponse:Ljava/lang/Object;
 
     if-nez p0, :cond_33
@@ -8653,7 +9160,7 @@
 
     move-result-object p0
 
-    .line 1886
+    .line 2011
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     goto :goto_4d
@@ -8661,24 +9168,24 @@
     :cond_48
     const-string p0, "notifyDetailSuccess wrapper=null"
 
-    .line 1889
+    .line 2014
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1891
+    .line 2016
     :goto_4d
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailOk:Z
     :try_end_4f
     .catchall {:try_start_7 .. :try_end_4f} :catchall_5b
 
-    .line 1897
+    .line 2022
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailDone:Z
 
-    .line 1898
+    .line 2023
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz p0, :cond_7d
 
-    .line 1899
+    .line 2024
     :goto_55
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
@@ -8689,7 +9196,7 @@
     :catchall_5b
     move-exception p0
 
-    .line 1893
+    .line 2018
     :try_start_5c
     new-instance v0, Ljava/lang/StringBuilder;
 
@@ -8709,20 +9216,20 @@
 
     const-string p0, "detail parse error"
 
-    .line 1894
+    .line 2019
     sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailError:Ljava/lang/String;
 
     const/4 p0, 0x0
 
-    .line 1895
+    .line 2020
     sput-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailOk:Z
     :try_end_76
     .catchall {:try_start_5c .. :try_end_76} :catchall_7e
 
-    .line 1897
+    .line 2022
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailDone:Z
 
-    .line 1898
+    .line 2023
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz p0, :cond_7d
@@ -8736,20 +9243,20 @@
     :catchall_7e
     move-exception p0
 
-    .line 1897
+    .line 2022
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailDone:Z
 
-    .line 1898
+    .line 2023
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz v0, :cond_8a
 
-    .line 1899
+    .line 2024
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
 
-    .line 1901
+    .line 2026
     :cond_8a
     goto :goto_8c
 
@@ -8763,7 +9270,7 @@
 .method public static notifyFailed(Ljava/lang/String;)V
     .registers 3
 
-    .line 1938
+    .line 2063
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "notifyFailed: "
@@ -8782,26 +9289,26 @@
 
     const-string p0, "request failed"
 
-    .line 1939
+    .line 2064
     :cond_15
     sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageError:Ljava/lang/String;
 
     const/4 p0, 0x0
 
-    .line 1940
+    .line 2065
     sput-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageOk:Z
 
     const/4 p0, 0x1
 
-    .line 1941
+    .line 2066
     sput-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageDone:Z
 
-    .line 1942
+    .line 2067
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz p0, :cond_26
 
-    .line 1943
+    .line 2068
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
     invoke-virtual {p0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
@@ -8813,7 +9320,7 @@
 .method public static notifyRawJson(Ljava/lang/String;)V
     .registers 3
 
-    .line 1736
+    .line 1861
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "notifyRawJson len="
@@ -8840,7 +9347,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1737
+    .line 1862
     sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageRawJson:Ljava/lang/String;
 
     return-void
@@ -8851,7 +9358,7 @@
 
     const-string v0, "notifySendStart: \u5f00\u59cb\u53d1\u9001"
 
-    .line 1749
+    .line 1874
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
@@ -8868,7 +9375,7 @@
 
     if-eqz p0, :cond_48
 
-    .line 1917
+    .line 2042
     :try_start_7
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -8880,14 +9387,14 @@
 
     move-result-object v3
 
-    .line 1918
+    .line 2043
     invoke-virtual {v3, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v3
 
     sput-object v3, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
-    .line 1919
+    .line 2044
     new-instance v3, Ljava/lang/StringBuilder;
 
     invoke-direct {v3, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -8906,7 +9413,7 @@
 
     invoke-virtual {v3, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1920
+    .line 2045
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
     if-nez p0, :cond_33
@@ -8933,7 +9440,7 @@
 
     move-result-object p0
 
-    .line 1919
+    .line 2044
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     goto :goto_4d
@@ -8941,24 +9448,24 @@
     :cond_48
     const-string p0, "notifySuccess wrapper=null"
 
-    .line 1922
+    .line 2047
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1924
+    .line 2049
     :goto_4d
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageOk:Z
     :try_end_4f
     .catchall {:try_start_7 .. :try_end_4f} :catchall_5b
 
-    .line 1930
+    .line 2055
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageDone:Z
 
-    .line 1931
+    .line 2056
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz p0, :cond_7d
 
-    .line 1932
+    .line 2057
     :goto_55
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
@@ -8969,7 +9476,7 @@
     :catchall_5b
     move-exception p0
 
-    .line 1926
+    .line 2051
     :try_start_5c
     new-instance v0, Ljava/lang/StringBuilder;
 
@@ -8989,20 +9496,20 @@
 
     const-string p0, "response parse error"
 
-    .line 1927
+    .line 2052
     sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageError:Ljava/lang/String;
 
     const/4 p0, 0x0
 
-    .line 1928
+    .line 2053
     sput-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageOk:Z
     :try_end_76
     .catchall {:try_start_5c .. :try_end_76} :catchall_7e
 
-    .line 1930
+    .line 2055
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageDone:Z
 
-    .line 1931
+    .line 2056
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz p0, :cond_7d
@@ -9016,20 +9523,20 @@
     :catchall_7e
     move-exception p0
 
-    .line 1930
+    .line 2055
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageDone:Z
 
-    .line 1931
+    .line 2056
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
     if-eqz v0, :cond_8a
 
-    .line 1932
+    .line 2057
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
 
-    .line 1934
+    .line 2059
     :cond_8a
     goto :goto_8c
 
@@ -9056,7 +9563,7 @@
 
     const-string v0, ".md"
 
-    .line 2525
+    .line 2650
     invoke-static {p0, p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->pickUniqueNameFile(Ljava/io/File;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p0
@@ -9067,7 +9574,7 @@
 .method private static pickUniqueNameFile(Ljava/io/File;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
     .registers 8
 
-    .line 2529
+    .line 2654
     new-instance v0, Ljava/io/File;
 
     new-instance v1, Ljava/lang/StringBuilder;
@@ -9084,14 +9591,14 @@
 
     invoke-direct {v0, p0, v1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 2530
+    .line 2655
     invoke-virtual {v0}, Ljava/io/File;->exists()Z
 
     move-result v0
 
     if-nez v0, :cond_2a
 
-    .line 2531
+    .line 2656
     new-instance p0, Ljava/lang/StringBuilder;
 
     invoke-direct {p0}, Ljava/lang/StringBuilder;-><init>()V
@@ -9109,7 +9616,7 @@
     :cond_2a
     const/4 v0, 0x1
 
-    .line 2534
+    .line 2659
     :goto_2b
     new-instance v1, Ljava/io/File;
 
@@ -9147,7 +9654,7 @@
 
     goto :goto_2b
 
-    .line 2537
+    .line 2662
     :cond_55
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -9180,7 +9687,7 @@
 
     const-string v0, ".md"
 
-    .line 2491
+    .line 2616
     invoke-static {p0, p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->pickUniqueNameMediaStore(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p0
@@ -9196,7 +9703,7 @@
         }
     .end annotation
 
-    .line 2496
+    .line 2621
     new-instance v0, Ljava/util/HashSet;
 
     invoke-direct {v0}, Ljava/util/HashSet;-><init>()V
@@ -9205,7 +9712,7 @@
 
     const/4 v2, 0x0
 
-    .line 2499
+    .line 2624
     :try_start_7
     invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
 
@@ -9233,7 +9740,7 @@
 
     if-eqz v2, :cond_2b
 
-    .line 2504
+    .line 2629
     :goto_1d
     invoke-interface {v2}, Landroid/database/Cursor;->moveToNext()Z
 
@@ -9241,7 +9748,7 @@
 
     if-eqz p0, :cond_2b
 
-    .line 2505
+    .line 2630
     invoke-interface {v2, v9}, Landroid/database/Cursor;->getString(I)Ljava/lang/String;
 
     move-result-object p0
@@ -9262,11 +9769,11 @@
 
     if-eqz v2, :cond_34
 
-    .line 2511
+    .line 2636
     :goto_31
     invoke-interface {v2}, Landroid/database/Cursor;->close()V
 
-    .line 2514
+    .line 2639
     :cond_34
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -9286,7 +9793,7 @@
 
     if-nez p0, :cond_59
 
-    .line 2515
+    .line 2640
     new-instance p0, Ljava/lang/StringBuilder;
 
     invoke-direct {p0}, Ljava/lang/StringBuilder;-><init>()V
@@ -9301,7 +9808,7 @@
 
     return-object p0
 
-    .line 2518
+    .line 2643
     :cond_59
     :goto_59
     new-instance p0, Ljava/lang/StringBuilder;
@@ -9336,7 +9843,7 @@
 
     goto :goto_59
 
-    .line 2521
+    .line 2646
     :cond_7e
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -9368,13 +9875,13 @@
 
     const-string v2, "https://"
 
-    .line 1575
+    .line 1700
     :try_start_6
     new-instance v3, Ljava/net/URI;
 
     invoke-direct {v3, p0}, Ljava/net/URI;-><init>(Ljava/lang/String;)V
 
-    .line 1576
+    .line 1701
     invoke-virtual {v3}, Ljava/net/URI;->getHost()Ljava/lang/String;
 
     move-result-object v3
@@ -9386,7 +9893,7 @@
     :catchall_10
     move-object v3, v0
 
-    .line 1580
+    .line 1705
     :goto_11
     :try_start_11
     invoke-virtual {v3}, Ljava/lang/String;->isEmpty()Z
@@ -9397,7 +9904,7 @@
 
     return-object v0
 
-    .line 1583
+    .line 1708
     :cond_18
     invoke-static {}, Landroid/webkit/CookieManager;->getInstance()Landroid/webkit/CookieManager;
 
@@ -9407,7 +9914,7 @@
 
     return-object v0
 
-    .line 1587
+    .line 1712
     :cond_1f
     new-instance v5, Ljava/lang/StringBuilder;
 
@@ -9425,7 +9932,7 @@
 
     if-nez v2, :cond_41
 
-    .line 1589
+    .line 1714
     new-instance v2, Ljava/lang/StringBuilder;
 
     invoke-direct {v2, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -9443,7 +9950,7 @@
     :cond_41
     if-nez v2, :cond_47
 
-    .line 1592
+    .line 1717
     invoke-virtual {v4, p0}, Landroid/webkit/CookieManager;->getCookie(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v2
@@ -9464,7 +9971,7 @@
     :catchall_4c
     move-exception p0
 
-    .line 1596
+    .line 1721
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "readCookie error: "
@@ -9489,7 +9996,7 @@
 .method private static varargs readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
     .registers 7
 
-    .line 2172
+    .line 2297
     array-length v0, p2
 
     const/4 v1, 0x0
@@ -9501,14 +10008,14 @@
 
     const/4 v3, 0x0
 
-    .line 2173
+    .line 2298
     invoke-static {p0, v2, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v2
 
     if-eqz v2, :cond_14
 
-    .line 2174
+    .line 2299
     invoke-virtual {v2}, Ljava/lang/String;->isEmpty()Z
 
     move-result v3
@@ -9529,7 +10036,7 @@
 .method private static readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
     .registers 4
 
-    .line 2163
+    .line 2288
     :try_start_0
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -9539,7 +10046,7 @@
 
     move-result-object p1
 
-    .line 2164
+    .line 2289
     invoke-virtual {p1, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
@@ -9548,7 +10055,7 @@
 
     goto :goto_13
 
-    .line 2165
+    .line 2290
     :cond_f
     invoke-virtual {p0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
@@ -9564,7 +10071,7 @@
 .method private static readFieldSafeObject(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
     .registers 3
 
-    .line 2406
+    .line 2531
     :try_start_0
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -9574,7 +10081,7 @@
 
     move-result-object p1
 
-    .line 2407
+    .line 2532
     invoke-virtual {p1, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
@@ -9592,7 +10099,7 @@
 .method private static readLongField(Ljava/lang/Object;Ljava/lang/String;)J
     .registers 3
 
-    .line 615
+    .line 740
     :try_start_0
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -9602,17 +10109,17 @@
 
     move-result-object p1
 
-    .line 616
+    .line 741
     invoke-virtual {p1, p0}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
 
-    .line 617
+    .line 742
     instance-of p1, p0, Ljava/lang/Long;
 
     if-eqz p1, :cond_17
 
-    .line 618
+    .line 743
     check-cast p0, Ljava/lang/Long;
 
     invoke-virtual {p0}, Ljava/lang/Long;->longValue()J
@@ -9621,13 +10128,13 @@
 
     return-wide p0
 
-    .line 620
+    .line 745
     :cond_17
     instance-of p1, p0, Ljava/lang/Integer;
 
     if-eqz p1, :cond_22
 
-    .line 621
+    .line 746
     check-cast p0, Ljava/lang/Integer;
 
     invoke-virtual {p0}, Ljava/lang/Integer;->longValue()J
@@ -9636,7 +10143,7 @@
 
     return-wide p0
 
-    .line 623
+    .line 748
     :cond_22
     invoke-virtual {p0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
@@ -9685,7 +10192,7 @@
 
     if-eqz v0, :cond_26d
 
-    .line 1765
+    .line 1890
     :try_start_1a
     invoke-virtual/range {p1 .. p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -9703,7 +10210,7 @@
 
     new-array v13, v14, [Ljava/lang/Object;
 
-    .line 1766
+    .line 1891
     invoke-virtual {v12, v0, v13}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v12
@@ -9712,7 +10219,7 @@
 
     if-eqz v12, :cond_26d
 
-    .line 1769
+    .line 1894
     :try_start_2f
     invoke-virtual {v12}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -9724,14 +10231,14 @@
 
     move-result-object v0
 
-    .line 1770
+    .line 1895
     invoke-virtual {v0, v12}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_44
 
-    .line 1772
+    .line 1897
     invoke-virtual {v0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v0
@@ -9751,7 +10258,7 @@
     :catchall_47
     move-object v13, v11
 
-    .line 1777
+    .line 1902
     :goto_48
     :try_start_48
     invoke-virtual {v12}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -9764,14 +10271,14 @@
 
     move-result-object v0
 
-    .line 1778
+    .line 1903
     invoke-virtual {v0, v12}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_5e
 
-    .line 1780
+    .line 1905
     invoke-virtual {v0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v11
@@ -9790,7 +10297,7 @@
     :try_start_60
     const-string v0, "com.hpbr.bosszhipin.data.manager.r"
 
-    .line 1787
+    .line 1912
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v0
@@ -9804,7 +10311,7 @@
     :try_start_6a
     new-array v13, v14, [Ljava/lang/Class;
 
-    .line 1788
+    .line 1913
     invoke-virtual {v0, v15, v13}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v0
@@ -9819,7 +10326,7 @@
 
     if-eqz v0, :cond_96
 
-    .line 1790
+    .line 1915
     invoke-virtual {v0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v13
@@ -9838,12 +10345,12 @@
 
     move-result-object v0
 
-    .line 1791
+    .line 1916
     instance-of v1, v0, Ljava/lang/Integer;
 
     if-eqz v1, :cond_96
 
-    .line 1792
+    .line 1917
     check-cast v0, Ljava/lang/Integer;
 
     invoke-virtual {v0}, Ljava/lang/Integer;->intValue()I
@@ -9872,7 +10379,7 @@
 
     move-object/from16 v16, v13
 
-    .line 1796
+    .line 1921
     :goto_9e
     :try_start_9e
     new-instance v1, Ljava/lang/StringBuilder;
@@ -9901,7 +10408,7 @@
     :try_start_b4
     const-string v0, "message.handler.g"
 
-    .line 1800
+    .line 1925
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v0
@@ -9912,7 +10419,7 @@
 
     new-array v13, v10, [Ljava/lang/Class;
 
-    .line 1801
+    .line 1926
     invoke-virtual/range {p2 .. p2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v19
@@ -9933,7 +10440,7 @@
 
     aput-object v19, v13, v17
 
-    .line 1800
+    .line 1925
     invoke-virtual {v0, v15, v13}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v0
@@ -9946,7 +10453,7 @@
 
     aput-object v12, v10, v13
 
-    .line 1802
+    .line 1927
     sget-object v13, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
 
     const/4 v15, 0x2
@@ -9963,7 +10470,7 @@
 
     if-eqz v0, :cond_10c
 
-    .line 1805
+    .line 1930
     :try_start_ea
     invoke-virtual {v12}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -9984,7 +10491,7 @@
     :catchall_f8
     move-exception v0
 
-    .line 1810
+    .line 1935
     :try_start_f9
     new-instance v10, Ljava/lang/StringBuilder;
 
@@ -10002,7 +10509,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1812
+    .line 1937
     :catchall_10c
     :cond_10c
     :goto_10c
@@ -10012,7 +10519,7 @@
     :try_end_110
     .catchall {:try_start_f9 .. :try_end_110} :catchall_248
 
-    .line 1814
+    .line 1939
     :try_start_110
     invoke-virtual/range {p2 .. p2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -10032,7 +10539,7 @@
     :try_end_121
     .catchall {:try_start_110 .. :try_end_121} :catchall_121
 
-    .line 1818
+    .line 1943
     :catchall_121
     :try_start_121
     invoke-virtual/range {p2 .. p2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -10055,7 +10562,7 @@
     :try_end_134
     .catchall {:try_start_121 .. :try_end_134} :catchall_134
 
-    .line 1822
+    .line 1947
     :catchall_134
     :try_start_134
     invoke-virtual {v12}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -10078,7 +10585,7 @@
     :try_end_146
     .catchall {:try_start_134 .. :try_end_146} :catchall_146
 
-    .line 1826
+    .line 1951
     :catchall_146
     :try_start_146
     invoke-virtual {v12}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -10099,7 +10606,7 @@
     :try_end_157
     .catchall {:try_start_146 .. :try_end_157} :catchall_157
 
-    .line 1830
+    .line 1955
     :catchall_157
     :try_start_157
     invoke-virtual {v12}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
@@ -10125,7 +10632,7 @@
     :try_start_168
     const-string v0, "com.hpbr.bosszhipin.data.manager.ContactManager"
 
-    .line 1835
+    .line 1960
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v0
@@ -10134,7 +10641,7 @@
 
     new-array v10, v14, [Ljava/lang/Class;
 
-    .line 1836
+    .line 1961
     invoke-virtual {v0, v8, v10}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v0
@@ -10149,7 +10656,7 @@
 
     if-eqz v8, :cond_250
 
-    .line 1838
+    .line 1963
     invoke-virtual {v8}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v0
@@ -10188,7 +10695,7 @@
 
     invoke-virtual {v0, v8, v10}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 1839
+    .line 1964
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0, v7}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -10208,7 +10715,7 @@
     :try_start_1b4
     const-string v0, "nj0.f"
 
-    .line 1842
+    .line 1967
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v0
@@ -10231,7 +10738,7 @@
 
     if-eqz v0, :cond_207
 
-    .line 1844
+    .line 1969
     invoke-virtual {v0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v1
@@ -10256,7 +10763,7 @@
 
     invoke-virtual {v1, v0, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 1845
+    .line 1970
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -10276,7 +10783,7 @@
     :catchall_1f3
     move-exception v0
 
-    .line 1848
+    .line 1973
     :try_start_1f4
     new-instance v1, Ljava/lang/StringBuilder;
 
@@ -10296,7 +10803,7 @@
     :try_end_207
     .catchall {:try_start_1f4 .. :try_end_207} :catchall_233
 
-    .line 1852
+    .line 1977
     :cond_207
     :goto_207
     :try_start_207
@@ -10318,7 +10825,7 @@
 
     const-string v0, "reportSendResult trigger refreshContacts V() ok"
 
-    .line 1853
+    .line 1978
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
     :try_end_21d
     .catchall {:try_start_207 .. :try_end_21d} :catchall_21e
@@ -10328,7 +10835,7 @@
     :catchall_21e
     move-exception v0
 
-    .line 1855
+    .line 1980
     :try_start_21f
     new-instance v1, Ljava/lang/StringBuilder;
 
@@ -10353,7 +10860,7 @@
     :catchall_233
     move-exception v0
 
-    .line 1859
+    .line 1984
     :try_start_234
     new-instance v1, Ljava/lang/StringBuilder;
 
@@ -10404,7 +10911,7 @@
 
     move-object v0, v11
 
-    .line 1864
+    .line 1989
     :goto_257
     new-instance v2, Ljava/lang/StringBuilder;
 
@@ -10429,7 +10936,7 @@
     :cond_26d
     move-object v0, v11
 
-    .line 1867
+    .line 1992
     :goto_26e
     new-instance v1, Ljava/lang/StringBuilder;
 
@@ -10453,7 +10960,7 @@
 
     invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1868
+    .line 1993
     invoke-virtual {v11}, Ljava/lang/String;->isEmpty()Z
 
     move-result v3
@@ -10474,7 +10981,7 @@
 
     move-result-object v1
 
-    .line 1869
+    .line 1994
     new-instance v3, Ljava/lang/StringBuilder;
 
     const-string v4, "reportSendResult ok="
@@ -10501,15 +11008,15 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1870
+    .line 1995
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sAttachActivity:Landroid/app/Activity;
 
     if-eqz v0, :cond_2c5
 
-    .line 1871
+    .line 1996
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sAttachActivity:Landroid/app/Activity;
 
-    .line 1872
+    .line 1997
     sget-object v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sMainHandler:Landroid/os/Handler;
 
     new-instance v3, Lcom/hpbr/bosszhipin/export2/ExportHelper$13;
@@ -10545,24 +11052,24 @@
 
     const/4 v9, 0x0
 
-    .line 1629
+    .line 1754
     sput-boolean v9, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailDone:Z
 
-    .line 1630
+    .line 1755
     sput-boolean v9, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailOk:Z
 
     const/4 v10, 0x0
 
-    .line 1631
+    .line 1756
     sput-object v10, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailError:Ljava/lang/String;
 
-    .line 1632
+    .line 1757
     sput-object v10, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailResponse:Ljava/lang/Object;
 
-    .line 1633
+    .line 1758
     sput-object v10, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailRawJson:Ljava/lang/String;
 
-    .line 1634
+    .line 1759
     new-instance v11, Ljava/util/concurrent/CountDownLatch;
 
     const/4 v12, 0x1
@@ -10571,13 +11078,13 @@
 
     sput-object v11, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
-    .line 1637
+    .line 1762
     :try_start_26
     invoke-static {p0, v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v11
 
-    .line 1638
+    .line 1763
     invoke-virtual {v11}, Ljava/lang/String;->isEmpty()Z
 
     move-result v13
@@ -10588,13 +11095,13 @@
 
     if-eqz v13, :cond_36
 
-    .line 1639
+    .line 1764
     :try_start_32
     invoke-static {p0, v14, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v11
 
-    .line 1641
+    .line 1766
     :cond_36
     invoke-virtual {v11}, Ljava/lang/String;->isEmpty()Z
 
@@ -10602,7 +11109,7 @@
 
     if-eqz v13, :cond_54
 
-    .line 1642
+    .line 1767
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0, v7}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -10625,7 +11132,7 @@
 
     return-object v10
 
-    .line 1645
+    .line 1770
     :cond_54
     new-instance v7, Ljava/lang/StringBuilder;
 
@@ -10637,7 +11144,7 @@
 
     invoke-virtual {v7, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1646
+    .line 1771
     invoke-static {p0, v14, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p0
@@ -10648,31 +11155,31 @@
 
     move-result-object p0
 
-    .line 1645
+    .line 1770
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     const-string p0, "com.hpbr.bosszhipin.export2.ExportDetailCallback"
 
-    .line 1648
+    .line 1773
     invoke-static {p0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object p0
 
-    .line 1649
+    .line 1774
     invoke-virtual {p0}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
 
     move-result-object p0
 
     const-string v0, "com.hpbr.bosszhipin.net.request.F1GeekGetJobDetailBatchRequest"
 
-    .line 1651
+    .line 1776
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v0
 
     const-string v7, "com.twl.http.callback.a"
 
-    .line 1652
+    .line 1777
     invoke-static {v7}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v7
@@ -10681,7 +11188,7 @@
 
     aput-object v7, v8, v9
 
-    .line 1653
+    .line 1778
     invoke-virtual {v0, v8}, Ljava/lang/Class;->getConstructor([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
 
     move-result-object v7
@@ -10690,24 +11197,24 @@
 
     aput-object p0, v8, v9
 
-    .line 1654
+    .line 1779
     invoke-virtual {v7, v8}, Ljava/lang/reflect/Constructor;->newInstance([Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object p0
 
     const-string v7, "net.bosszhipin.api.GetJobDetailRequest"
 
-    .line 1656
+    .line 1781
     invoke-static {v7}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v7
 
-    .line 1657
+    .line 1782
     invoke-virtual {v7}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
 
     move-result-object v8
 
-    .line 1658
+    .line 1783
     invoke-virtual {v7, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v7
@@ -10716,7 +11223,7 @@
 
     const-string v7, "getJobDetailRequest"
 
-    .line 1659
+    .line 1784
     invoke-virtual {v0, v7}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v7
@@ -10725,17 +11232,17 @@
 
     const-string v7, "net.bosszhipin.api.GetJobQueryBannerRequest"
 
-    .line 1661
+    .line 1786
     invoke-static {v7}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v7
 
-    .line 1662
+    .line 1787
     invoke-virtual {v7}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
 
     move-result-object v8
 
-    .line 1663
+    .line 1788
     invoke-virtual {v7, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v1
@@ -10744,7 +11251,7 @@
 
     const-string v1, "jobQueryBannerRequest"
 
-    .line 1664
+    .line 1789
     invoke-virtual {v0, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v0
@@ -10753,7 +11260,7 @@
 
     const-string v0, "net.bosszhipin.base.BaseBatchApiRequest"
 
-    .line 1666
+    .line 1791
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v0
@@ -10771,7 +11278,7 @@
     :try_start_d7
     const-string v1, "DETAIL"
 
-    .line 1668
+    .line 1793
     new-instance v7, Ljava/lang/StringBuilder;
 
     invoke-direct {v7, v6}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -10791,7 +11298,7 @@
     :catchall_e9
     move-exception v1
 
-    .line 1670
+    .line 1795
     :try_start_ea
     new-instance v6, Ljava/lang/StringBuilder;
 
@@ -10812,10 +11319,10 @@
     :goto_fd
     new-array v1, v9, [Ljava/lang/Object;
 
-    .line 1672
+    .line 1797
     invoke-virtual {v0, p0, v1}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 1674
+    .line 1799
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailLatch:Ljava/util/concurrent/CountDownLatch;
 
     sget-object v0, Ljava/util/concurrent/TimeUnit;->MILLISECONDS:Ljava/util/concurrent/TimeUnit;
@@ -10828,7 +11335,7 @@
 
     if-nez p0, :cond_11e
 
-    .line 1676
+    .line 1801
     new-instance p0, Ljava/lang/StringBuilder;
 
     invoke-direct {p0, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -10843,13 +11350,13 @@
 
     return-object v10
 
-    .line 1679
+    .line 1804
     :cond_11e
     sget-boolean p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailOk:Z
 
     if-nez p0, :cond_134
 
-    .line 1680
+    .line 1805
     new-instance p0, Ljava/lang/StringBuilder;
 
     invoke-direct {p0, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -10866,7 +11373,7 @@
 
     return-object v10
 
-    .line 1683
+    .line 1808
     :cond_134
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -10878,7 +11385,7 @@
 
     invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    .line 1684
+    .line 1809
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailResponse:Ljava/lang/Object;
 
     if-nez v0, :cond_148
@@ -10905,10 +11412,10 @@
 
     move-result-object p0
 
-    .line 1683
+    .line 1808
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1685
+    .line 1810
     sget-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailResponse:Ljava/lang/Object;
     :try_end_15e
     .catchall {:try_start_ea .. :try_end_15e} :catchall_15f
@@ -10918,7 +11425,7 @@
     :catchall_15f
     move-exception p0
 
-    .line 1687
+    .line 1812
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "requestDetail error: "
@@ -10954,7 +11461,7 @@
 
     const-wide/16 v1, 0x258
 
-    .line 1605
+    .line 1730
     :try_start_8
     invoke-static {v1, v2}, Ljava/lang/Thread;->sleep(J)V
     :try_end_b
@@ -10962,7 +11469,7 @@
 
     goto :goto_13
 
-    .line 1607
+    .line 1732
     :catch_c
     invoke-static {}, Ljava/lang/Thread;->currentThread()Ljava/lang/Thread;
 
@@ -10970,7 +11477,7 @@
 
     invoke-virtual {v1}, Ljava/lang/Thread;->interrupt()V
 
-    .line 1610
+    .line 1735
     :cond_13
     :goto_13
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->requestDetail(Ljava/lang/Object;)Ljava/lang/Object;
@@ -10981,7 +11488,7 @@
 
     return-object v1
 
-    .line 1614
+    .line 1739
     :cond_1a
     sget-object v1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sDetailError:Ljava/lang/String;
 
@@ -11023,21 +11530,21 @@
 
     const/4 v2, 0x0
 
-    .line 1218
+    .line 1343
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageDone:Z
 
-    .line 1219
+    .line 1344
     sput-boolean v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageOk:Z
 
     const/4 v3, 0x0
 
-    .line 1220
+    .line 1345
     sput-object v3, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageError:Ljava/lang/String;
 
-    .line 1221
+    .line 1346
     sput-object v3, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
-    .line 1222
+    .line 1347
     new-instance v4, Ljava/util/concurrent/CountDownLatch;
 
     const/4 v5, 0x1
@@ -11046,46 +11553,46 @@
 
     sput-object v4, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
-    .line 1224
+    .line 1349
     invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildListRequest(I)Ljava/lang/Object;
 
     move-result-object p1
 
     const-string v4, "com.hpbr.bosszhipin.export2.ExportCallback"
 
-    .line 1226
+    .line 1351
     invoke-static {v4}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v4
 
-    .line 1227
+    .line 1352
     invoke-virtual {v4}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
 
     move-result-object v4
 
     const-string v6, "com.twl.http.client.a"
 
-    .line 1229
+    .line 1354
     invoke-static {v6}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v6
 
     const-string v7, "mCallback"
 
-    .line 1230
+    .line 1355
     invoke-virtual {v6, v7}, Ljava/lang/Class;->getDeclaredField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v6
 
-    .line 1231
+    .line 1356
     invoke-virtual {v6, v5}, Ljava/lang/reflect/Field;->setAccessible(Z)V
 
-    .line 1232
+    .line 1357
     invoke-virtual {v6, p1, v4}, Ljava/lang/reflect/Field;->set(Ljava/lang/Object;Ljava/lang/Object;)V
 
     const-string v5, "com.twl.http.callback.a"
 
-    .line 1233
+    .line 1358
     invoke-static {v5}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v5
@@ -11096,10 +11603,10 @@
 
     move-result-object v5
 
-    .line 1234
+    .line 1359
     invoke-virtual {v5, v4, p1}, Ljava/lang/reflect/Field;->set(Ljava/lang/Object;Ljava/lang/Object;)V
 
-    .line 1236
+    .line 1361
     invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v4
@@ -11114,10 +11621,10 @@
 
     new-array v5, v2, [Ljava/lang/Object;
 
-    .line 1237
+    .line 1362
     invoke-virtual {v4, p1, v5}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 1239
+    .line 1364
     sget-object p1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sLatch:Ljava/util/concurrent/CountDownLatch;
 
     const-wide/16 v4, 0x7530
@@ -11132,7 +11639,7 @@
 
     return-object v3
 
-    .line 1243
+    .line 1368
     :cond_65
     sget-boolean p1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageOk:Z
 
@@ -11140,7 +11647,7 @@
 
     return-object v3
 
-    .line 1246
+    .line 1371
     :cond_6a
     sget-object p1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
@@ -11148,18 +11655,18 @@
 
     return-object v3
 
-    .line 1250
+    .line 1375
     :cond_6f
     new-instance p1, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;
 
     invoke-direct {p1, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;-><init>(Lcom/hpbr/bosszhipin/export2/ExportHelper$1;)V
 
-    .line 1251
+    .line 1376
     sget-object v4, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
     iput-object v4, p1, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->resp:Ljava/lang/Object;
 
-    .line 1253
+    .line 1378
     :try_start_78
     sget-object v4, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
@@ -11167,7 +11674,7 @@
 
     move-result-object v4
 
-    .line 1254
+    .line 1379
     new-instance v5, Ljava/lang/StringBuilder;
 
     invoke-direct {v5, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -11189,7 +11696,7 @@
     :try_start_91
     const-string v1, "jobList"
 
-    .line 1257
+    .line 1382
     invoke-virtual {v4, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v3
@@ -11207,7 +11714,7 @@
     :try_start_9b
     const-string v1, "geekList"
 
-    .line 1262
+    .line 1387
     invoke-virtual {v4, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v3
@@ -11226,7 +11733,7 @@
     :try_start_a5
     const-string v1, "feedCardList"
 
-    .line 1268
+    .line 1393
     invoke-virtual {v4, v1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object v3
@@ -11245,12 +11752,12 @@
     :try_start_af
     const-string p0, "response has no jobList/geekList/feedCardList field"
 
-    .line 1273
+    .line 1398
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     goto :goto_10e
 
-    .line 1275
+    .line 1400
     :cond_b5
     sget-object v1, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
@@ -11258,22 +11765,22 @@
 
     move-result-object v1
 
-    .line 1276
+    .line 1401
     instance-of v3, v1, Ljava/util/List;
 
     if-eqz v3, :cond_f2
 
-    .line 1277
+    .line 1402
     check-cast v1, Ljava/util/List;
 
-    .line 1278
+    .line 1403
     invoke-interface {v1}, Ljava/util/List;->size()I
 
     move-result v0
 
     iput v0, p1, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->feedCount:I
 
-    .line 1279
+    .line 1404
     new-instance v0, Ljava/lang/StringBuilder;
 
     invoke-direct {v0, p0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -11288,7 +11795,7 @@
 
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1280
+    .line 1405
     invoke-interface {v1}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 
     move-result-object p0
@@ -11305,21 +11812,21 @@
 
     move-result-object v0
 
-    .line 1281
+    .line 1406
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->extractGeekItem(Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
 
     if-eqz v0, :cond_dc
 
-    .line 1283
+    .line 1408
     iget-object v1, p1, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->cards:Ljava/util/List;
 
     invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
 
     goto :goto_dc
 
-    .line 1287
+    .line 1412
     :cond_f2
     new-instance p0, Ljava/lang/StringBuilder;
 
@@ -11353,12 +11860,12 @@
     :goto_10e
     const-string p0, "hasMore"
 
-    .line 1290
+    .line 1415
     invoke-virtual {v4, p0}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
     move-result-object p0
 
-    .line 1291
+    .line 1416
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageResponse:Ljava/lang/Object;
 
     invoke-virtual {p0, v0}, Ljava/lang/reflect/Field;->getBoolean(Ljava/lang/Object;)Z
@@ -11367,7 +11874,7 @@
 
     iput-boolean p0, p1, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->hasMore:Z
 
-    .line 1292
+    .line 1417
     new-instance p0, Ljava/lang/StringBuilder;
 
     invoke-direct {p0}, Ljava/lang/StringBuilder;-><init>()V
@@ -11393,7 +11900,7 @@
     :catchall_133
     move-exception p0
 
-    .line 1294
+    .line 1419
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "parse page error: "
@@ -11412,7 +11919,7 @@
 
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 1295
+    .line 1420
     iput-boolean v2, p1, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;->hasMore:Z
 
     :goto_14b
@@ -11438,7 +11945,7 @@
 
     if-lez v1, :cond_2f
 
-    .line 1128
+    .line 1253
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v2, "retry attempt "
@@ -11463,7 +11970,7 @@
 
     const-wide/16 v2, 0x320
 
-    .line 1130
+    .line 1255
     :try_start_24
     invoke-static {v2, v3}, Ljava/lang/Thread;->sleep(J)V
     :try_end_27
@@ -11471,7 +11978,7 @@
 
     goto :goto_2f
 
-    .line 1132
+    .line 1257
     :catch_28
     invoke-static {}, Ljava/lang/Thread;->currentThread()Ljava/lang/Thread;
 
@@ -11479,7 +11986,7 @@
 
     invoke-virtual {v0}, Ljava/lang/Thread;->interrupt()V
 
-    .line 1135
+    .line 1260
     :cond_2f
     :goto_2f
     invoke-static {p0, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->requestPage(Ljava/lang/String;I)Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;
@@ -11490,7 +11997,7 @@
 
     return-object v0
 
-    .line 1139
+    .line 1264
     :cond_36
     sget-object v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sPageError:Ljava/lang/String;
 
@@ -11521,7 +12028,7 @@
 
     const-string v1, "_"
 
-    .line 2566
+    .line 2691
     invoke-virtual {p0, v0, v1}, Ljava/lang/String;->replaceAll(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p0
@@ -11538,7 +12045,7 @@
 
     move-result-object p0
 
-    .line 2567
+    .line 2692
     invoke-virtual {p0}, Ljava/lang/String;->length()I
 
     move-result v0
@@ -11549,7 +12056,7 @@
 
     const/4 v0, 0x0
 
-    .line 2568
+    .line 2693
     invoke-virtual {p0, v0, v1}, Ljava/lang/String;->substring(II)Ljava/lang/String;
 
     move-result-object p0
@@ -11573,7 +12080,7 @@
         }
     .end annotation
 
-    .line 442
+    .line 447
     invoke-interface/range {p1 .. p1}, Ljava/util/List;->size()I
 
     move-result v0
@@ -11587,14 +12094,14 @@
     :try_start_a
     const-string v0, "com.hpbr.bosszhipin.data.db.entry.ContactBean"
 
-    .line 452
+    .line 457
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v10
 
     const-string v0, "com.hpbr.bosszhipin.data.manager.ContactManager"
 
-    .line 453
+    .line 458
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v11
@@ -11605,7 +12112,7 @@
 
     new-array v2, v12, [Ljava/lang/Class;
 
-    .line 454
+    .line 459
     invoke-virtual {v11, v0, v2}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v0
@@ -11623,14 +12130,14 @@
     :try_start_26
     const-string v0, "message.handler.d"
 
-    .line 463
+    .line 468
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v14
 
     const-string v0, "message.handler.c"
 
-    .line 464
+    .line 469
     invoke-static {v0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v15
@@ -11648,7 +12155,7 @@
 
     move-object/from16 v9, p1
 
-    .line 472
+    .line 477
     invoke-interface {v9, v0}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object v3
@@ -11671,12 +12178,12 @@
 
     const-string v2, "\u672a\u77e5"
 
-    .line 475
+    .line 480
     invoke-static {v3, v2, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v0
 
-    .line 477
+    .line 482
     sget-object v2, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sMainHandler:Landroid/os/Handler;
 
     new-instance v4, Lcom/hpbr/bosszhipin/export2/ExportHelper$9;
@@ -11701,7 +12208,7 @@
 
     move-object v9, v15
 
-    .line 485
+    .line 490
     :try_start_67
     invoke-static/range {v2 .. v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sendOneContact(Landroid/app/Activity;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Class;Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/Class;)Z
 
@@ -11720,7 +12227,7 @@
 
     move-object v2, v0
 
-    .line 493
+    .line 498
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v3, "batch send item "
@@ -11747,7 +12254,7 @@
     :goto_8d
     const-wide/16 v2, 0x12c
 
-    .line 497
+    .line 502
     :try_start_8f
     invoke-static {v2, v3}, Ljava/lang/Thread;->sleep(J)V
     :try_end_92
@@ -11759,7 +12266,7 @@
 
     goto :goto_37
 
-    .line 499
+    .line 504
     :catch_95
     invoke-static {}, Ljava/lang/Thread;->currentThread()Ljava/lang/Thread;
 
@@ -11772,7 +12279,7 @@
 
     move/from16 v2, v17
 
-    .line 503
+    .line 508
     new-instance v3, Ljava/lang/StringBuilder;
 
     new-instance v4, Ljava/lang/StringBuilder;
@@ -11801,7 +12308,7 @@
 
     invoke-direct {v3, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    .line 507
+    .line 512
     new-instance v4, Ljava/lang/StringBuilder;
 
     const-string v5, "batch send done total="
@@ -11832,7 +12339,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 508
+    .line 513
     invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v0
@@ -11842,7 +12349,7 @@
     :catchall_ee
     move-exception v0
 
-    .line 466
+    .line 471
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "batch send handler init error: "
@@ -11861,7 +12368,7 @@
 
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 467
+    .line 472
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "\u6279\u91cf\u6c9f\u901a\u5931\u8d25: \u6d88\u606f\u901a\u9053\u5f02\u5e38 "
@@ -11883,7 +12390,7 @@
     :catchall_117
     move-exception v0
 
-    .line 456
+    .line 461
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "batch send init classes error: "
@@ -11902,7 +12409,7 @@
 
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 457
+    .line 462
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "\u6279\u91cf\u6c9f\u901a\u5931\u8d25: \u521d\u59cb\u5316\u5f02\u5e38 "
@@ -11923,7 +12430,7 @@
 .end method
 
 .method private static sendOneContact(Landroid/app/Activity;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Class;Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/Class;)Z
-    .registers 29
+    .registers 34
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "(",
@@ -11946,97 +12453,344 @@
 
     move-object/from16 v2, p2
 
-    const-string v3, "com.hpbr.bosszhipin.data.manager.r"
+    move-object/from16 v3, p3
 
-    const-string v4, "friendSource"
+    move-object/from16 v4, p4
 
-    const-string v5, "batch send ok friendId="
+    move-object/from16 v5, p5
 
-    const-string v6, "batch send returned null chatBean friendId="
+    const-string v6, "com.hpbr.bosszhipin.data.manager.r"
 
-    const-string v7, "batch send new ContactBean friendId="
+    const-string v7, "friendSource"
+
+    const-string v8, "batch send ok friendId="
+
+    const-string v9, "batch send returned null chatBean friendId="
+
+    const-string v10, "batch send fill contact from relation friendId="
+
+    const-string v11, "batch send save contact DB friendId="
+
+    const-string v12, "batch send refresh contacts V() friendId="
+
+    const-string v13, "batch send new ContactBean friendId="
 
     const-string v0, "batch send longlink connected="
 
-    const/4 v8, 0x0
+    const/4 v15, 0x0
 
-    const/4 v9, 0x0
+    :try_start_1d
+    const-string v16, "message.server.a"
 
-    :try_start_12
-    const-string v10, "message.server.a"
+    .line 520
+    invoke-static/range {v16 .. v16}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
-    .line 515
-    invoke-static {v10}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+    move-result-object v14
+    :try_end_23
+    .catchall {:try_start_1d .. :try_end_23} :catchall_66
 
-    move-result-object v10
+    move-object/from16 v16, v9
 
-    const-string v11, "b"
+    :try_start_25
+    const-string v9, "b"
+    :try_end_27
+    .catchall {:try_start_25 .. :try_end_27} :catchall_62
 
-    new-array v12, v9, [Ljava/lang/Class;
+    move-object/from16 v17, v8
 
-    invoke-virtual {v10, v11, v12}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    :try_start_29
+    new-array v8, v15, [Ljava/lang/Class;
 
-    move-result-object v10
+    invoke-virtual {v14, v9, v8}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
-    new-array v11, v9, [Ljava/lang/Object;
+    move-result-object v8
 
-    invoke-virtual {v10, v8, v11}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+    new-array v9, v15, [Ljava/lang/Object;
 
-    move-result-object v10
+    const/4 v14, 0x0
 
-    if-eqz v10, :cond_4a
+    invoke-virtual {v8, v14, v9}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
-    .line 517
-    invoke-virtual {v10}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    move-result-object v8
 
-    move-result-object v11
+    if-eqz v8, :cond_5a
 
-    const-string v12, "d"
+    .line 522
+    invoke-virtual {v8}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
-    new-array v13, v9, [Ljava/lang/Class;
+    move-result-object v9
 
-    invoke-virtual {v11, v12, v13}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    const-string v14, "d"
 
-    move-result-object v11
+    new-array v2, v15, [Ljava/lang/Class;
 
-    new-array v12, v9, [Ljava/lang/Object;
+    invoke-virtual {v9, v14, v2}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
-    invoke-virtual {v11, v10, v12}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v2
 
-    move-result-object v10
+    new-array v9, v15, [Ljava/lang/Object;
 
-    .line 518
-    new-instance v11, Ljava/lang/StringBuilder;
+    invoke-virtual {v2, v8, v9}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
-    invoke-direct {v11, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    move-result-object v2
 
-    invoke-virtual {v11, v10}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+    .line 523
+    new-instance v8, Ljava/lang/StringBuilder;
 
-    invoke-virtual {v11}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-direct {v8, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v8, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v8}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v0
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    goto :goto_66
+    goto :goto_80
 
-    :cond_4a
+    :cond_5a
     const-string v0, "batch send longlink server=null"
 
-    .line 520
+    .line 525
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
-    :try_end_4f
-    .catchall {:try_start_12 .. :try_end_4f} :catchall_50
+    :try_end_5f
+    .catchall {:try_start_29 .. :try_end_5f} :catchall_60
 
-    goto :goto_66
+    goto :goto_80
 
-    :catchall_50
+    :catchall_60
     move-exception v0
 
-    .line 523
+    goto :goto_6b
+
+    :catchall_62
+    move-exception v0
+
+    move-object/from16 v17, v8
+
+    goto :goto_6b
+
+    :catchall_66
+    move-exception v0
+
+    move-object/from16 v17, v8
+
+    move-object/from16 v16, v9
+
+    .line 528
+    :goto_6b
+    new-instance v2, Ljava/lang/StringBuilder;
+
+    const-string v8, "batch send longlink check error: "
+
+    invoke-direct {v2, v8}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    :goto_80
+    const-string v0, "bossId"
+
+    .line 530
+    invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readLongField(Ljava/lang/Object;Ljava/lang/String;)J
+
+    move-result-wide v8
+
+    const-string v0, ""
+
+    const-string v2, "jobName"
+
+    const-wide/16 v18, 0x0
+
+    cmp-long v14, v8, v18
+
+    if-gtz v14, :cond_a6
+
+    .line 532
+    new-instance v3, Ljava/lang/StringBuilder;
+
+    const-string v4, "batch send skip, bossId<=0 jobName="
+
+    invoke-direct {v3, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-static {v1, v2, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v3, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    return v15
+
+    :cond_a6
+    :try_start_a6
+    const-string v14, "0"
+
+    .line 537
+    invoke-static {v1, v7, v14}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v14
+
+    invoke-static {v14}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+
+    move-result v14
+    :try_end_b0
+    .catchall {:try_start_a6 .. :try_end_b0} :catchall_b1
+
+    goto :goto_b2
+
+    :catchall_b1
+    const/4 v14, 0x0
+
+    :goto_b2
+    const/4 v15, 0x3
+
+    move-object/from16 v21, v12
+
+    new-array v12, v15, [Ljava/lang/String;
+
+    const-string v22, "bossName"
+
+    const/16 v20, 0x0
+
+    aput-object v22, v12, v20
+
+    const-string v22, "brandName"
+
+    const/4 v15, 0x1
+
+    aput-object v22, v12, v15
+
+    const/4 v15, 0x2
+
+    aput-object v2, v12, v15
+
+    .line 540
+    invoke-static {v1, v0, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v2
+
+    .line 544
+    :try_start_c9
+    invoke-static {v6}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+
+    move-result-object v0
+
+    const-string v12, "E"
+    :try_end_cf
+    .catchall {:try_start_c9 .. :try_end_cf} :catchall_10b
+
+    move-object/from16 v24, v11
+
+    const/4 v15, 0x0
+
+    :try_start_d2
+    new-array v11, v15, [Ljava/lang/Class;
+
+    invoke-virtual {v0, v12, v11}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+
+    move-result-object v0
+
+    new-array v11, v15, [Ljava/lang/Object;
+
+    const/4 v12, 0x0
+
+    invoke-virtual {v0, v12, v11}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_102
+
+    .line 546
+    invoke-virtual {v0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    move-result-object v11
+
+    const-string v12, "get"
+    :try_end_e7
+    .catchall {:try_start_d2 .. :try_end_e7} :catchall_107
+
+    move-object/from16 v25, v10
+
+    :try_start_e9
+    new-array v10, v15, [Ljava/lang/Class;
+
+    invoke-virtual {v11, v12, v10}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+
+    move-result-object v10
+
+    new-array v11, v15, [Ljava/lang/Object;
+
+    invoke-virtual {v10, v0, v11}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    .line 547
+    instance-of v10, v0, Ljava/lang/Integer;
+
+    if-eqz v10, :cond_104
+
+    .line 548
+    check-cast v0, Ljava/lang/Integer;
+
+    invoke-virtual {v0}, Ljava/lang/Integer;->intValue()I
+
+    move-result v0
+    :try_end_ff
+    .catchall {:try_start_e9 .. :try_end_ff} :catchall_100
+
+    goto :goto_105
+
+    :catchall_100
+    move-exception v0
+
+    goto :goto_110
+
+    :cond_102
+    move-object/from16 v25, v10
+
+    :cond_104
+    const/4 v0, 0x0
+
+    :goto_105
+    move v10, v0
+
+    goto :goto_126
+
+    :catchall_107
+    move-exception v0
+
+    move-object/from16 v25, v10
+
+    goto :goto_110
+
+    :catchall_10b
+    move-exception v0
+
+    move-object/from16 v25, v10
+
+    move-object/from16 v24, v11
+
+    .line 552
+    :goto_110
     new-instance v10, Ljava/lang/StringBuilder;
 
-    const-string v11, "batch send longlink check error: "
+    const-string v11, "batch send role resolve error: "
 
     invoke-direct {v10, v11}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
@@ -12052,269 +12806,103 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    :goto_66
-    const-string v0, "bossId"
+    const/4 v10, 0x0
 
-    .line 525
-    invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readLongField(Ljava/lang/Object;Ljava/lang/String;)J
-
-    move-result-wide v10
-
-    const-string v0, ""
-
-    const-string v12, "jobName"
-
-    const-wide/16 v13, 0x0
-
-    cmp-long v15, v10, v13
-
-    if-gtz v15, :cond_8c
-
-    .line 527
-    new-instance v2, Ljava/lang/StringBuilder;
-
-    const-string v3, "batch send skip, bossId<=0 jobName="
-
-    invoke-direct {v2, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-
-    invoke-static {v1, v12, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    .line 556
+    :goto_126
+    :try_start_126
+    invoke-static {v6}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v0
 
-    invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    const-string v6, "A"
 
-    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    const/4 v11, 0x0
 
-    move-result-object v0
+    new-array v12, v11, [Ljava/lang/Class;
 
-    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
-
-    return v9
-
-    :cond_8c
-    :try_start_8c
-    const-string v15, "0"
-
-    .line 532
-    invoke-static {v1, v4, v15}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldSafe(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object v15
-
-    invoke-static {v15}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-
-    move-result v15
-    :try_end_96
-    .catchall {:try_start_8c .. :try_end_96} :catchall_97
-
-    goto :goto_98
-
-    :catchall_97
-    const/4 v15, 0x0
-
-    :goto_98
-    const/4 v13, 0x3
-
-    new-array v14, v13, [Ljava/lang/String;
-
-    const-string v16, "bossName"
-
-    aput-object v16, v14, v9
-
-    const-string v16, "brandName"
-
-    const/4 v13, 0x1
-
-    aput-object v16, v14, v13
-
-    const/16 v16, 0x2
-
-    aput-object v12, v14, v16
-
-    .line 535
-    invoke-static {v1, v0, v14}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->readFieldAny(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object v1
-
-    .line 539
-    :try_start_ac
-    invoke-static {v3}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+    invoke-virtual {v0, v6, v12}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v0
 
-    const-string v12, "E"
+    new-array v6, v11, [Ljava/lang/Object;
 
-    new-array v14, v9, [Ljava/lang/Class;
+    const/4 v11, 0x0
 
-    invoke-virtual {v0, v12, v14}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
-
-    move-result-object v0
-
-    new-array v12, v9, [Ljava/lang/Object;
-
-    invoke-virtual {v0, v8, v12}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+    invoke-virtual {v0, v11, v6}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
 
-    if-eqz v0, :cond_dd
+    .line 557
+    instance-of v6, v0, Ljava/lang/Long;
 
-    .line 541
-    invoke-virtual {v0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+    if-eqz v6, :cond_145
 
-    move-result-object v12
-
-    const-string v14, "get"
-
-    new-array v13, v9, [Ljava/lang/Class;
-
-    invoke-virtual {v12, v14, v13}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
-
-    move-result-object v12
-
-    new-array v13, v9, [Ljava/lang/Object;
-
-    invoke-virtual {v12, v0, v13}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
-
-    move-result-object v0
-
-    .line 542
-    instance-of v12, v0, Ljava/lang/Integer;
-
-    if-eqz v12, :cond_dd
-
-    .line 543
-    check-cast v0, Ljava/lang/Integer;
-
-    invoke-virtual {v0}, Ljava/lang/Integer;->intValue()I
-
-    move-result v0
-    :try_end_dc
-    .catchall {:try_start_ac .. :try_end_dc} :catchall_e0
-
-    goto :goto_de
-
-    :cond_dd
-    const/4 v0, 0x0
-
-    :goto_de
-    move v12, v0
-
-    goto :goto_f7
-
-    :catchall_e0
-    move-exception v0
-
-    .line 547
-    new-instance v12, Ljava/lang/StringBuilder;
-
-    const-string v13, "batch send role resolve error: "
-
-    invoke-direct {v12, v13}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-
-    invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
-
-    move-result-object v0
-
-    invoke-virtual {v12, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v12}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v0
-
-    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
-
-    const/4 v12, 0x0
-
-    .line 551
-    :goto_f7
-    :try_start_f7
-    invoke-static {v3}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
-
-    move-result-object v0
-
-    const-string v3, "A"
-
-    new-array v13, v9, [Ljava/lang/Class;
-
-    invoke-virtual {v0, v3, v13}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
-
-    move-result-object v0
-
-    new-array v3, v9, [Ljava/lang/Object;
-
-    invoke-virtual {v0, v8, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
-
-    move-result-object v0
-
-    .line 552
-    instance-of v3, v0, Ljava/lang/Long;
-
-    if-eqz v3, :cond_114
-
-    .line 553
+    .line 558
     check-cast v0, Ljava/lang/Long;
 
     invoke-virtual {v0}, Ljava/lang/Long;->longValue()J
 
-    move-result-wide v13
+    move-result-wide v11
 
-    goto :goto_137
+    goto :goto_168
 
-    :cond_114
-    if-eqz v0, :cond_135
+    :cond_145
+    if-eqz v0, :cond_166
 
-    .line 555
+    .line 560
     invoke-virtual {v0}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
     move-result-object v0
 
     invoke-static {v0}, Ljava/lang/Long;->parseLong(Ljava/lang/String;)J
 
-    move-result-wide v13
-    :try_end_11e
-    .catchall {:try_start_f7 .. :try_end_11e} :catchall_11f
+    move-result-wide v11
+    :try_end_14f
+    .catchall {:try_start_126 .. :try_end_14f} :catchall_150
 
-    goto :goto_137
+    goto :goto_168
 
-    :catchall_11f
+    :catchall_150
     move-exception v0
 
-    .line 558
-    new-instance v3, Ljava/lang/StringBuilder;
+    .line 563
+    new-instance v6, Ljava/lang/StringBuilder;
 
-    const-string v13, "batch send myId resolve error: "
+    const-string v11, "batch send myId resolve error: "
 
-    invoke-direct {v3, v13}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    invoke-direct {v6, v11}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
     invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
 
     move-result-object v0
 
-    invoke-virtual {v3, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v6, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-virtual {v6}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v0
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    :cond_135
-    const-wide/16 v13, 0x0
+    :cond_166
+    move-wide/from16 v11, v18
 
-    .line 560
-    :goto_137
+    .line 565
+    :goto_168
     new-instance v0, Ljava/lang/StringBuilder;
 
-    const-string v3, "batch send role="
+    const-string v6, "batch send role="
 
-    invoke-direct {v0, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    invoke-direct {v0, v6}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    invoke-virtual {v0, v12}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+    invoke-virtual {v0, v10}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 
-    const-string v3, " myId="
+    const-string v6, " myId="
 
-    invoke-virtual {v0, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v0, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v0, v13, v14}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    invoke-virtual {v0, v11, v12}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
 
     invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
@@ -12322,90 +12910,146 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    :try_start_150
+    .line 567
+    invoke-static {v1, v8, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->createFriendAndWait(Ljava/lang/Object;J)Ljava/lang/Object;
+
+    move-result-object v1
+
+    if-nez v1, :cond_19a
+
+    .line 569
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    const-string v1, "batch send create friend failed/skip friendId="
+
+    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    :goto_198
+    const/4 v1, 0x0
+
+    return v1
+
+    .line 572
+    :cond_19a
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    const-string v15, "batch send create friend ok friendId="
+
+    invoke-direct {v0, v15}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    :try_start_1ab
     const-string v0, "U"
+    :try_end_1ad
+    .catchall {:try_start_1ab .. :try_end_1ad} :catchall_1ea
 
-    const/4 v8, 0x3
+    move-object/from16 p1, v1
 
-    new-array v9, v8, [Ljava/lang/Class;
+    const/4 v15, 0x3
 
-    .line 564
-    sget-object v8, Ljava/lang/Long;->TYPE:Ljava/lang/Class;
+    :try_start_1b0
+    new-array v1, v15, [Ljava/lang/Class;
 
-    const/16 v18, 0x0
+    .line 576
+    sget-object v15, Ljava/lang/Long;->TYPE:Ljava/lang/Class;
 
-    aput-object v8, v9, v18
+    const/16 v20, 0x0
 
-    sget-object v8, Ljava/lang/Integer;->TYPE:Ljava/lang/Class;
+    aput-object v15, v1, v20
 
-    const/16 v17, 0x1
+    sget-object v15, Ljava/lang/Integer;->TYPE:Ljava/lang/Class;
 
-    aput-object v8, v9, v17
+    const/16 v22, 0x1
 
-    sget-object v8, Ljava/lang/Integer;->TYPE:Ljava/lang/Class;
+    aput-object v15, v1, v22
 
-    aput-object v8, v9, v16
+    sget-object v15, Ljava/lang/Integer;->TYPE:Ljava/lang/Class;
 
-    move-object/from16 v8, p4
+    const/16 v23, 0x2
 
-    invoke-virtual {v8, v0, v9}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    aput-object v15, v1, v23
 
-    move-result-object v0
-
-    const/4 v8, 0x3
-
-    new-array v9, v8, [Ljava/lang/Object;
-
-    .line 565
-    invoke-static {v10, v11}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
-
-    move-result-object v8
-
-    const/16 v18, 0x0
-
-    aput-object v8, v9, v18
-
-    invoke-static {v12}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
-
-    move-result-object v8
-
-    const/16 v17, 0x1
-
-    aput-object v8, v9, v17
-
-    invoke-static {v15}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
-
-    move-result-object v8
-
-    aput-object v8, v9, v16
-
-    move-object/from16 v8, p5
-
-    invoke-virtual {v0, v8, v9}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+    invoke-virtual {v4, v0, v1}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v0
-    :try_end_18a
-    .catchall {:try_start_150 .. :try_end_18a} :catchall_18b
 
-    goto :goto_1a2
+    const/4 v1, 0x3
 
-    :catchall_18b
+    new-array v15, v1, [Ljava/lang/Object;
+
+    .line 577
+    invoke-static {v8, v9}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+
+    move-result-object v1
+
+    const/16 v20, 0x0
+
+    aput-object v1, v15, v20
+
+    invoke-static {v10}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+
+    move-result-object v1
+
+    const/16 v22, 0x1
+
+    aput-object v1, v15, v22
+
+    invoke-static {v14}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+
+    move-result-object v1
+
+    const/16 v23, 0x2
+
+    aput-object v1, v15, v23
+
+    invoke-virtual {v0, v5, v15}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+    :try_end_1e7
+    .catchall {:try_start_1b0 .. :try_end_1e7} :catchall_1e8
+
+    goto :goto_203
+
+    :catchall_1e8
     move-exception v0
 
-    .line 567
-    new-instance v8, Ljava/lang/StringBuilder;
+    goto :goto_1ed
 
-    const-string v9, "batch send ContactManager.U error: "
+    :catchall_1ea
+    move-exception v0
 
-    invoke-direct {v8, v9}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    move-object/from16 p1, v1
+
+    .line 579
+    :goto_1ed
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    const-string v15, "batch send ContactManager.U error: "
+
+    invoke-direct {v1, v15}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
     invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
 
     move-result-object v0
 
-    invoke-virtual {v8, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v8}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v0
 
@@ -12413,79 +13057,75 @@
 
     const/4 v0, 0x0
 
-    :goto_1a2
-    const-string v8, " myRole="
+    :goto_203
+    const-string v1, " myRole="
 
-    const-string v9, " name="
+    const-string v15, " name="
 
-    move-object/from16 v19, v6
+    const-string v5, "myRole"
 
-    const-string v6, "myRole"
+    const-string v4, "myId"
 
-    move-object/from16 v20, v5
+    if-nez v0, :cond_25e
 
-    const-string v5, "myId"
-
-    if-nez v0, :cond_201
-
-    .line 571
-    :try_start_1b0
+    .line 583
+    :try_start_20d
     invoke-virtual/range {p3 .. p3}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
 
     move-result-object v0
 
-    const-string v2, "friendId"
+    const-string v3, "friendId"
 
-    .line 572
-    invoke-static {v0, v2, v10, v11}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setLongField(Ljava/lang/Object;Ljava/lang/String;J)V
+    .line 584
+    invoke-static {v0, v3, v8, v9}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setLongField(Ljava/lang/Object;Ljava/lang/String;J)V
 
-    .line 573
-    invoke-static {v0, v4, v15}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
+    .line 585
+    invoke-static {v0, v7, v14}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
 
-    const-string v2, "friendName"
+    const-string v3, "friendName"
 
-    .line 574
-    invoke-static {v0, v2, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+    .line 586
+    invoke-static {v0, v3, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
 
-    .line 575
-    invoke-static {v0, v5, v13, v14}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setLongField(Ljava/lang/Object;Ljava/lang/String;J)V
+    .line 587
+    invoke-static {v0, v4, v11, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setLongField(Ljava/lang/Object;Ljava/lang/String;J)V
 
-    .line 576
-    invoke-static {v0, v6, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
+    .line 588
+    invoke-static {v0, v5, v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
 
-    .line 577
-    new-instance v2, Ljava/lang/StringBuilder;
+    .line 589
+    new-instance v3, Ljava/lang/StringBuilder;
 
-    invoke-direct {v2, v7}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    invoke-direct {v3, v13}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    invoke-virtual {v2, v10, v11}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v15}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v13, v14}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v11, v12}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v12}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v10}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v1
 
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
-    :try_end_1e8
-    .catchall {:try_start_1b0 .. :try_end_1e8} :catchall_1e9
+    :try_end_245
+    .catchall {:try_start_20d .. :try_end_245} :catchall_246
 
-    goto :goto_22a
+    goto :goto_287
 
-    :catchall_1e9
+    :catchall_246
     move-exception v0
 
-    .line 580
+    .line 592
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "batch send new ContactBean error: "
@@ -12504,88 +13144,384 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    :goto_1ff
-    const/4 v1, 0x0
+    goto/16 :goto_198
 
-    return v1
+    .line 596
+    :cond_25e
+    invoke-static {v0, v4, v11, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setLongField(Ljava/lang/Object;Ljava/lang/String;J)V
 
-    .line 584
-    :cond_201
-    invoke-static {v0, v5, v13, v14}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setLongField(Ljava/lang/Object;Ljava/lang/String;J)V
+    .line 597
+    invoke-static {v0, v5, v10}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
 
-    .line 585
-    invoke-static {v0, v6, v12}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
-
-    .line 586
-    new-instance v2, Ljava/lang/StringBuilder;
+    .line 598
+    new-instance v3, Ljava/lang/StringBuilder;
 
     const-string v4, "batch send reuse ContactBean friendId="
 
-    invoke-direct {v2, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    invoke-direct {v3, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    invoke-virtual {v2, v10, v11}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v15}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v13, v14}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v11, v12}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2, v12}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v10}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v1
 
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    :goto_22a
-    :try_start_22a
-    const-string v1, "a"
+    :goto_287
+    move-object v1, v0
 
-    const/4 v2, 0x1
+    :try_start_288
+    const-string v0, "fromServerGeekAddFriendBean"
+
+    const/4 v2, 0x3
 
     new-array v3, v2, [Ljava/lang/Class;
 
+    const-string v2, "net.bosszhipin.api.bean.ServerAddFriendBean"
+
+    .line 604
+    invoke-static {v2}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
+
+    move-result-object v2
+
     const/4 v4, 0x0
 
-    aput-object p3, v3, v4
+    aput-object v2, v3, v4
 
-    move-object/from16 v5, p6
+    sget-object v2, Ljava/lang/Long;->TYPE:Ljava/lang/Class;
 
-    .line 591
-    invoke-virtual {v5, v1, v3}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+    const/4 v4, 0x1
 
-    move-result-object v1
+    aput-object v2, v3, v4
 
-    new-array v3, v2, [Ljava/lang/Object;
+    sget-object v2, Ljava/lang/Integer;->TYPE:Ljava/lang/Class;
 
-    aput-object v0, v3, v4
+    const/4 v4, 0x2
 
-    const/4 v2, 0x0
+    aput-object v2, v3, v4
+    :try_end_2a0
+    .catchall {:try_start_288 .. :try_end_2a0} :catchall_2d2
 
-    .line 592
-    invoke-virtual {v1, v2, v3}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+    move-object/from16 v2, p3
+
+    .line 603
+    :try_start_2a2
+    invoke-virtual {v2, v0, v3}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v0
 
-    if-nez v0, :cond_244
+    const/4 v3, 0x3
 
-    return v4
+    new-array v4, v3, [Ljava/lang/Object;
 
-    .line 596
-    :cond_244
+    const/4 v3, 0x0
+
+    aput-object p1, v4, v3
+
+    .line 605
+    invoke-static {v11, v12}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+
+    move-result-object v3
+
+    const/4 v5, 0x1
+
+    aput-object v3, v4, v5
+
+    invoke-static {v10}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+
+    move-result-object v3
+
+    const/4 v5, 0x2
+
+    aput-object v3, v4, v5
+
+    invoke-virtual {v0, v1, v4}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v1
+
+    .line 606
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    move-object/from16 v3, v25
+
+    invoke-direct {v0, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+    :try_end_2cf
+    .catchall {:try_start_2a2 .. :try_end_2cf} :catchall_2d0
+
+    goto :goto_2ea
+
+    :catchall_2d0
+    move-exception v0
+
+    goto :goto_2d5
+
+    :catchall_2d2
+    move-exception v0
+
+    move-object/from16 v2, p3
+
+    .line 608
+    :goto_2d5
+    new-instance v3, Ljava/lang/StringBuilder;
+
+    const-string v4, "batch send fromServerGeekAddFriendBean error: "
+
+    invoke-direct {v3, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v3, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    :goto_2ea
+    :try_start_2ea
+    const-string v0, "isNeedComplete"
+    :try_end_2ec
+    .catchall {:try_start_2ea .. :try_end_2ec} :catchall_2f1
+
+    const/4 v3, 0x0
+
+    .line 611
+    :try_start_2ed
+    invoke-static {v1, v0, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->setBooleanField(Ljava/lang/Object;Ljava/lang/String;Z)V
+    :try_end_2f0
+    .catchall {:try_start_2ed .. :try_end_2f0} :catchall_2f2
+
+    goto :goto_2f2
+
+    :catchall_2f1
+    const/4 v3, 0x0
+
+    :catchall_2f2
+    :goto_2f2
+    :try_start_2f2
+    const-string v0, "G"
+
+    const/4 v4, 0x2
+
+    new-array v5, v4, [Ljava/lang/Class;
+
+    aput-object v2, v5, v3
+
+    .line 615
+    sget-object v6, Ljava/lang/Integer;->TYPE:Ljava/lang/Class;
+
+    const/4 v7, 0x1
+
+    aput-object v6, v5, v7
+    :try_end_2fe
+    .catchall {:try_start_2f2 .. :try_end_2fe} :catchall_329
+
+    move-object/from16 v6, p4
+
+    :try_start_300
+    invoke-virtual {v6, v0, v5}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+
+    move-result-object v0
+
+    new-array v5, v4, [Ljava/lang/Object;
+
+    aput-object v1, v5, v3
+
+    invoke-static {v10}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+
+    move-result-object v3
+
+    aput-object v3, v5, v7
+    :try_end_30e
+    .catchall {:try_start_300 .. :try_end_30e} :catchall_327
+
+    move-object/from16 v3, p5
+
+    :try_start_310
+    invoke-virtual {v0, v3, v5}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    .line 616
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    move-object/from16 v4, v24
+
+    invoke-direct {v0, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+    :try_end_324
+    .catchall {:try_start_310 .. :try_end_324} :catchall_325
+
+    goto :goto_343
+
+    :catchall_325
+    move-exception v0
+
+    goto :goto_32e
+
+    :catchall_327
+    move-exception v0
+
+    goto :goto_32c
+
+    :catchall_329
+    move-exception v0
+
+    move-object/from16 v6, p4
+
+    :goto_32c
+    move-object/from16 v3, p5
+
+    .line 618
+    :goto_32e
+    new-instance v4, Ljava/lang/StringBuilder;
+
+    const-string v5, "batch send ContactManager.G error: "
+
+    invoke-direct {v4, v5}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v4}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    :goto_343
+    :try_start_343
+    const-string v0, "V"
+
+    const/4 v4, 0x0
+
+    new-array v5, v4, [Ljava/lang/Class;
+
+    .line 621
+    invoke-virtual {v6, v0, v5}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+
+    move-result-object v0
+
+    new-array v5, v4, [Ljava/lang/Object;
+
+    invoke-virtual {v0, v3, v5}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    .line 622
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    move-object/from16 v3, v21
+
+    invoke-direct {v0, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+    :try_end_362
+    .catchall {:try_start_343 .. :try_end_362} :catchall_363
+
+    goto :goto_379
+
+    :catchall_363
+    move-exception v0
+
+    .line 624
+    new-instance v3, Ljava/lang/StringBuilder;
+
+    const-string v4, "batch send refresh V() error: "
+
+    invoke-direct {v3, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v3, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    :goto_379
+    :try_start_379
+    const-string v0, "a"
+
+    const/4 v3, 0x1
+
+    new-array v4, v3, [Ljava/lang/Class;
+
+    const/4 v5, 0x0
+
+    aput-object v2, v4, v5
+
+    move-object/from16 v2, p6
+
+    .line 628
+    invoke-virtual {v2, v0, v4}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+
+    move-result-object v0
+
+    new-array v2, v3, [Ljava/lang/Object;
+
+    aput-object v1, v2, v5
+
+    const/4 v1, 0x0
+
+    .line 629
+    invoke-virtual {v0, v1, v2}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+
+    move-result-object v0
+
+    if-nez v0, :cond_393
+
+    return v5
+
+    .line 633
+    :cond_393
     invoke-virtual/range {p7 .. p7}, Ljava/lang/Class;->newInstance()Ljava/lang/Object;
 
     move-result-object v1
 
     const-string v2, "com.hpbr.bosszhipin.export2.ExportChatCallback"
 
-    .line 597
+    .line 634
     invoke-static {v2}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v2
@@ -12600,7 +13536,7 @@
 
     new-array v5, v4, [Ljava/lang/Class;
 
-    .line 598
+    .line 635
     invoke-virtual {v0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v6
@@ -12617,11 +13553,13 @@
 
     sget-object v6, Ljava/lang/Integer;->TYPE:Ljava/lang/Class;
 
-    aput-object v6, v5, v16
+    const/4 v7, 0x2
+
+    aput-object v6, v5, v7
 
     const-string v6, "com.hpbr.bosszhipin.module.contacts.service.ChatSendCallback"
 
-    .line 599
+    .line 636
     invoke-static {v6}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
 
     move-result-object v6
@@ -12638,13 +13576,13 @@
 
     sget-object v6, Ljava/lang/Long;->TYPE:Ljava/lang/Class;
 
-    const/4 v8, 0x5
+    const/4 v10, 0x5
 
-    aput-object v6, v5, v8
+    aput-object v6, v5, v10
 
     move-object/from16 v6, p7
 
-    .line 598
+    .line 635
     invoke-virtual {v6, v3, v5}, Ljava/lang/Class;->getMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
 
     move-result-object v3
@@ -12657,20 +13595,22 @@
 
     move-object/from16 v6, p2
 
-    const/4 v9, 0x1
+    const/4 v11, 0x1
 
-    aput-object v6, v4, v9
+    aput-object v6, v4, v11
 
-    .line 600
-    invoke-static {v9}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+    .line 637
+    invoke-static {v11}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
 
     move-result-object v0
 
-    aput-object v0, v4, v16
+    const/4 v11, 0x2
 
-    const/4 v9, 0x3
+    aput-object v0, v4, v11
 
-    aput-object v2, v4, v9
+    const/4 v11, 0x3
+
+    aput-object v2, v4, v11
 
     invoke-static {v5}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
 
@@ -12678,28 +13618,26 @@
 
     aput-object v0, v4, v7
 
-    const-wide/16 v12, 0x0
-
-    invoke-static {v12, v13}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+    invoke-static/range {v18 .. v19}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
 
     move-result-object v0
 
-    aput-object v0, v4, v8
+    aput-object v0, v4, v10
 
     invoke-virtual {v3, v1, v4}, Ljava/lang/reflect/Method;->invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 
     move-result-object v0
 
-    if-eqz v0, :cond_2c2
+    if-eqz v0, :cond_411
 
-    .line 602
+    .line 639
     new-instance v0, Ljava/lang/StringBuilder;
 
-    move-object/from16 v1, v20
+    move-object/from16 v1, v17
 
     invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    invoke-virtual {v0, v10, v11}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    invoke-virtual {v0, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
 
     const-string v1, " msg="
 
@@ -12717,32 +13655,32 @@
 
     return v1
 
-    .line 605
-    :cond_2c2
+    .line 642
+    :cond_411
     new-instance v0, Ljava/lang/StringBuilder;
 
-    move-object/from16 v1, v19
+    move-object/from16 v1, v16
 
     invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    invoke-virtual {v0, v10, v11}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    invoke-virtual {v0, v8, v9}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
 
     invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v0
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
-    :try_end_2d3
-    .catchall {:try_start_22a .. :try_end_2d3} :catchall_2d5
+    :try_end_422
+    .catchall {:try_start_379 .. :try_end_422} :catchall_424
 
     const/4 v1, 0x0
 
     return v1
 
-    :catchall_2d5
+    :catchall_424
     move-exception v0
 
-    .line 608
+    .line 645
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "batch send invoke error: "
@@ -12757,13 +13695,13 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    goto/16 :goto_1ff
+    goto/16 :goto_198
 .end method
 
-.method private static setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
+.method private static setBooleanField(Ljava/lang/Object;Ljava/lang/String;Z)V
     .registers 4
 
-    .line 640
+    .line 731
     :try_start_0
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -12773,7 +13711,63 @@
 
     move-result-object v0
 
-    .line 641
+    .line 732
+    invoke-static {p2}, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+
+    move-result-object p2
+
+    invoke-virtual {v0, p0, p2}, Ljava/lang/reflect/Field;->set(Ljava/lang/Object;Ljava/lang/Object;)V
+    :try_end_f
+    .catchall {:try_start_0 .. :try_end_f} :catchall_10
+
+    goto :goto_2e
+
+    :catchall_10
+    move-exception p0
+
+    .line 734
+    new-instance p2, Ljava/lang/StringBuilder;
+
+    const-string v0, "setBooleanField "
+
+    invoke-direct {p2, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    const-string p1, " error: "
+
+    invoke-virtual {p2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {p0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-virtual {p2, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {p2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+
+    :goto_2e
+    return-void
+.end method
+
+.method private static setIntField(Ljava/lang/Object;Ljava/lang/String;I)V
+    .registers 4
+
+    .line 765
+    :try_start_0
+    invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    move-result-object v0
+
+    invoke-virtual {v0, p1}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
+
+    move-result-object v0
+
+    .line 766
     invoke-static {p2}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
 
     move-result-object p2
@@ -12787,7 +13781,7 @@
     :catchall_10
     move-exception p0
 
-    .line 643
+    .line 768
     new-instance p2, Ljava/lang/StringBuilder;
 
     const-string v0, "setIntField "
@@ -12819,7 +13813,7 @@
 .method private static setLongField(Ljava/lang/Object;Ljava/lang/String;J)V
     .registers 5
 
-    .line 631
+    .line 756
     :try_start_0
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -12829,7 +13823,7 @@
 
     move-result-object v0
 
-    .line 632
+    .line 757
     invoke-static {p2, p3}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
 
     move-result-object p2
@@ -12843,7 +13837,7 @@
     :catchall_10
     move-exception p0
 
-    .line 634
+    .line 759
     new-instance p2, Ljava/lang/StringBuilder;
 
     const-string p3, "setLongField "
@@ -12875,7 +13869,7 @@
 .method private static setStringField(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
     .registers 4
 
-    .line 649
+    .line 774
     :try_start_0
     invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
@@ -12885,7 +13879,7 @@
 
     move-result-object v0
 
-    .line 650
+    .line 775
     invoke-virtual {v0, p0, p2}, Ljava/lang/reflect/Field;->set(Ljava/lang/Object;Ljava/lang/Object;)V
     :try_end_b
     .catchall {:try_start_0 .. :try_end_b} :catchall_c
@@ -12895,7 +13889,7 @@
     :catchall_c
     move-exception p0
 
-    .line 652
+    .line 777
     new-instance p2, Ljava/lang/StringBuilder;
 
     const-string v0, "setStringField "
@@ -12929,7 +13923,7 @@
 
     const-string v0, "screen conditions sceneId="
 
-    .line 835
+    .line 960
     :try_start_2
     invoke-virtual {p0}, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
 
@@ -12942,7 +13936,7 @@
     :cond_9
     const-string v1, "key_scene_id"
 
-    .line 839
+    .line 964
     invoke-virtual {p0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v1
@@ -12955,7 +13949,7 @@
 
     const-string v1, "key_source_text"
 
-    .line 840
+    .line 965
     invoke-virtual {p0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v1
@@ -12968,7 +13962,7 @@
 
     const-string v1, "key_top_content_id"
 
-    .line 841
+    .line 966
     invoke-virtual {p0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v1
@@ -12981,7 +13975,7 @@
 
     const-string v1, "key_extend_params"
 
-    .line 842
+    .line 967
     invoke-virtual {p0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p0
@@ -12992,7 +13986,7 @@
 
     sput-object p0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sExtendParams:Ljava/lang/String;
 
-    .line 843
+    .line 968
     new-instance p0, Ljava/lang/StringBuilder;
 
     invoke-direct {p0, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -13038,7 +14032,7 @@
     :catchall_69
     move-exception p0
 
-    .line 846
+    .line 971
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "setupScreenConditions error: "
@@ -13066,7 +14060,7 @@
 
     if-eqz p0, :cond_a1
 
-    .line 327
+    .line 332
     invoke-virtual {p0}, Landroid/app/Activity;->isFinishing()Z
 
     move-result v0
@@ -13081,7 +14075,7 @@
 
     goto/16 :goto_a1
 
-    .line 332
+    .line 337
     :cond_10
     :try_start_10
     new-instance v0, Landroid/widget/EditText;
@@ -13090,12 +14084,12 @@
 
     const/4 v1, 0x2
 
-    .line 333
+    .line 338
     invoke-virtual {v0, v1}, Landroid/widget/EditText;->setInputType(I)V
 
     const/16 v1, 0xf
 
-    .line 334
+    .line 339
     invoke-static {v1}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
 
     move-result-object v1
@@ -13104,17 +14098,17 @@
 
     const/4 v1, 0x1
 
-    .line 335
+    .line 340
     invoke-virtual {v0, v1}, Landroid/widget/EditText;->setSelectAllOnFocus(Z)V
 
     const/16 v1, 0x11
 
-    .line 336
+    .line 341
     invoke-virtual {v0, v1}, Landroid/widget/EditText;->setGravity(I)V
 
     const/high16 v1, 0x41c00000    # 24.0f
 
-    .line 337
+    .line 342
     invoke-static {p0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v2
@@ -13135,26 +14129,26 @@
 
     invoke-virtual {v0, v2, v4, v1, v3}, Landroid/widget/EditText;->setPadding(IIII)V
 
-    .line 339
+    .line 344
     new-instance v1, Landroid/app/AlertDialog$Builder;
 
     invoke-direct {v1, p0}, Landroid/app/AlertDialog$Builder;-><init>(Landroid/content/Context;)V
 
     const-string v2, "\u6279\u91cf\u6c9f\u901a\u6570\u91cf"
 
-    .line 340
+    .line 345
     invoke-virtual {v1, v2}, Landroid/app/AlertDialog$Builder;->setTitle(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v1
 
     const-string v2, "\u8bf7\u8f93\u5165\u8981\u6c9f\u901a\u7684\u804c\u4f4d\u6570\u91cf (\u9ed8\u8ba4 15\u6761, \u6700\u591a 75\u6761):"
 
-    .line 341
+    .line 346
     invoke-virtual {v1, v2}, Landroid/app/AlertDialog$Builder;->setMessage(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v1
 
-    .line 342
+    .line 347
     invoke-virtual {v1, v0}, Landroid/app/AlertDialog$Builder;->setView(Landroid/view/View;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v1
@@ -13165,7 +14159,7 @@
 
     invoke-direct {v3, v0, p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper$6;-><init>(Landroid/widget/EditText;Landroid/app/Activity;)V
 
-    .line 343
+    .line 348
     invoke-virtual {v1, v2, v3}, Landroid/app/AlertDialog$Builder;->setPositiveButton(Ljava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v0
@@ -13174,22 +14168,22 @@
 
     const/4 v2, 0x0
 
-    .line 361
+    .line 366
     invoke-virtual {v0, v1, v2}, Landroid/app/AlertDialog$Builder;->setNegativeButton(Ljava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v0
 
-    .line 362
+    .line 367
     invoke-virtual {v0}, Landroid/app/AlertDialog$Builder;->create()Landroid/app/AlertDialog;
 
     move-result-object v0
 
     const/4 v1, 0x0
 
-    .line 363
+    .line 368
     invoke-virtual {v0, v1}, Landroid/app/AlertDialog;->setCanceledOnTouchOutside(Z)V
 
-    .line 364
+    .line 369
     invoke-virtual {v0}, Landroid/app/AlertDialog;->show()V
     :try_end_74
     .catchall {:try_start_10 .. :try_end_74} :catchall_75
@@ -13199,7 +14193,7 @@
     :catchall_75
     move-exception v0
 
-    .line 366
+    .line 371
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "showBatchDialog error: "
@@ -13218,7 +14212,7 @@
 
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 367
+    .line 372
     new-instance v1, Ljava/lang/StringBuilder;
 
     const-string v2, "\u6279\u91cf\u6c9f\u901a\u542f\u52a8\u5f02\u5e38: "
@@ -13244,7 +14238,7 @@
     :goto_a1
     const-string p0, "showBatchDialog skip, activity not usable"
 
-    .line 328
+    .line 333
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
@@ -13255,7 +14249,7 @@
 
     if-eqz p0, :cond_9b
 
-    .line 372
+    .line 377
     invoke-virtual {p0}, Landroid/app/Activity;->isFinishing()Z
 
     move-result v0
@@ -13270,7 +14264,7 @@
 
     goto/16 :goto_9b
 
-    .line 377
+    .line 382
     :cond_10
     :try_start_10
     new-instance v0, Landroid/widget/EditText;
@@ -13279,17 +14273,17 @@
 
     const v1, 0x20001
 
-    .line 378
+    .line 383
     invoke-virtual {v0, v1}, Landroid/widget/EditText;->setInputType(I)V
 
     const v1, 0x800033
 
-    .line 379
+    .line 384
     invoke-virtual {v0, v1}, Landroid/widget/EditText;->setGravity(I)V
 
     const/high16 v1, 0x41800000    # 16.0f
 
-    .line 380
+    .line 385
     invoke-static {p0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v2
@@ -13312,29 +14306,29 @@
 
     const/4 v1, 0x5
 
-    .line 381
+    .line 386
     invoke-virtual {v0, v1}, Landroid/widget/EditText;->setLines(I)V
 
-    .line 383
+    .line 388
     new-instance v1, Landroid/app/AlertDialog$Builder;
 
     invoke-direct {v1, p0}, Landroid/app/AlertDialog$Builder;-><init>(Landroid/content/Context;)V
 
     const-string v2, "\u6d88\u606f\u5185\u5bb9"
 
-    .line 384
+    .line 389
     invoke-virtual {v1, v2}, Landroid/app/AlertDialog$Builder;->setTitle(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v1
 
     const-string v2, "\u8bf7\u8f93\u5165\u8981\u53d1\u9001\u7684\u6d88\u606f (500\u5b57\u4ee5\u5185):"
 
-    .line 385
+    .line 390
     invoke-virtual {v1, v2}, Landroid/app/AlertDialog$Builder;->setMessage(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v1
 
-    .line 386
+    .line 391
     invoke-virtual {v1, v0}, Landroid/app/AlertDialog$Builder;->setView(Landroid/view/View;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v1
@@ -13345,7 +14339,7 @@
 
     invoke-direct {v3, v0, p0, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper$7;-><init>(Landroid/widget/EditText;Landroid/app/Activity;I)V
 
-    .line 387
+    .line 392
     invoke-virtual {v1, v2, v3}, Landroid/app/AlertDialog$Builder;->setPositiveButton(Ljava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object p1
@@ -13354,22 +14348,22 @@
 
     const/4 v1, 0x0
 
-    .line 402
+    .line 407
     invoke-virtual {p1, v0, v1}, Landroid/app/AlertDialog$Builder;->setNegativeButton(Ljava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object p1
 
-    .line 403
+    .line 408
     invoke-virtual {p1}, Landroid/app/AlertDialog$Builder;->create()Landroid/app/AlertDialog;
 
     move-result-object p1
 
     const/4 v0, 0x0
 
-    .line 404
+    .line 409
     invoke-virtual {p1, v0}, Landroid/app/AlertDialog;->setCanceledOnTouchOutside(Z)V
 
-    .line 405
+    .line 410
     invoke-virtual {p1}, Landroid/app/AlertDialog;->show()V
     :try_end_6e
     .catchall {:try_start_10 .. :try_end_6e} :catchall_6f
@@ -13379,7 +14373,7 @@
     :catchall_6f
     move-exception p1
 
-    .line 407
+    .line 412
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "showBatchMsgDialog error: "
@@ -13398,7 +14392,7 @@
 
     invoke-static {v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 408
+    .line 413
     new-instance v0, Ljava/lang/StringBuilder;
 
     const-string v1, "\u6d88\u606f\u5bf9\u8bdd\u6846\u5f02\u5e38: "
@@ -13424,7 +14418,7 @@
     :goto_9b
     const-string p0, "showBatchMsgDialog skip, activity not usable"
 
-    .line 373
+    .line 378
     invoke-static {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
     return-void
@@ -13437,7 +14431,7 @@
 
     const/4 v1, 0x0
 
-    .line 279
+    .line 284
     :try_start_3
     new-instance v2, Landroid/widget/EditText;
 
@@ -13445,10 +14439,10 @@
 
     const/4 v3, 0x2
 
-    .line 280
+    .line 285
     invoke-virtual {v2, v3}, Landroid/widget/EditText;->setInputType(I)V
 
-    .line 281
+    .line 286
     invoke-static {v0}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
 
     move-result-object v3
@@ -13457,17 +14451,17 @@
 
     const/4 v3, 0x1
 
-    .line 282
+    .line 287
     invoke-virtual {v2, v3}, Landroid/widget/EditText;->setSelectAllOnFocus(Z)V
 
     const/16 v3, 0x11
 
-    .line 283
+    .line 288
     invoke-virtual {v2, v3}, Landroid/widget/EditText;->setGravity(I)V
 
     const/high16 v3, 0x41c00000    # 24.0f
 
-    .line 284
+    .line 289
     invoke-static {p0, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->dp(Landroid/content/Context;F)I
 
     move-result v4
@@ -13488,26 +14482,26 @@
 
     invoke-virtual {v2, v4, v6, v3, v5}, Landroid/widget/EditText;->setPadding(IIII)V
 
-    .line 286
+    .line 291
     new-instance v3, Landroid/app/AlertDialog$Builder;
 
     invoke-direct {v3, p0}, Landroid/app/AlertDialog$Builder;-><init>(Landroid/content/Context;)V
 
     const-string v4, "\u5bfc\u51fa\u6570\u91cf"
 
-    .line 287
+    .line 292
     invoke-virtual {v3, v4}, Landroid/app/AlertDialog$Builder;->setTitle(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v3
 
     const-string v4, "\u8bf7\u8f93\u5165\u5bfc\u51fa\u804c\u4f4d\u6570\u91cf (\u9ed8\u8ba4 15\u6761, \u6700\u591a 75\u6761):"
 
-    .line 288
+    .line 293
     invoke-virtual {v3, v4}, Landroid/app/AlertDialog$Builder;->setMessage(Ljava/lang/CharSequence;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v3
 
-    .line 289
+    .line 294
     invoke-virtual {v3, v2}, Landroid/app/AlertDialog$Builder;->setView(Landroid/view/View;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v3
@@ -13518,7 +14512,7 @@
 
     invoke-direct {v5, v2, p1, p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper$5;-><init>(Landroid/widget/EditText;Landroid/widget/TextView;Landroid/app/Activity;)V
 
-    .line 290
+    .line 295
     invoke-virtual {v3, v4, v5}, Landroid/app/AlertDialog$Builder;->setPositiveButton(Ljava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v2
@@ -13527,20 +14521,20 @@
 
     const/4 v4, 0x0
 
-    .line 310
+    .line 315
     invoke-virtual {v2, v3, v4}, Landroid/app/AlertDialog$Builder;->setNegativeButton(Ljava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v2
 
-    .line 311
+    .line 316
     invoke-virtual {v2}, Landroid/app/AlertDialog$Builder;->create()Landroid/app/AlertDialog;
 
     move-result-object v2
 
-    .line 312
+    .line 317
     invoke-virtual {v2, v1}, Landroid/app/AlertDialog;->setCanceledOnTouchOutside(Z)V
 
-    .line 313
+    .line 318
     invoke-virtual {v2}, Landroid/app/AlertDialog;->show()V
     :try_end_64
     .catchall {:try_start_3 .. :try_end_64} :catchall_65
@@ -13550,7 +14544,7 @@
     :catchall_65
     move-exception v2
 
-    .line 315
+    .line 320
     new-instance v3, Ljava/lang/StringBuilder;
 
     const-string v4, "showCountDialog error: "
@@ -13569,15 +14563,15 @@
 
     invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
 
-    .line 316
+    .line 321
     invoke-virtual {p1, v1}, Landroid/widget/TextView;->setEnabled(Z)V
 
     const-string v1, "\u5bfc\u51fa\u4e2d..."
 
-    .line 317
+    .line 322
     invoke-virtual {p1, v1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
-    .line 318
+    .line 323
     invoke-static {p0, p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->startExport(Landroid/app/Activity;Landroid/widget/TextView;I)V
 
     :goto_86
@@ -13587,7 +14581,7 @@
 .method private static startBatchSend(Landroid/app/Activity;ILjava/lang/String;)V
     .registers 5
 
-    .line 413
+    .line 418
     new-instance v0, Ljava/lang/Thread;
 
     new-instance v1, Lcom/hpbr/bosszhipin/export2/ExportHelper$8;
@@ -13596,7 +14590,7 @@
 
     invoke-direct {v0, v1}, Ljava/lang/Thread;-><init>(Ljava/lang/Runnable;)V
 
-    .line 438
+    .line 443
     invoke-virtual {v0}, Ljava/lang/Thread;->start()V
 
     return-void
@@ -13607,10 +14601,10 @@
 
     const/4 v0, 0x1
 
-    .line 658
+    .line 783
     sput-boolean v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sRunning:Z
 
-    .line 659
+    .line 784
     new-instance v0, Ljava/lang/Thread;
 
     new-instance v1, Lcom/hpbr/bosszhipin/export2/ExportHelper$10;
@@ -13619,7 +14613,7 @@
 
     invoke-direct {v0, v1}, Ljava/lang/Thread;-><init>(Ljava/lang/Runnable;)V
 
-    .line 685
+    .line 810
     invoke-virtual {v0}, Ljava/lang/Thread;->start()V
 
     return-void
@@ -13630,7 +14624,7 @@
 
     const/4 v0, 0x1
 
-    .line 2581
+    .line 2706
     :try_start_1
     invoke-static {p0, p1, v0}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
 
@@ -13647,7 +14641,7 @@
 .method private static toastMain(Landroid/app/Activity;Ljava/lang/String;)V
     .registers 4
 
-    .line 1506
+    .line 1631
     sget-object v0, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sMainHandler:Landroid/os/Handler;
 
     new-instance v1, Lcom/hpbr/bosszhipin/export2/ExportHelper$11;
@@ -13662,7 +14656,7 @@
 .method private static verifyCurl(Landroid/app/Activity;)V
     .registers 3
 
-    .line 1517
+    .line 1642
     new-instance v0, Ljava/lang/Thread;
 
     new-instance v1, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;
@@ -13671,7 +14665,7 @@
 
     invoke-direct {v0, v1}, Ljava/lang/Thread;-><init>(Ljava/lang/Runnable;)V
 
-    .line 1568
+    .line 1693
     invoke-virtual {v0}, Ljava/lang/Thread;->start()V
 
     return-void
@@ -13696,7 +14690,7 @@
 
     const/4 v1, 0x0
 
-    .line 2452
+    .line 2577
     invoke-interface {p1, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object p1
@@ -13715,12 +14709,12 @@
 
     move-result-object p1
 
-    .line 2453
+    .line 2578
     invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sanitize(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p1
 
-    .line 2454
+    .line 2579
     invoke-virtual {p1}, Ljava/lang/String;->isEmpty()Z
 
     move-result v1
@@ -13732,7 +14726,7 @@
     :cond_20
     const/4 v1, 0x0
 
-    .line 2459
+    .line 2584
     :try_start_21
     sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
 
@@ -13740,12 +14734,12 @@
 
     if-lt v2, v3, :cond_4a
 
-    .line 2460
+    .line 2585
     invoke-static {p0, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->pickUniqueNameMediaStore(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p1
 
-    .line 2461
+    .line 2586
     invoke-static {p0, p1, p2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->insertIntoMediaStore(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Landroid/net/Uri;
 
     move-result-object p0
@@ -13754,7 +14748,7 @@
 
     return-object v1
 
-    .line 2465
+    .line 2590
     :cond_32
     new-instance p0, Ljava/io/File;
 
@@ -13778,7 +14772,7 @@
 
     return-object p0
 
-    .line 2469
+    .line 2594
     :cond_4a
     new-instance p0, Ljava/io/File;
 
@@ -13792,7 +14786,7 @@
 
     invoke-direct {p0, v0, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 2471
+    .line 2596
     invoke-virtual {p0}, Ljava/io/File;->exists()Z
 
     move-result v0
@@ -13807,18 +14801,18 @@
 
     return-object v1
 
-    .line 2474
+    .line 2599
     :cond_64
     invoke-static {p0, p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->pickUniqueNameFile(Ljava/io/File;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p1
 
-    .line 2475
+    .line 2600
     new-instance v0, Ljava/io/File;
 
     invoke-direct {v0, p0, p1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 2476
+    .line 2601
     new-instance p0, Ljava/io/FileOutputStream;
 
     invoke-direct {p0, v0}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
@@ -13828,7 +14822,7 @@
     :try_start_72
     const-string p1, "UTF-8"
 
-    .line 2478
+    .line 2603
     invoke-virtual {p2, p1}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
 
     move-result-object p1
@@ -13837,7 +14831,7 @@
     :try_end_7b
     .catchall {:try_start_72 .. :try_end_7b} :catchall_7f
 
-    .line 2480
+    .line 2605
     :try_start_7b
     invoke-virtual {p0}, Ljava/io/FileOutputStream;->close()V
 
@@ -13848,7 +14842,7 @@
 
     invoke-virtual {p0}, Ljava/io/FileOutputStream;->close()V
 
-    .line 2481
+    .line 2606
     throw p1
     :try_end_84
     .catchall {:try_start_7b .. :try_end_84} :catchall_84
@@ -13856,7 +14850,7 @@
     :catchall_84
     move-exception p0
 
-    .line 2485
+    .line 2610
     new-instance p1, Ljava/lang/StringBuilder;
 
     const-string p2, "write file error: "
@@ -13897,7 +14891,7 @@
 
     const/4 v1, 0x0
 
-    .line 2414
+    .line 2539
     invoke-interface {p1, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
 
     move-result-object p1
@@ -13916,12 +14910,12 @@
 
     move-result-object p1
 
-    .line 2415
+    .line 2540
     invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->sanitize(Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p1
 
-    .line 2416
+    .line 2541
     invoke-virtual {p1}, Ljava/lang/String;->isEmpty()Z
 
     move-result v1
@@ -13933,7 +14927,7 @@
     :cond_20
     const/4 v1, 0x0
 
-    .line 2421
+    .line 2546
     :try_start_21
     sget v2, Landroid/os/Build$VERSION;->SDK_INT:I
     :try_end_23
@@ -13945,7 +14939,7 @@
 
     if-lt v2, v3, :cond_4e
 
-    .line 2422
+    .line 2547
     :try_start_29
     invoke-static {p0, p1, v4}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->pickUniqueNameMediaStore(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
@@ -13953,7 +14947,7 @@
 
     const-string v2, "text/plain"
 
-    .line 2423
+    .line 2548
     invoke-static {p0, p1, p2, v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->insertIntoMediaStore(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/net/Uri;
 
     move-result-object p0
@@ -13962,7 +14956,7 @@
 
     return-object v1
 
-    .line 2427
+    .line 2552
     :cond_36
     new-instance p0, Ljava/io/File;
 
@@ -13986,7 +14980,7 @@
 
     return-object p0
 
-    .line 2430
+    .line 2555
     :cond_4e
     new-instance p0, Ljava/io/File;
 
@@ -14000,7 +14994,7 @@
 
     invoke-direct {p0, v0, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 2432
+    .line 2557
     invoke-virtual {p0}, Ljava/io/File;->exists()Z
 
     move-result v0
@@ -14015,18 +15009,18 @@
 
     return-object v1
 
-    .line 2435
+    .line 2560
     :cond_68
     invoke-static {p0, p1, v4}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->pickUniqueNameFile(Ljava/io/File;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p1
 
-    .line 2436
+    .line 2561
     new-instance v0, Ljava/io/File;
 
     invoke-direct {v0, p0, p1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 2437
+    .line 2562
     new-instance p0, Ljava/io/FileOutputStream;
 
     invoke-direct {p0, v0}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
@@ -14036,7 +15030,7 @@
     :try_start_76
     const-string p1, "UTF-8"
 
-    .line 2439
+    .line 2564
     invoke-virtual {p2, p1}, Ljava/lang/String;->getBytes(Ljava/lang/String;)[B
 
     move-result-object p1
@@ -14045,7 +15039,7 @@
     :try_end_7f
     .catchall {:try_start_76 .. :try_end_7f} :catchall_83
 
-    .line 2441
+    .line 2566
     :try_start_7f
     invoke-virtual {p0}, Ljava/io/FileOutputStream;->close()V
 
@@ -14056,7 +15050,7 @@
 
     invoke-virtual {p0}, Ljava/io/FileOutputStream;->close()V
 
-    .line 2442
+    .line 2567
     throw p1
     :try_end_88
     .catchall {:try_start_7f .. :try_end_88} :catchall_88
@@ -14064,7 +15058,7 @@
     :catchall_88
     move-exception p0
 
-    .line 2446
+    .line 2571
     new-instance p1, Ljava/lang/StringBuilder;
 
     const-string p2, "write txt error: "
