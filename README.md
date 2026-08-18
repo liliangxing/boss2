@@ -31,8 +31,8 @@ v1 = 原始 APK + 改包名 + PMS hook。仓库不提供 v1（`.gitignore` 排�
 ```bash
 # --- 环境 ---
 # baksmali.jar / smali.jar 已在仓库 tools/ 目录
-# apksigner / zipalign 需安装 Android Build Tools r34
-export PATH="$PWD/build-tools/android-14:$PATH"
+# apksigner / zipalign / d8 需安装 Android Build Tools r34（本环境在 /tmp/bt/android-14）
+export PATH="/tmp/bt/android-14:$PATH"
 
 # --- 步骤 1: 复制原始 APK ---
 cp bosszhipin_original.apk boss2_v1_work.apk
@@ -348,6 +348,35 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 > 当前最新构建产物 `boss2_v6.apk`（md5 `641504419ab9775528dc8d620710168a`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）+ **更多面板**（在线简历导出/导入，见功能清单第 5 项）。构建与部署见下方「构建与部署（当前版本）」。
 
+### 接手工作指引（如何改到你现在的版本，正确路径）
+
+版本流水线（每步产物都已验证，缺哪级就从哪级往下走）:
+
+```
+原始 APK ──> boss2_v1.apk ──> boss2_v5.apk ──> boss2_v6.apk（当前）
+```
+
+- 原始 → v1: 改包名 `com.hpbr.bosszhipin`→`com.hpbr.bosszhipin2` + 注入 PMS hook（见「阶段二」，**zip 级最小改动**，勿用 apktool 全量重编译）
+- v1 → v5: `python3 scripts/build.py`（6 项补丁: XLog 密钥 / BuildConfig / 安全检测 / YZWG 加载 / libyzwg.so 二进制 / 签名，见「阶段三」）
+- v5 → v6: 重建 `classes10.dex` + `build_v6.py` 注入 `ExportHelper.attach`（本仓库已含全部产物，通常从这步接手）
+
+**新增/修改导出功能的唯一正确路径**:
+
+1. 业务逻辑全部写进 `src/export2/com/hpbr/bosszhipin/export2/ExportHelper.java`，对 App 类**全反射**（javac bootclasspath 仅 android.jar）
+2. 需要新回调 → 手写 smali 放 `src/export2/smali/.../`，泛型 = 真实响应类（如 `GetUserAccountGeekDetailResponse`），`onSuccess(Lhg0/a;)V` 声明 `.registers 2`；并在 `scripts/build_classes10.sh` 的合并段补一行 `cp`
+3. `bash scripts/build_classes10.sh`（javac → d8 → baksmali → 合并手写回调 → smali → classes10.dex）
+4. `python3 scripts/build_v6.py --input boss2_v5.apk --output boss2_v6.apk`（注入 classes6/7 锚点 + 加 classes10 + zipalign + V1/V2 签名）
+5. `python3 scripts/verify.py boss2_v6.apk`（11 项全 PASSED）+ 真机 `adb logcat -s ExportHelper` 看效果
+
+**侦察/接线约定**（接新接口时照此做）:
+
+- 接口类签名一律在 `research/smali_all/classes*/` 反编译源里查（不猜字段名）
+- 请求参数一律塞 `extra_map`（请求基类 `com/twl/http/client/a` 的 public 字段），**不走 addParam**
+- 请求对象与回调通过两个字段互绑: `com/twl/http/client/a.mCallback`（protected）+ `com/twl/http/callback/a.request`（public）
+- 响应回调链: 基类 `net/bosszhipin/base/b` 内部 `dealResponse` → 子线程调 `onSuccess(Lhg0/a;)V`，`hg0/a.a` 字段即响应对象；失败走 `onFailed(Lcom/twl/http/error/a;)V` → `error.b()` 取错误串
+- 同步等待: 回调里 countDown，外面 `CountDownLatch.await(30s)`（构建联 15s 例外）
+- 手写回调因 d8 反编译会丢泛型，必须源码 smali 合并；`onSuccess` 寄存器数不足会被 smali 静默丢弃，改完先确认 classes10.dex 里有该类再构建
+
 ### 功能清单（v6）
 
 1. **悬浮按钮组**: 「沟通」「导出」「更多」三个按钮竖排在同一个 `LinearLayout`（btnGroup）内，顶部是一个 **正立三角形** dragBar（▲ 尖端朝上，28.8x21.6dp，`ShapeDrawable`+`PathShape` 绘制，颜色 0x66000000 半透明，比按钮更透，底边距仅 1.44dp，比按钮间距 4.32dp 更贴近沟通按钮），**只有三角形能拖动按钮组**（触摸监听只挂在 dragBar，按钮本体不拦截触摸、可正常点击）。按钮文字 11f、padding 10/4、圆角 12、背景 0xB3000000、间距 3dp——整体紧凑。
@@ -505,12 +534,18 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 ### 构建与部署（当前版本）
 
 ```bash
+# 0. 准备 boss2_v5.apk（仓库 .gitignore 排除 *.apk）
+#    本环境现成: /tmp/boss2/boss2_v5.apk；或按上方「完整构建流程」从原始 APK 生成
 # 1. 修改源码后重建导出 DEX（ExportHelper.java → javac → d8 → 合并回调 smali → classes10.dex）
-export PATH="$PWD/build-tools/android-14:$PATH"
+#    PATH 需含 d8/zipalign/apksigner（本环境: /tmp/bt/android-14）
+#    ANDROID_JAR 需指向 android.jar（本环境: /data/user/work/android-sdk/platforms/android-34/android.jar）
+export PATH="/tmp/bt/android-14:$PATH"
+export ANDROID_JAR=/data/user/work/android-sdk/platforms/android-34/android.jar
+export D8=/tmp/bt/android-14/d8
 bash scripts/build_classes10.sh
 
 # 2. 从 v5 重打 v6（注入 classes6/7 锚点 + 替换 DEX + 添加 classes10 + zipalign + V1/V2 签名）
-python3 scripts/build_v6.py --input downloads/boss2_v5.apk --output boss2_v6.apk
+python3 scripts/build_v6.py --input /tmp/boss2/boss2_v5.apk --output boss2_v6.apk
 
 # 3. 验证 11 项全部 PASSED
 python3 scripts/verify.py boss2_v6.apk
