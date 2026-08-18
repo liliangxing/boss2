@@ -1,4 +1,4 @@
-.class Lcom/hpbr/bosszhipin/export2/ExportHelper$15$1;
+.class Lcom/hpbr/bosszhipin/export2/ExportHelper$19$1;
 .super Ljava/lang/Object;
 .source "ExportHelper.java"
 
@@ -8,7 +8,7 @@
 
 # annotations
 .annotation system Ldalvik/annotation/EnclosingMethod;
-    value = Lcom/hpbr/bosszhipin/export2/ExportHelper$15;->run()V
+    value = Lcom/hpbr/bosszhipin/export2/ExportHelper$19;->run()V
 .end annotation
 
 .annotation system Ldalvik/annotation/InnerClass;
@@ -18,13 +18,13 @@
 
 
 # instance fields
-.field final synthetic this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$15;
+.field final synthetic this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$19;
 
 .field final synthetic val$curlFile:Ljava/io/File;
 
 
 # direct methods
-.method constructor <init>(Lcom/hpbr/bosszhipin/export2/ExportHelper$15;Ljava/io/File;)V
+.method constructor <init>(Lcom/hpbr/bosszhipin/export2/ExportHelper$19;Ljava/io/File;)V
     .registers 3
     .annotation system Ldalvik/annotation/Signature;
         value = {
@@ -32,10 +32,10 @@
         }
     .end annotation
 
-    .line 2113
-    iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$15$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$15;
+    .line 2390
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$19$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$19;
 
-    iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$15$1;->val$curlFile:Ljava/io/File;
+    iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$19$1;->val$curlFile:Ljava/io/File;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
@@ -47,10 +47,10 @@
 .method public run()V
     .registers 4
 
-    .line 2116
-    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$15$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$15;
+    .line 2393
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$19$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$19;
 
-    iget-object v0, v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$15;->val$activity:Landroid/app/Activity;
+    iget-object v0, v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$19;->val$activity:Landroid/app/Activity;
 
     new-instance v1, Ljava/lang/StringBuilder;
 
@@ -58,7 +58,7 @@
 
     invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 
-    iget-object v2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$15$1;->val$curlFile:Ljava/io/File;
+    iget-object v2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$19$1;->val$curlFile:Ljava/io/File;
 
     invoke-virtual {v2}, Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
 

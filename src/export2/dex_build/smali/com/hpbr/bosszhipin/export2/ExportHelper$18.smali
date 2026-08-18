@@ -8,7 +8,7 @@
 
 # annotations
 .annotation system Ldalvik/annotation/EnclosingMethod;
-    value = Lcom/hpbr/bosszhipin/export2/ExportHelper;->doImportResume(Landroid/app/Activity;Ljava/io/File;)V
+    value = Lcom/hpbr/bosszhipin/export2/ExportHelper;->exportResumeMd(Landroid/app/Activity;)V
 .end annotation
 
 .annotation system Ldalvik/annotation/InnerClass;
@@ -20,22 +20,18 @@
 # instance fields
 .field final synthetic val$activity:Landroid/app/Activity;
 
-.field final synthetic val$file:Ljava/io/File;
-
 
 # direct methods
-.method constructor <init>(Ljava/io/File;Landroid/app/Activity;)V
-    .registers 3
+.method constructor <init>(Landroid/app/Activity;)V
+    .registers 2
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "()V"
         }
     .end annotation
 
-    .line 3215
-    iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$file:Ljava/io/File;
-
-    iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
+    .line 2043
+    iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
@@ -47,144 +43,189 @@
 .method public run()V
     .registers 6
 
-    const-string v0, "\u5bfc\u5165\u7b80\u5386\u5f02\u5e38: "
+    const-string v0, "\u7b80\u5386\u5df2\u5bfc\u51fa: "
 
-    const-string v1, "doImportResume error: "
+    const-string v1, "resp geekDetail error: "
 
-    .line 3219
-    # getter for: Lcom/hpbr/bosszhipin/export2/ExportHelper;->sImportLock:Ljava/lang/Object;
-    invoke-static {}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2700()Ljava/lang/Object;
+    .line 2047
+    :try_start_4
+    iget-object v2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
+
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->requestResumeDetail(Landroid/app/Activity;)Ljava/lang/Object;
+    invoke-static {v2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2300(Landroid/app/Activity;)Ljava/lang/Object;
 
     move-result-object v2
 
-    monitor-enter v2
+    if-nez v2, :cond_14
 
-    .line 3221
-    :try_start_9
-    iget-object v3, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$file:Ljava/io/File;
+    .line 2049
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
 
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->readResumeMdFile(Ljava/io/File;)Ljava/lang/String;
-    invoke-static {v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2800(Ljava/io/File;)Ljava/lang/String;
+    const-string v1, "\u83b7\u53d6\u5728\u7ebf\u7b80\u5386\u5931\u8d25"
 
-    move-result-object v3
-    :try_end_f
-    .catchall {:try_start_9 .. :try_end_f} :catchall_26
-
-    if-nez v3, :cond_13
-
-    .line 3224
-    :try_start_11
-    monitor-exit v2
-    :try_end_12
-    .catchall {:try_start_11 .. :try_end_12} :catchall_58
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
+    invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2400(Landroid/app/Activity;Ljava/lang/String;)V
+    :try_end_13
+    .catchall {:try_start_4 .. :try_end_13} :catchall_6c
 
     return-void
 
-    .line 3226
-    :cond_13
-    :try_start_13
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->validateResumeMd(Ljava/lang/String;)Z
-    invoke-static {v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2900(Ljava/lang/String;)Z
-
-    move-result v4
-    :try_end_17
-    .catchall {:try_start_13 .. :try_end_17} :catchall_26
-
-    if-nez v4, :cond_1b
-
-    .line 3228
-    :try_start_19
-    monitor-exit v2
-    :try_end_1a
-    .catchall {:try_start_19 .. :try_end_1a} :catchall_58
-
-    return-void
-
-    .line 3230
-    :cond_1b
-    :try_start_1b
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->parseResumeMd(Ljava/lang/String;)Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;
-    invoke-static {v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$3000(Ljava/lang/String;)Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;
+    .line 2054
+    :cond_14
+    :try_start_14
+    invoke-virtual {v2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 
     move-result-object v3
 
-    .line 3231
-    iget-object v4, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
+    const-string v4, "geekDetail"
 
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->importResumeData(Landroid/app/Activity;Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;)Ljava/lang/String;
-    invoke-static {v4, v3}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$3100(Landroid/app/Activity;Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;)Ljava/lang/String;
+    invoke-virtual {v3, v4}, Ljava/lang/Class;->getField(Ljava/lang/String;)Ljava/lang/reflect/Field;
 
-    move-result-object v0
-    :try_end_25
-    .catchall {:try_start_1b .. :try_end_25} :catchall_26
+    move-result-object v3
 
-    goto :goto_4a
+    .line 2055
+    invoke-virtual {v3, v2}, Ljava/lang/reflect/Field;->get(Ljava/lang/Object;)Ljava/lang/Object;
 
-    :catchall_26
-    move-exception v3
+    move-result-object v1
+    :try_end_22
+    .catchall {:try_start_14 .. :try_end_22} :catchall_23
 
-    .line 3233
-    :try_start_27
-    new-instance v4, Ljava/lang/StringBuilder;
+    goto :goto_38
 
-    invoke-direct {v4, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    :catchall_23
+    move-exception v2
 
-    invoke-virtual {v3}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+    .line 2057
+    :try_start_24
+    new-instance v3, Ljava/lang/StringBuilder;
+
+    invoke-direct {v3, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v2}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
 
     move-result-object v1
 
-    invoke-virtual {v4, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v3, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
-    invoke-virtual {v4}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
     move-result-object v1
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
     invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
 
-    .line 3234
-    new-instance v1, Ljava/lang/StringBuilder;
+    const/4 v1, 0x0
 
-    invoke-direct {v1, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+    :goto_38
+    if-nez v1, :cond_42
 
-    invoke-virtual {v3}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+    .line 2060
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
 
-    move-result-object v0
+    const-string v1, "\u7b80\u5386\u6570\u636e\u4e3a\u7a7a"
 
-    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v0
-
-    .line 3236
-    :goto_4a
-    monitor-exit v2
-    :try_end_4b
-    .catchall {:try_start_27 .. :try_end_4b} :catchall_58
-
-    .line 3238
-    # getter for: Lcom/hpbr/bosszhipin/export2/ExportHelper;->sMainHandler:Landroid/os/Handler;
-    invoke-static {}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$1200()Landroid/os/Handler;
-
-    move-result-object v1
-
-    new-instance v2, Lcom/hpbr/bosszhipin/export2/ExportHelper$18$1;
-
-    invoke-direct {v2, p0, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper$18$1;-><init>(Lcom/hpbr/bosszhipin/export2/ExportHelper$18;Ljava/lang/String;)V
-
-    invoke-virtual {v1, v2}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
+    invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2400(Landroid/app/Activity;Ljava/lang/String;)V
 
     return-void
 
-    :catchall_58
+    .line 2063
+    :cond_42
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->buildResumeMd(Ljava/lang/Object;)Ljava/lang/String;
+    invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2500(Ljava/lang/Object;)Ljava/lang/String;
+
+    move-result-object v1
+
+    .line 2064
+    iget-object v2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
+
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->writeResumeMdFile(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
+    invoke-static {v2, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2600(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
+
+    move-result-object v1
+
+    if-eqz v1, :cond_64
+
+    .line 2066
+    iget-object v2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
+
+    new-instance v3, Ljava/lang/StringBuilder;
+
+    invoke-direct {v3, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v1}, Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v3, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
+    invoke-static {v2, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2400(Landroid/app/Activity;Ljava/lang/String;)V
+
+    goto :goto_99
+
+    .line 2068
+    :cond_64
+    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
+
+    const-string v1, "\u7b80\u5386\u5bfc\u51fa\u5931\u8d25: \u5199\u5165\u6587\u4ef6\u51fa\u9519"
+
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
+    invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2400(Landroid/app/Activity;Ljava/lang/String;)V
+    :try_end_6b
+    .catchall {:try_start_24 .. :try_end_6b} :catchall_6c
+
+    goto :goto_99
+
+    :catchall_6c
     move-exception v0
 
-    .line 3236
-    :try_start_59
-    monitor-exit v2
-    :try_end_5a
-    .catchall {:try_start_59 .. :try_end_5a} :catchall_58
+    .line 2071
+    new-instance v1, Ljava/lang/StringBuilder;
 
-    throw v0
+    const-string v2, "exportResumeMd error: "
+
+    invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->log(Ljava/lang/String;)V
+    invoke-static {v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$600(Ljava/lang/String;)V
+
+    .line 2072
+    iget-object v1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$18;->val$activity:Landroid/app/Activity;
+
+    new-instance v2, Ljava/lang/StringBuilder;
+
+    const-string v3, "\u5bfc\u51fa\u7b80\u5386\u5f02\u5e38: "
+
+    invoke-direct {v2, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toastMain(Landroid/app/Activity;Ljava/lang/String;)V
+    invoke-static {v1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2400(Landroid/app/Activity;Ljava/lang/String;)V
+
+    :goto_99
+    return-void
 .end method

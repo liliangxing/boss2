@@ -525,6 +525,228 @@ public class ExportHelper {
         return sb.toString();
     }
 
+    /* ============ 批量发简历 ============ */
+
+    private static void showBatchSendResumeDialog(final Activity activity) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            log("showBatchSendResumeDialog skip, activity not usable");
+            return;
+        }
+        try {
+            final EditText input = new EditText(activity);
+            input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            input.setText(String.valueOf(DEFAULT_COUNT));
+            input.setSelectAllOnFocus(true);
+            input.setGravity(Gravity.CENTER);
+            input.setPadding(dp(activity, 24), dp(activity, 8), dp(activity, 24), dp(activity, 8));
+
+            AlertDialog dialog = new AlertDialog.Builder(activity)
+                    .setTitle("\u6279\u91CF\u53D1\u7B80\u5386\u6570\u91CF")
+                    .setMessage("\u8BF7\u8F93\u5165\u8981\u53D1\u7B80\u5386\u7684\u804C\u4F4D\u6570\u91CF (\u9ED8\u8BA4 " + DEFAULT_COUNT
+                            + "\u6761, \u6700\u591A " + MAX_JOBS + "\u6761):")
+                    .setView(input)
+                    .setPositiveButton("\u4E0B\u4E00\u6B65", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface d, int which) {
+                            int count = DEFAULT_COUNT;
+                            try {
+                                count = Integer.parseInt(input.getText().toString().trim());
+                            } catch (Throwable ignored) {
+                            }
+                            if (count < 1) {
+                                count = 1;
+                            }
+                            if (count > MAX_JOBS) {
+                                count = MAX_JOBS;
+                            }
+                            log("user choose batch send resume count=" + count);
+                            showBatchSendResumeMsgDialog(activity, count);
+                        }
+                    })
+                    .setNegativeButton("\u53D6\u6D88", null)
+                    .create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        } catch (Throwable t) {
+            log("showBatchSendResumeDialog error: " + t.getMessage());
+            toast(activity, "\u6279\u91CF\u53D1\u7B80\u5386\u542F\u52A8\u5F02\u5E38: " + t.getMessage());
+        }
+    }
+
+    private static void showBatchSendResumeMsgDialog(final Activity activity, final int count) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            log("showBatchSendResumeMsgDialog skip, activity not usable");
+            return;
+        }
+        try {
+            final EditText input = new EditText(activity);
+            input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+            input.setGravity(Gravity.TOP | Gravity.START);
+            input.setPadding(dp(activity, 16), dp(activity, 8), dp(activity, 16), dp(activity, 8));
+            input.setLines(5);
+
+            AlertDialog dialog = new AlertDialog.Builder(activity)
+                    .setTitle("\u6D88\u606F\u5185\u5BB9")
+                    .setMessage("\u8BF7\u8F93\u5165\u8981\u53D1\u9001\u7684\u6D88\u606F (" + MAX_BATCH_MSG_LEN + "\u5B57\u4EE5\u5185):")
+                    .setView(input)
+                    .setPositiveButton("\u786E\u5B9A\u5E76\u53D1\u9001", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface d, int which) {
+                            String msg = input.getText().toString().trim();
+                            if (msg.length() > MAX_BATCH_MSG_LEN) {
+                                msg = msg.substring(0, MAX_BATCH_MSG_LEN);
+                            }
+                            if (msg.isEmpty()) {
+                                toast(activity, "\u6D88\u606F\u4E0D\u80FD\u4E3A\u7A7A");
+                                return;
+                            }
+                            log("user confirm batch send resume msg len=" + msg.length());
+                            startBatchSendResume(activity, count, msg);
+                        }
+                    })
+                    .setNegativeButton("\u53D6\u6D88", null)
+                    .create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        } catch (Throwable t) {
+            log("showBatchSendResumeMsgDialog error: " + t.getMessage());
+            toast(activity, "\u6D88\u606F\u5BF9\u8BDD\u6846\u5F02\u5E38: " + t.getMessage());
+        }
+    }
+
+    private static void startBatchSendResume(final Activity activity, final int count, final String msg) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String result = null;
+                try {
+                    List<Object> jobs = collectFromScreen(activity);
+                    log("batch send resume jobs collected=" + jobs.size());
+                    if (jobs.isEmpty()) {
+                        result = "\u672A\u83B7\u53D6\u5230\u804C\u4F4D\u5217\u8868\u6570\u636E, \u8BF7\u5148\u5237\u65B0\u5217\u8868";
+                    } else {
+                        result = sendBatchMessagesResume(activity, jobs, count, msg);
+                    }
+                } catch (Throwable t) {
+                    log("batch send resume error: " + t);
+                    result = "\u6279\u91CF\u53D1\u7B80\u5386\u5931\u8D25: " + t.getMessage();
+                } finally {
+                    final String finalResult = result;
+                    sMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            toast(activity, finalResult);
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private static String sendBatchMessagesResume(Activity activity, List<Object> jobs, int count, String msg) {
+        int total = Math.min(count, jobs.size());
+        int sent = 0;
+        int failed = 0;
+        List<String> resumeSecurityIds = new ArrayList<String>();
+        log("batch send resume start total=" + total);
+
+        Class<?> contactBeanClass = null;
+        Class<?> contactManagerClass = null;
+        Object contactManager = null;
+        try {
+            contactBeanClass = Class.forName("com.hpbr.bosszhipin.data.db.entry.ContactBean");
+            contactManagerClass = Class.forName("com.hpbr.bosszhipin.data.manager.ContactManager");
+            contactManager = contactManagerClass.getMethod("v").invoke(null);
+        } catch (Throwable t) {
+            log("batch send resume init classes error: " + t.getMessage());
+            return "\u6279\u91CF\u53D1\u7B80\u5386\u5931\u8D25: \u521D\u59CB\u5316\u5F02\u5E38 " + t.getMessage();
+        }
+
+        Class<?> handlerDClass = null;
+        Class<?> handlerCClass = null;
+        try {
+            handlerDClass = Class.forName("message.handler.d");
+            handlerCClass = Class.forName("message.handler.c");
+        } catch (Throwable t) {
+            log("batch send resume handler init error: " + t.getMessage());
+            return "\u6279\u91CF\u53D1\u7B80\u5386\u5931\u8D25: \u6D88\u606F\u901A\u9053\u5F02\u5E38 " + t.getMessage();
+        }
+
+        for (int i = 0; i < total; i++) {
+            final Object job = jobs.get(i);
+            final int idx = i + 1;
+            final int totalN = total;
+            String bossName = readFieldAny(job, "\u672A\u77E5", "bossName", "jobName");
+            log("batch send resume progress " + idx + "/" + totalN + " \u63A5\u6536\u4EBA:" + bossName);
+            try {
+                boolean ok = sendOneContact(activity, job, msg, contactBeanClass, contactManagerClass, contactManager,
+                        handlerDClass, handlerCClass);
+                if (ok) {
+                    sent++;
+                    String sid = readFieldSafe(job, "securityId", "");
+                    if (!sid.isEmpty() && !resumeSecurityIds.contains(sid)) {
+                        resumeSecurityIds.add(sid);
+                    }
+                } else {
+                    failed++;
+                }
+            } catch (Throwable t) {
+                log("batch send resume item " + idx + " error: " + t);
+                failed++;
+            }
+            try {
+                Thread.sleep(300L);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        String resumeMsg = "";
+        if (!resumeSecurityIds.isEmpty()) {
+            boolean rok = sendResumeDeliver(resumeSecurityIds);
+            log("batch send resume deliver ok=" + rok + " ids=" + resumeSecurityIds.size());
+            resumeMsg = rok ? ("\u7B80\u5386\u5DF2\u6295\u9012 " + resumeSecurityIds.size() + "\u5BB6")
+                    : "\u7B80\u5386\u6295\u9012\u5931\u8D25";
+        }
+
+        StringBuilder sb = new StringBuilder("\u6279\u91CF\u53D1\u7B80\u5386\u5B8C\u6210: \u603B\u6570 " + total
+                + ", \u6210\u529F " + sent + ", \u5931\u8D25 " + failed);
+        if (!resumeMsg.isEmpty()) {
+            sb.append(", ").append(resumeMsg);
+        }
+        log("batch send resume done total=" + total + " sent=" + sent + " failed=" + failed
+                + " resumeIds=" + resumeSecurityIds.size());
+        return sb.toString();
+    }
+
+    private static boolean sendResumeDeliver(List<String> securityIds) {
+        if (securityIds == null || securityIds.isEmpty()) {
+            return false;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String s : securityIds) {
+            if (s == null || s.isEmpty()) {
+                continue;
+            }
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(s);
+        }
+        if (sb.length() == 0) {
+            return false;
+        }
+        try {
+            Object req = newReq("net.bosszhipin.api.GeekResumeSendRequest");
+            setStringField(req, "idList", sb.toString());
+            return executeAndWait(req);
+        } catch (Throwable t) {
+            log("sendResumeDeliver error: " + t.getMessage());
+            return false;
+        }
+    }
+
     private static boolean sendOneContact(Activity activity, Object job, String msg,
                                          Class<?> contactBeanClass, Class<?> contactManagerClass, Object contactManager,
                                          Class<?> handlerDClass, Class<?> handlerCClass) {
@@ -1064,6 +1286,10 @@ public class ExportHelper {
                     log(indent + "    >> MATCH GeekF1ProListFragment, collecting...");
                     collectFromGeekListFragment(f, jobs);
                 }
+                if (name.equals("com.hpbr.bosszhipin.module.main.stuf1.GListContentFragment")) {
+                    log(indent + "    >> MATCH GListContentFragment, collecting...");
+                    collectFromGListFragment(f, jobs);
+                }
                 try {
                     Method mChild = f.getClass().getMethod("getChildFragmentManager");
                     Object childFm = mChild.invoke(f);
@@ -1181,6 +1407,47 @@ public class ExportHelper {
             log("screen collected jobs=" + jobs.size());
         } catch (Throwable t) {
             log("collectFromGeekListFragment error: " + t.getMessage());
+        }
+    }
+
+    /**
+     * 从 GListContentFragment 收集职位数据。
+     * 结构: GListContentFragment.G -> F1StudentAdapter(BaseQuickAdapter) -> getData()
+     */
+    private static void collectFromGListFragment(Object frag, List<Object> jobs) {
+        try {
+            Field fG = findField(frag.getClass(), "G");
+            if (fG == null) {
+                log("  collect glist: field G not found in " + frag.getClass().getName());
+                return;
+            }
+            Object adapter = fG.get(frag);
+            if (adapter == null) {
+                log("  collect glist: adapter(G) is null");
+                return;
+            }
+            log("  collect glist: adapter=" + adapter.getClass().getName());
+            Method mGetData = adapter.getClass().getMethod("getData");
+            Object listObj = mGetData.invoke(adapter);
+            if (!(listObj instanceof List)) {
+                log("  collect glist: getData() not List, type="
+                        + (listObj == null ? "null" : listObj.getClass().getName()));
+                return;
+            }
+            List<?> items = (List<?>) listObj;
+            log("screen adapter items=" + items.size());
+            for (Object item : items) {
+                if (item == null) {
+                    continue;
+                }
+                Object job = extractGeekItem(item);
+                if (job != null) {
+                    jobs.add(job);
+                }
+            }
+            log("screen collected jobs=" + jobs.size());
+        } catch (Throwable t) {
+            log("collectFromGListFragment error: " + t.getMessage());
         }
     }
 
@@ -1697,6 +1964,16 @@ public class ExportHelper {
                 @Override
                 public void onClick(View v) {
                     importResumeMd(activity);
+                }
+            }));
+            row.addView(makePanelItem(activity, "\u4FE1", "\u6279\u91CF\u53D1\u7B80\u5386", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (sRunning) {
+                        toast(activity, "\u9A8C\u8BC1\u4E2D...\u8BF7\u7A0D\u540E");
+                        return;
+                    }
+                    showBatchSendResumeDialog(activity);
                 }
             }));
 

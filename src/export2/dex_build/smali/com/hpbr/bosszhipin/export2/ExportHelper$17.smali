@@ -3,12 +3,12 @@
 .source "ExportHelper.java"
 
 # interfaces
-.implements Landroid/content/DialogInterface$OnClickListener;
+.implements Landroid/view/View$OnClickListener;
 
 
 # annotations
 .annotation system Ldalvik/annotation/EnclosingMethod;
-    value = Lcom/hpbr/bosszhipin/export2/ExportHelper;->importResumeMd(Landroid/app/Activity;)V
+    value = Lcom/hpbr/bosszhipin/export2/ExportHelper;->showMorePanel(Landroid/app/Activity;)V
 .end annotation
 
 .annotation system Ldalvik/annotation/InnerClass;
@@ -20,22 +20,18 @@
 # instance fields
 .field final synthetic val$activity:Landroid/app/Activity;
 
-.field final synthetic val$files:Ljava/util/List;
-
 
 # direct methods
-.method constructor <init>(Landroid/app/Activity;Ljava/util/List;)V
-    .registers 3
+.method constructor <init>(Landroid/app/Activity;)V
+    .registers 2
     .annotation system Ldalvik/annotation/Signature;
         value = {
             "()V"
         }
     .end annotation
 
-    .line 3179
+    .line 1969
     iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$17;->val$activity:Landroid/app/Activity;
-
-    iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$17;->val$files:Ljava/util/List;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
@@ -44,22 +40,33 @@
 
 
 # virtual methods
-.method public onClick(Landroid/content/DialogInterface;I)V
-    .registers 4
+.method public onClick(Landroid/view/View;)V
+    .registers 3
 
-    .line 3182
+    .line 1972
+    # getter for: Lcom/hpbr/bosszhipin/export2/ExportHelper;->sRunning:Z
+    invoke-static {}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$200()Z
+
+    move-result p1
+
+    if-eqz p1, :cond_e
+
+    .line 1973
     iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$17;->val$activity:Landroid/app/Activity;
 
-    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$17;->val$files:Ljava/util/List;
+    const-string v0, "\u9a8c\u8bc1\u4e2d...\u8bf7\u7a0d\u540e"
 
-    invoke-interface {v0, p2}, Ljava/util/List;->get(I)Ljava/lang/Object;
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toast(Landroid/content/Context;Ljava/lang/String;)V
+    invoke-static {p1, v0}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$300(Landroid/content/Context;Ljava/lang/String;)V
 
-    move-result-object p2
+    return-void
 
-    check-cast p2, Ljava/io/File;
+    .line 1976
+    :cond_e
+    iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$17;->val$activity:Landroid/app/Activity;
 
-    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->doImportResume(Landroid/app/Activity;Ljava/io/File;)V
-    invoke-static {p1, p2}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2600(Landroid/app/Activity;Ljava/io/File;)V
+    # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->showBatchSendResumeDialog(Landroid/app/Activity;)V
+    invoke-static {p1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$2200(Landroid/app/Activity;)V
 
     return-void
 .end method

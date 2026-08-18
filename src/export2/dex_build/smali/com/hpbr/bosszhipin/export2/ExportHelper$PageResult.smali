@@ -36,10 +36,10 @@
 .method private constructor <init>()V
     .registers 2
 
-    .line 1230
+    .line 1497
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
-    .line 1232
+    .line 1499
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
@@ -52,7 +52,7 @@
 .method synthetic constructor <init>(Lcom/hpbr/bosszhipin/export2/ExportHelper$1;)V
     .registers 2
 
-    .line 1230
+    .line 1497
     invoke-direct {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper$PageResult;-><init>()V
 
     return-void

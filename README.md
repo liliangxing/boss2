@@ -346,7 +346,7 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v6.apk`（md5 `641504419ab9775528dc8d620710168a`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）+ **更多面板**（在线简历导出/导入，见功能清单第 5 项）。构建与部署见下方「构建与部署（当前版本）」。
+> 当前最新构建产物 `boss2_v6.apk`（md5 `65415993f1d65948f3245e34e4783ff8`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）+ **更多面板**（在线简历导出/导入）+ **批量发简历**（选职位数→输入消息→逐个建联+发消息→循环后统一投递在线简历，见功能清单第 6 项）。构建与部署见下方「构建与部署（当前版本）」。
 
 ### 接手工作指引（如何改到你现在的版本，正确路径）
 
@@ -359,6 +359,16 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 - 原始 → v1: 改包名 `com.hpbr.bosszhipin`→`com.hpbr.bosszhipin2` + 注入 PMS hook（见「阶段二」，**zip 级最小改动**，勿用 apktool 全量重编译）
 - v1 → v5: `python3 scripts/build.py`（6 项补丁: XLog 密钥 / BuildConfig / 安全检测 / YZWG 加载 / libyzwg.so 二进制 / 签名，见「阶段三」）
 - v5 → v6: 重建 `classes10.dex` + `build_v6.py` 注入 `ExportHelper.attach`（本仓库已含全部产物，通常从这步接手）
+
+**批量发简历（v6 新增）的正确实现路径**:
+
+1. 悬浮按钮组「更多」面板已有「批量沟通」入口；批量发简历复用它，仅在发送消息后追加「投递在线简历」一步（`showBatchSendResumeDialog` 输入数量 → `showBatchSendResumeMsgDialog` 输入消息 → `startBatchSendResume`）
+2. 职位收集: `collectFromScreen(activity)` 反射遍历 Fragment 树，`dumpFragmentTree` 匹配三类列表 Fragment——`GetDiscoverFragment`(发现页)、`GeekF1ProListFragment`(推荐列表)、`GListContentFragment`(main.stuf1，字段 `G`=F1StudentAdapter→`getData()`)。**这三处必须同时匹配**，否则用户停留在某页时收集为空 → 报「未获取到职位列表数据」
+3. 循环体: 每个职位 `sendOneContact(...)` 建联+发聊天消息（与批量沟通同一函数），**成功后把该 job 的 `securityId` 收进 `resumeSecurityIds` 列表**
+4. 循环结束后: `sendResumeDeliver(resumeSecurityIds)` → `newReq("net.bosszhipin.api.GeekResumeSendRequest")` → `setStringField(req,"idList", 逗号拼接的 securityId)` → `executeAndWait`（POST `zpgeek/app/geek/resume/send`）
+5. 结果 Toast: `批量发简历完成: 总数 N, 成功 X, 失败 Y, 简历已投递 Z 家`
+
+> **注意**: 当前投递走的是**在线简历**（`GeekResumeSendRequest` 只带 idList，无简历选择能力）。用户要求投递**本地 PDF（附件简历）**，见下方「改造方案：投递附件简历（本地 PDF）」。
 
 **新增/修改导出功能的唯一正确路径**:
 
@@ -389,6 +399,19 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
    - **导入简历**: 列出该目录 `.md` → 校验头（`# 在线简历导出` + `## 基本信息` + `格式版本: 1`）→ `parseResumeMd` 解析各段 → 先请求在线简历拿现有条目 ID → `GeekUpdateBaseInfoRequest`(extra_map=userDescription/professionalSkill) 更新基本/技能 → 依次删除旧的工作/教育/项目/期望/培训（`WorkExpDeleteRequest`/`GeekDeleteEducationExpRequest`/`GeekDeleteProjectExpRequest`/`DeleteJobIntentRequest`/`TrainingExpDeleteRequest`）→ 再保存新条目（`WorkExpSaveRequest`/`EduExpUpdateRequest`/`GeekUpdateProjectExpRequest`/`GeekUpdateExpectPositionRequest`/`TrainingExpSaveRequest`）→ Toast 汇总各段成功数。
    - **保存回调**: 所有增删改请求共用一个 `ExportSaveCallback`（继承 `net/bosszhipin/base/b`，泛型 = `HttpResponse`，`onSuccess`→`notifySaveLoaded` / `onFailed`→`notifySaveFailed`），`newReq(cls)` 反射构造（先试 `(Lcom/twl/http/callback/a;)V` 构造，`NoSuchMethodException` 时回退 `(Lnet/bosszhipin/base/b;)V`——`DeleteJobIntentRequest` 只提供后者）。请求字段全部经 `extra_map` 传入（`setExtraMap`）。
    - **踩坑记录**: 手写回调的 `onSuccess(Lhg0/a;)V` 必须声明 `.registers 2`（带 this+参数至少 2 寄存器），写 `.registers 1` 会被 smali 报错并**静默丢弃该类**（`smali.jar assemble` 仍返回成功，回调直接缺失）。
+6. **批量发简历**: 点「更多」→「批量发简历」→ 输入数量（默认 15，最多 75）→ 输入消息 → 自动收集屏幕列表职位 → 逐个 `sendOneContact`（HTTP 建联 + 长连接发消息）→ 收集成功职位的 `securityId` → 循环结束统一 `sendResumeDeliver`（POST `zpgeek/app/geek/resume/send`，参数 `idList` = 逗号分隔 securityId，投递**在线简历**）→ Toast「批量发简历完成: 总数 N, 成功 X, 失败 Y, 简历已投递 Z 家」。日志走 `batch send resume ...` / `batch send resume deliver ok=`。
+
+### 改造方案：投递附件简历（本地 PDF）——待实施
+
+> 用户需求: 批量发简历时应投递**本地 PDF 附件简历**，而非默认在线简历。当前 `GeekResumeSendRequest`（resume/send）只带 `idList`，**无简历选择能力**，投递的是账号的在线简历。已确认官方投递链路存在附件简历选择能力，方案如下:
+
+1. **列简历**: `ResumeListRequest`（`net.bosszhipin.api.ResumeListRequest`）→ GET `zpgeek/cvapp/geek/resume/querylist` → 响应 `resumeList`（`List<ServerResumeBean>`），`ServerResumeBean.annexType != 0` 即附件简历（`annexResumeStatus`/`resumeId`/`encryptResumeId` 字段）
+2. **选附件**: 在批量发简历对话框加一步「简历选择」（或默认取第一份附件简历），拿到 `resumeId`（若接口要加密值则用 `encryptResumeId`）
+3. **单职位投递**: 改用 `OneKeySendResumeRequest`（`net.bosszhipin.api.OneKeySendResumeRequest`）→ POST `zpgeek/app/geek/resume/onekey/deliver`，字段 `bossId`/`jobId`/`expectId`/`lid`/`oneKeyType`/`resumeId`/`securityId`。投递对话框选简历逻辑参照 `research/smali_all/classes6/b00/p.smali`（约 486 行构造 OneKeySendResumeRequest；`ResumeListResponse.supportAnnexType` 开关）与 `classes6/com/hpbr/bosszhipin/module/my/activity/geek/resume/dialog/n.smali`（简历选择对话框，`ServerResumeBean` 的 `annexType` 区分在线/附件）
+4. **逐职位投递**: 循环 `sendOneContact` 时把每个 job 的 `bossId/jobId/expectId/lid/securityId` 记下，循环后对每个职位依次 `onekey/deliver`（或复用官方批量投递的其它接口）
+5. **验证**: `adb logcat -s ExportHelper` 应看到投递请求发出；真机确认目标 Boss 收到的是附件 PDF
+
+> 注意: 单职位投递是多请求，批量 N 家 = N 次 `onekey/deliver`，比当前一次 `resume/send` 慢；是否可一次投递多职位到多家需确认官方是否有批量接口（`resume/send` 就是批量投在线简历的官方接口）。本地手机存储直接发文件链路此前已确认不可行（ChatBeanFactory 无附件简历消息工厂；FileUploadRequest 转简历消息链路易失败），故**走平台已上传的附件简历**（`annexResumeStatus=1` 即已上传）是最优解。
 
 ### 代码架构（正确路径）
 
@@ -530,6 +553,12 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 | `research/.../classes4/com/hpbr/bosszhipin/data/manager/r.smali` | 会话数据入口 (A()=当前 uid, E()=当前 role) |
 | `research/.../classes2/com/bszp/kernel/account/AccountHelper.smali` | getUid() / getIdentity() |
 | `research/.../classes4/com/hpbr/bosszhipin/chat/contact/fragment/ContactsFragment.smali` | 消息页 fragment (会话列表观察端, refreshAdapter) |
+| `research/.../classes9/net/bosszhipin/api/GeekResumeSendRequest.smali` | 批量投递在线简历请求 (POST `zpgeek/app/geek/resume/send`, 仅 `idList` 字段) |
+| `research/.../classes9/net/bosszhipin/api/OneKeySendResumeRequest.smali` | 单职位投递请求 (POST `zpgeek/app/geek/resume/onekey/deliver`, 字段 bossId/jobId/expectId/lid/oneKeyType/resumeId/securityId; 可指定附件简历) |
+| `research/.../classes9/net/bosszhipin/api/ResumeListRequest.smali` | 简历列表请求 (POST `zpgeek/cvapp/geek/resume/querylist`, 响应 resumeList=List<ServerResumeBean>) |
+| `research/.../classes9/net/bosszhipin/api/bean/ServerResumeBean.smali` | 简历 bean (`annexType` 附件标记, resumeId/encryptResumeId 等) |
+| `research/.../classes6/b00/p.smali` | 官方职位详情投递逻辑 (约486行构造 OneKeySendResumeRequest; `b1` 处理 resumeList) |
+| `research/.../classes6/com/hpbr/bosszhipin/module/main/stuf1/GListContentFragment.smali` | 职位列表 Fragment (字段 `G`=F1StudentAdapter→getData(), collectFromGListFragment 读取) |
 
 ### 构建与部署（当前版本）
 
