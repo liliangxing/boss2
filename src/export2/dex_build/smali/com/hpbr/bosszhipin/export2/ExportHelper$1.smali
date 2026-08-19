@@ -30,7 +30,7 @@
         }
     .end annotation
 
-    .line 239
+    .line 244
     iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$activity:Landroid/app/Activity;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -43,7 +43,7 @@
 .method public onClick(Landroid/view/View;)V
     .registers 2
 
-    .line 242
+    .line 247
     iget-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$1;->val$activity:Landroid/app/Activity;
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->showBatchDialog(Landroid/app/Activity;)V

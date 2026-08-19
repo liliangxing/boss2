@@ -102,6 +102,11 @@ public class ExportHelper {
     private static volatile boolean sSaveOk;
     private static volatile String sSaveError;
 
+    private static volatile CountDownLatch sResumeListLatch;
+    private static volatile boolean sResumeListOk;
+    private static volatile String sResumeListError;
+    private static volatile Object sResumeListData;
+
     private static final Object sImportLock = new Object();
 
     private static final List<String> sCurlList = new ArrayList<String>();
@@ -560,7 +565,7 @@ public class ExportHelper {
                                 count = MAX_JOBS;
                             }
                             log("user choose batch send resume count=" + count);
-                            showBatchSendResumeMsgDialog(activity, count);
+                            showResumePicker(activity, count);
                         }
                     })
                     .setNegativeButton("\u53D6\u6D88", null)
@@ -573,7 +578,97 @@ public class ExportHelper {
         }
     }
 
-    private static void showBatchSendResumeMsgDialog(final Activity activity, final int count) {
+    private static void showResumePicker(final Activity activity, final int count) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            log("showResumePicker skip, activity not usable");
+            return;
+        }
+        toast(activity, "\u6B63\u5728\u52A0\u8F7D\u7B80\u5386\u5217\u8868...");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final List<Object> annex = new ArrayList<Object>();
+                final List<String> labels = new ArrayList<String>();
+                try {
+                    List<Object> all = loadResumeList();
+                    if (all != null) {
+                        for (Object r : all) {
+                            if (r == null) {
+                                continue;
+                            }
+                            int annexType = readIntField(r, "annexType", 0);
+                            if (annexType == 0) {
+                                continue;
+                            }
+                            long resumeId = readLongField(r, "resumeId");
+                            if (resumeId <= 0) {
+                                continue;
+                            }
+                            annex.add(r);
+                            StringBuilder lb = new StringBuilder();
+                            String customName = readFieldSafe(r, "customName", "");
+                            String suffix = readFieldSafe(r, "suffixName", "");
+                            String size = readFieldSafe(r, "resumeSizeDesc", "");
+                            String time = readFieldSafe(r, "uploadTime", "");
+                            if (!customName.isEmpty()) {
+                                lb.append(customName);
+                            }
+                            if (!suffix.isEmpty()) {
+                                lb.append(".").append(suffix);
+                            }
+                            if (!size.isEmpty()) {
+                                lb.append(" (").append(size).append(")");
+                            }
+                            if (!time.isEmpty()) {
+                                lb.append("\n\u66F4\u65B0\u4E8E ").append(time);
+                            }
+                            labels.add(lb.toString());
+                        }
+                    }
+                } catch (Throwable t) {
+                    log("showResumePicker load error: " + t.getMessage());
+                }
+                final String err = sResumeListError;
+                sMainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (annex.isEmpty()) {
+                            log("no annex resume, fallback to online resume, err=" + err);
+                            toast(activity, "\u672A\u627E\u5230\u9644\u4EF6\u7B80\u5386(PDF), \u5C06\u6295\u9012\u5728\u7EBF\u7B80\u5386");
+                            showBatchSendResumeMsgDialog(activity, count, 0L);
+                            return;
+                        }
+                        final int[] checked = {0};
+                        AlertDialog dlg = new AlertDialog.Builder(activity)
+                                .setTitle("\u9009\u62E9\u9644\u4EF6\u7B80\u5386")
+                                .setSingleChoiceItems(labels.toArray(new String[0]), 0,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface d, int which) {
+                                                checked[0] = which;
+                                            }
+                                        })
+                                .setPositiveButton("\u4E0B\u4E00\u6B65", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface d, int which) {
+                                        Object chosen = annex.get(checked[0]);
+                                        long resumeId = readLongField(chosen, "resumeId");
+                                        log("user choose annex resume id=" + resumeId
+                                                + " name=" + readFieldSafe(chosen, "customName", ""));
+                                        showBatchSendResumeMsgDialog(activity, count, resumeId);
+                                    }
+                                })
+                                .setNegativeButton("\u53D6\u6D88", null)
+                                .create();
+                        dlg.setCanceledOnTouchOutside(false);
+                        dlg.show();
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private static void showBatchSendResumeMsgDialog(final Activity activity, final int count, final long resumeId) {
         if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
             log("showBatchSendResumeMsgDialog skip, activity not usable");
             return;
@@ -601,7 +696,7 @@ public class ExportHelper {
                                 return;
                             }
                             log("user confirm batch send resume msg len=" + msg.length());
-                            startBatchSendResume(activity, count, msg);
+                            startBatchSendResume(activity, count, msg, resumeId);
                         }
                     })
                     .setNegativeButton("\u53D6\u6D88", null)
@@ -614,7 +709,7 @@ public class ExportHelper {
         }
     }
 
-    private static void startBatchSendResume(final Activity activity, final int count, final String msg) {
+    private static void startBatchSendResume(final Activity activity, final int count, final String msg, final long resumeId) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -625,7 +720,7 @@ public class ExportHelper {
                     if (jobs.isEmpty()) {
                         result = "\u672A\u83B7\u53D6\u5230\u804C\u4F4D\u5217\u8868\u6570\u636E, \u8BF7\u5148\u5237\u65B0\u5217\u8868";
                     } else {
-                        result = sendBatchMessagesResume(activity, jobs, count, msg);
+                        result = sendBatchMessagesResume(activity, jobs, count, msg, resumeId);
                     }
                 } catch (Throwable t) {
                     log("batch send resume error: " + t);
@@ -643,12 +738,13 @@ public class ExportHelper {
         }).start();
     }
 
-    private static String sendBatchMessagesResume(Activity activity, List<Object> jobs, int count, String msg) {
+    private static String sendBatchMessagesResume(Activity activity, List<Object> jobs, int count, String msg, long resumeId) {
         int total = Math.min(count, jobs.size());
         int sent = 0;
         int failed = 0;
         List<String> resumeSecurityIds = new ArrayList<String>();
-        log("batch send resume start total=" + total);
+        List<Object> resumeJobs = new ArrayList<Object>();
+        log("batch send resume start total=" + total + " annexResumeId=" + resumeId);
 
         Class<?> contactBeanClass = null;
         Class<?> contactManagerClass = null;
@@ -687,6 +783,7 @@ public class ExportHelper {
                     if (!sid.isEmpty() && !resumeSecurityIds.contains(sid)) {
                         resumeSecurityIds.add(sid);
                     }
+                    resumeJobs.add(job);
                 } else {
                     failed++;
                 }
@@ -703,11 +800,32 @@ public class ExportHelper {
         }
 
         String resumeMsg = "";
-        if (!resumeSecurityIds.isEmpty()) {
-            boolean rok = sendResumeDeliver(resumeSecurityIds);
-            log("batch send resume deliver ok=" + rok + " ids=" + resumeSecurityIds.size());
-            resumeMsg = rok ? ("\u7B80\u5386\u5DF2\u6295\u9012 " + resumeSecurityIds.size() + "\u5BB6")
-                    : "\u7B80\u5386\u6295\u9012\u5931\u8D25";
+        if (!resumeJobs.isEmpty()) {
+            if (resumeId > 0) {
+                int okCnt = 0;
+                for (Object job : resumeJobs) {
+                    boolean rok = sendOneKeyResume(job, resumeId);
+                    log("batch send resume onekey deliver ok=" + rok + " bossId=" + readLongField(job, "bossId")
+                            + " jobId=" + readLongField(job, "jobId"));
+                    if (rok) {
+                        okCnt++;
+                    }
+                    try {
+                        Thread.sleep(300L);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+                log("batch send resume onekey deliver total=" + resumeJobs.size() + " ok=" + okCnt);
+                resumeMsg = okCnt > 0 ? ("\u9644\u4EF6\u7B80\u5386\u5DF2\u6295\u9012 " + okCnt + " \u5BB6")
+                        : "\u9644\u4EF6\u7B80\u5386\u6295\u9012\u5931\u8D25";
+            } else if (!resumeSecurityIds.isEmpty()) {
+                boolean rok = sendResumeDeliver(resumeSecurityIds);
+                log("batch send resume deliver ok=" + rok + " ids=" + resumeSecurityIds.size());
+                resumeMsg = rok ? ("\u7B80\u5386\u5DF2\u6295\u9012 " + resumeSecurityIds.size() + "\u5BB6")
+                        : "\u7B80\u5386\u6295\u9012\u5931\u8D25";
+            }
         }
 
         StringBuilder sb = new StringBuilder("\u6279\u91CF\u53D1\u7B80\u5386\u5B8C\u6210: \u603B\u6570 " + total
@@ -716,8 +834,94 @@ public class ExportHelper {
             sb.append(", ").append(resumeMsg);
         }
         log("batch send resume done total=" + total + " sent=" + sent + " failed=" + failed
-                + " resumeIds=" + resumeSecurityIds.size());
+                + " resumeIds=" + resumeSecurityIds.size() + " annexResumeId=" + resumeId);
         return sb.toString();
+    }
+
+    private static boolean sendOneKeyResume(Object job, long resumeId) {
+        try {
+            Object req = newReq("net.bosszhipin.api.OneKeySendResumeRequest");
+            Class<?> rc = Class.forName("net.bosszhipin.api.OneKeySendResumeRequest");
+            Field fBoss = rc.getField("bossId");
+            fBoss.setLong(req, readLongField(job, "bossId"));
+            Field fJob = rc.getField("jobId");
+            fJob.setLong(req, readLongField(job, "jobId"));
+            Field fExpect = rc.getField("expectId");
+            fExpect.setLong(req, readLongField(job, "expectId"));
+            Field fLid = rc.getField("lid");
+            fLid.set(req, readFieldSafe(job, "lid", ""));
+            Field fType = rc.getField("oneKeyType");
+            fType.setInt(req, 0);
+            Field fResume = rc.getField("resumeId");
+            fResume.setLong(req, resumeId);
+            Field fSec = rc.getField("securityId");
+            fSec.set(req, readFieldSafe(job, "securityId", ""));
+            Field fDetail = rc.getField("detailInterest");
+            fDetail.setInt(req, 0);
+            log("send onekey resume resumeId=" + resumeId + " bossId=" + readLongField(job, "bossId")
+                    + " jobId=" + readLongField(job, "jobId") + " securityId=" + readFieldSafe(job, "securityId", ""));
+            return executeAndWait(req);
+        } catch (Throwable t) {
+            log("sendOneKeyResume error: " + t.getMessage());
+            return false;
+        }
+    }
+
+    private static List<Object> loadResumeList() {
+        sResumeListLatch = new CountDownLatch(1);
+        sResumeListOk = false;
+        sResumeListError = null;
+        sResumeListData = null;
+        try {
+            Class<?> callbackIface = Class.forName("com.twl.http.callback.a");
+            Class<?> cbClass = Class.forName("com.hpbr.bosszhipin.export2.ExportResumeListCallback");
+            Class<?> reqClass = Class.forName("net.bosszhipin.api.ResumeListRequest");
+            Object callback = cbClass.newInstance();
+            Object request = reqClass.getConstructor(callbackIface).newInstance(callback);
+            setIntField(request, "entrance", 4);
+            Class<?> hg0c = Class.forName("hg0.c");
+            hg0c.getMethod("d", Class.forName("com.twl.http.client.a")).invoke(null, request);
+            boolean done = sResumeListLatch.await(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            if (!done || !sResumeListOk) {
+                log("resume list request not ok done=" + done + " err=" + sResumeListError);
+                return null;
+            }
+            Object data = sResumeListData;
+            if (data instanceof List) {
+                return (List<Object>) data;
+            }
+            return null;
+        } catch (Throwable t) {
+            log("loadResumeList error: " + t.getMessage());
+            return null;
+        }
+    }
+
+    public static void notifyResumeListLoaded(Object hg0a) {
+        try {
+            Object resp = hg0a.getClass().getField("a").get(hg0a);
+            if (resp != null) {
+                Object list = resp.getClass().getField("resumeList").get(resp);
+                sResumeListData = list;
+                sResumeListOk = true;
+            } else {
+                sResumeListError = "response is null";
+            }
+        } catch (Throwable t) {
+            sResumeListError = "parse error: " + t.getMessage();
+        }
+        CountDownLatch l = sResumeListLatch;
+        if (l != null) {
+            l.countDown();
+        }
+    }
+
+    public static void notifyResumeListFailed(String msg) {
+        sResumeListError = (msg == null || msg.isEmpty()) ? "resume list failed" : msg;
+        CountDownLatch l = sResumeListLatch;
+        if (l != null) {
+            l.countDown();
+        }
     }
 
     private static boolean sendResumeDeliver(List<String> securityIds) {

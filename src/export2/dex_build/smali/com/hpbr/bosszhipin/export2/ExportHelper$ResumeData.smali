@@ -83,46 +83,46 @@
 .method private constructor <init>()V
     .registers 2
 
-    .line 3430
+    .line 3634
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
     const-string v0, ""
 
-    .line 3431
+    .line 3635
     iput-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;->userDescription:Ljava/lang/String;
 
-    .line 3432
+    .line 3636
     iput-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;->skill:Ljava/lang/String;
 
-    .line 3433
+    .line 3637
     new-instance v0, Ljava/util/HashMap;
 
     invoke-direct {v0}, Ljava/util/HashMap;-><init>()V
 
     iput-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;->expect:Ljava/util/Map;
 
-    .line 3434
+    .line 3638
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
 
     iput-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;->works:Ljava/util/List;
 
-    .line 3435
+    .line 3639
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
 
     iput-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;->edus:Ljava/util/List;
 
-    .line 3436
+    .line 3640
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
 
     iput-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;->projects:Ljava/util/List;
 
-    .line 3437
+    .line 3641
     new-instance v0, Ljava/util/ArrayList;
 
     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
@@ -135,7 +135,7 @@
 .method synthetic constructor <init>(Lcom/hpbr/bosszhipin/export2/ExportHelper$1;)V
     .registers 2
 
-    .line 3430
+    .line 3634
     invoke-direct {p0}, Lcom/hpbr/bosszhipin/export2/ExportHelper$ResumeData;-><init>()V
 
     return-void

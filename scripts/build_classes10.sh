@@ -63,6 +63,8 @@ cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportCreateFriendCallback.smali 
    "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportCreateFriendCallback.smali"
 cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportResumeCallback.smali \
    "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportResumeCallback.smali"
+cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportResumeListCallback.smali \
+   "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportResumeListCallback.smali"
 cp "$SRC_CB_SMALI"/com/hpbr/bosszhipin/export2/ExportSaveCallback.smali \
    "$SMALI_OUT/com/hpbr/bosszhipin/export2/ExportSaveCallback.smali"
 java -jar "$SMALI_JAR" assemble "$SMALI_OUT" -o "$OUT_DEX"

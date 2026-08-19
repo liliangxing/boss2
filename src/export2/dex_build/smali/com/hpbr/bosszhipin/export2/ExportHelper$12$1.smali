@@ -20,7 +20,7 @@
 # instance fields
 .field final synthetic this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$12;
 
-.field final synthetic val$msg:Ljava/lang/String;
+.field final synthetic val$finalResult:Ljava/lang/String;
 
 
 # direct methods
@@ -32,10 +32,10 @@
         }
     .end annotation
 
-    .line 1034
+    .line 730
     iput-object p1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$12;
 
-    iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->val$msg:Ljava/lang/String;
+    iput-object p2, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->val$finalResult:Ljava/lang/String;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
@@ -47,30 +47,12 @@
 .method public run()V
     .registers 3
 
-    .line 1037
-    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$12;
-
-    iget-object v0, v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$btn:Landroid/widget/TextView;
-
-    const/4 v1, 0x1
-
-    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setEnabled(Z)V
-
-    .line 1038
-    iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$12;
-
-    iget-object v0, v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$btn:Landroid/widget/TextView;
-
-    const-string v1, "\u5bfc\u51fa"
-
-    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
-
-    .line 1039
+    .line 733
     iget-object v0, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->this$0:Lcom/hpbr/bosszhipin/export2/ExportHelper$12;
 
     iget-object v0, v0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12;->val$activity:Landroid/app/Activity;
 
-    iget-object v1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->val$msg:Ljava/lang/String;
+    iget-object v1, p0, Lcom/hpbr/bosszhipin/export2/ExportHelper$12$1;->val$finalResult:Ljava/lang/String;
 
     # invokes: Lcom/hpbr/bosszhipin/export2/ExportHelper;->toast(Landroid/content/Context;Ljava/lang/String;)V
     invoke-static {v0, v1}, Lcom/hpbr/bosszhipin/export2/ExportHelper;->access$300(Landroid/content/Context;Ljava/lang/String;)V

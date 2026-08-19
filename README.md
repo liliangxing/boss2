@@ -346,7 +346,7 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 ## 导出功能 (ExportHelper) — 交接说明
 
-> 当前最新构建产物 `boss2_v6.apk`（md5 `65415993f1d65948f3245e34e4783ff8`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）+ **更多面板**（在线简历导出/导入）+ **批量发简历**（选职位数→输入消息→逐个建联+发消息→循环后统一投递在线简历，见功能清单第 6 项）。构建与部署见下方「构建与部署（当前版本）」。
+> 当前最新构建产物 `boss2_v6.apk`（md5 `d3444b967013bfd30e2c9fb8a9b2de2a`）。v5 → v6 注入一条悬浮按钮组，实现：**导出**（列表+详情，curl 报文独立成 `Curl[第1条职位名].txt`）+ **沟通**（批量沟通：先 HTTP 建联再长连接发送，发送后消息列表可见）+ **Curl 验证**（第1条校验，同时生成 curl 报文文件）+ **更多面板**（在线简历导出/导入）+ **批量发简历**（选职位数→选附件简历→输入消息→逐个建联+发消息→循环后逐职位投递所选**附件简历(本地 PDF)**，见功能清单第 6 项）。构建与部署见下方「构建与部署（当前版本）」。
 
 ### 接手工作指引（如何改到你现在的版本，正确路径）
 
@@ -362,13 +362,12 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
 
 **批量发简历（v6 新增）的正确实现路径**:
 
-1. 悬浮按钮组「更多」面板已有「批量沟通」入口；批量发简历复用它，仅在发送消息后追加「投递在线简历」一步（`showBatchSendResumeDialog` 输入数量 → `showBatchSendResumeMsgDialog` 输入消息 → `startBatchSendResume`）
+1. 悬浮按钮组「更多」面板已有「批量沟通」入口；批量发简历复用它，仅在发送消息后追加「投递附件简历」一步（`showBatchSendResumeDialog` 输入数量 → `showResumePicker` 选择附件简历 → `showBatchSendResumeMsgDialog` 输入消息 → `startBatchSendResume`）
 2. 职位收集: `collectFromScreen(activity)` 反射遍历 Fragment 树，`dumpFragmentTree` 匹配三类列表 Fragment——`GetDiscoverFragment`(发现页)、`GeekF1ProListFragment`(推荐列表)、`GListContentFragment`(main.stuf1，字段 `G`=F1StudentAdapter→`getData()`)。**这三处必须同时匹配**，否则用户停留在某页时收集为空 → 报「未获取到职位列表数据」
-3. 循环体: 每个职位 `sendOneContact(...)` 建联+发聊天消息（与批量沟通同一函数），**成功后把该 job 的 `securityId` 收进 `resumeSecurityIds` 列表**
-4. 循环结束后: `sendResumeDeliver(resumeSecurityIds)` → `newReq("net.bosszhipin.api.GeekResumeSendRequest")` → `setStringField(req,"idList", 逗号拼接的 securityId)` → `executeAndWait`（POST `zpgeek/app/geek/resume/send`）
-5. 结果 Toast: `批量发简历完成: 总数 N, 成功 X, 失败 Y, 简历已投递 Z 家`
-
-> **注意**: 当前投递走的是**在线简历**（`GeekResumeSendRequest` 只带 idList，无简历选择能力）。用户要求投递**本地 PDF（附件简历）**，见下方「改造方案：投递附件简历（本地 PDF）」。
+3. 简历选择: `showResumePicker` 后台调 `loadResumeList()`（`ResumeListRequest` → POST `zpgeek/cvapp/geek/resume/querylist`，`entrance=4`）→ 弹单选对话框列出 `resumeList` 中 **`annexType != 0`** 的附件简历（customName/suffixName/resumeSizeDesc/uploadTime）→ 默认选中第一份，确定后把 `resumeId` 传给消息对话框。无附件简历时回退在线简历并 Toast 提示
+4. 循环体: 每个职位 `sendOneContact(...)` 建联+发聊天消息（与批量沟通同一函数），**成功后把该 job 收进 `resumeJobs` 列表**（同时收集 `securityId` 供在线回退）
+5. 循环结束后: 若选中附件简历（resumeId>0）→ 对每个职位 `sendOneKeyResume(job, resumeId)`（`OneKeySendResumeRequest` → POST `zpgeek/app/geek/resume/onekey/deliver`，字段 bossId/jobId/expectId/lid/oneKeyType=0/resumeId/securityId/detailInterest=0）逐职位投递；否则回退 `sendResumeDeliver`（`GeekResumeSendRequest` 批量投在线简历）
+6. 结果 Toast: `批量发简历完成: 总数 N, 成功 X, 失败 Y, 附件简历已投递 Z 家`（附件模式）/ `简历已投递 Z 家`（在线回退）
 
 **新增/修改导出功能的唯一正确路径**:
 
@@ -399,19 +398,21 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
    - **导入简历**: 列出该目录 `.md` → 校验头（`# 在线简历导出` + `## 基本信息` + `格式版本: 1`）→ `parseResumeMd` 解析各段 → 先请求在线简历拿现有条目 ID → `GeekUpdateBaseInfoRequest`(extra_map=userDescription/professionalSkill) 更新基本/技能 → 依次删除旧的工作/教育/项目/期望/培训（`WorkExpDeleteRequest`/`GeekDeleteEducationExpRequest`/`GeekDeleteProjectExpRequest`/`DeleteJobIntentRequest`/`TrainingExpDeleteRequest`）→ 再保存新条目（`WorkExpSaveRequest`/`EduExpUpdateRequest`/`GeekUpdateProjectExpRequest`/`GeekUpdateExpectPositionRequest`/`TrainingExpSaveRequest`）→ Toast 汇总各段成功数。
    - **保存回调**: 所有增删改请求共用一个 `ExportSaveCallback`（继承 `net/bosszhipin/base/b`，泛型 = `HttpResponse`，`onSuccess`→`notifySaveLoaded` / `onFailed`→`notifySaveFailed`），`newReq(cls)` 反射构造（先试 `(Lcom/twl/http/callback/a;)V` 构造，`NoSuchMethodException` 时回退 `(Lnet/bosszhipin/base/b;)V`——`DeleteJobIntentRequest` 只提供后者）。请求字段全部经 `extra_map` 传入（`setExtraMap`）。
    - **踩坑记录**: 手写回调的 `onSuccess(Lhg0/a;)V` 必须声明 `.registers 2`（带 this+参数至少 2 寄存器），写 `.registers 1` 会被 smali 报错并**静默丢弃该类**（`smali.jar assemble` 仍返回成功，回调直接缺失）。
-6. **批量发简历**: 点「更多」→「批量发简历」→ 输入数量（默认 15，最多 75）→ 输入消息 → 自动收集屏幕列表职位 → 逐个 `sendOneContact`（HTTP 建联 + 长连接发消息）→ 收集成功职位的 `securityId` → 循环结束统一 `sendResumeDeliver`（POST `zpgeek/app/geek/resume/send`，参数 `idList` = 逗号分隔 securityId，投递**在线简历**）→ Toast「批量发简历完成: 总数 N, 成功 X, 失败 Y, 简历已投递 Z 家」。日志走 `batch send resume ...` / `batch send resume deliver ok=`。
+6. **批量发简历**: 点「更多」→「批量发简历」→ 输入数量（默认 15，最多 75）→ 自动加载简历列表并弹「选择附件简历」单选对话框（仅列出 `annexType != 0` 的附件 PDF，无附件时回退在线简历）→ 输入消息 → 自动收集屏幕列表职位 → 逐个 `sendOneContact`（HTTP 建联 + 长连接发消息）→ 收集成功职位 → 循环结束逐职位 `sendOneKeyResume`（POST `zpgeek/app/geek/resume/onekey/deliver`，携带选中的附件 `resumeId`）→ Toast「批量发简历完成: 总数 N, 成功 X, 失败 Y, 附件简历已投递 Z 家」。日志走 `user choose annex resume id=..` / `send onekey resume resumeId=..` / `batch send resume onekey deliver total=.. ok=..` / `batch send resume ...`。
 
-### 改造方案：投递附件简历（本地 PDF）——待实施
+### 投递附件简历（本地 PDF）——已实施
 
-> 用户需求: 批量发简历时应投递**本地 PDF 附件简历**，而非默认在线简历。当前 `GeekResumeSendRequest`（resume/send）只带 `idList`，**无简历选择能力**，投递的是账号的在线简历。已确认官方投递链路存在附件简历选择能力，方案如下:
+> 用户需求: 批量发简历时应投递**本地 PDF 附件简历**，而非默认在线简历。已实现：批量发简历流程新增「选择附件简历」步骤（列简历 → 单选附件 → 逐职位 `onekey/deliver`），投递的是**平台已上传的附件简历（PDF）**。实现细节见上方「批量发简历（v6 新增）的正确实现路径」。
 
-1. **列简历**: `ResumeListRequest`（`net.bosszhipin.api.ResumeListRequest`）→ GET `zpgeek/cvapp/geek/resume/querylist` → 响应 `resumeList`（`List<ServerResumeBean>`），`ServerResumeBean.annexType != 0` 即附件简历（`annexResumeStatus`/`resumeId`/`encryptResumeId` 字段）
-2. **选附件**: 在批量发简历对话框加一步「简历选择」（或默认取第一份附件简历），拿到 `resumeId`（若接口要加密值则用 `encryptResumeId`）
-3. **单职位投递**: 改用 `OneKeySendResumeRequest`（`net.bosszhipin.api.OneKeySendResumeRequest`）→ POST `zpgeek/app/geek/resume/onekey/deliver`，字段 `bossId`/`jobId`/`expectId`/`lid`/`oneKeyType`/`resumeId`/`securityId`。投递对话框选简历逻辑参照 `research/smali_all/classes6/b00/p.smali`（约 486 行构造 OneKeySendResumeRequest；`ResumeListResponse.supportAnnexType` 开关）与 `classes6/com/hpbr/bosszhipin/module/my/activity/geek/resume/dialog/n.smali`（简历选择对话框，`ServerResumeBean` 的 `annexType` 区分在线/附件）
-4. **逐职位投递**: 循环 `sendOneContact` 时把每个 job 的 `bossId/jobId/expectId/lid/securityId` 记下，循环后对每个职位依次 `onekey/deliver`（或复用官方批量投递的其它接口）
-5. **验证**: `adb logcat -s ExportHelper` 应看到投递请求发出；真机确认目标 Boss 收到的是附件 PDF
+已落地实现要点:
 
-> 注意: 单职位投递是多请求，批量 N 家 = N 次 `onekey/deliver`，比当前一次 `resume/send` 慢；是否可一次投递多职位到多家需确认官方是否有批量接口（`resume/send` 就是批量投在线简历的官方接口）。本地手机存储直接发文件链路此前已确认不可行（ChatBeanFactory 无附件简历消息工厂；FileUploadRequest 转简历消息链路易失败），故**走平台已上传的附件简历**（`annexResumeStatus=1` 即已上传）是最优解。
+1. **列简历**: `loadResumeList()` → `ResumeListRequest`（`net.bosszhipin.api.ResumeListRequest`）→ GET `zpgeek/cvapp/geek/resume/querylist`（`entrance=4`）→ `ExportResumeListCallback`（泛型=`ResumeListResponse`，`onSuccess`→`notifyResumeListLoaded`）同步等待 → 取响应 `resumeList`（`List<ServerResumeBean>`）
+2. **选附件**: `showResumePicker` 过滤 `ServerResumeBean.annexType != 0` 的附件简历（resumeId>0），弹单选对话框（customName/suffixName/resumeSizeDesc/uploadTime），默认第一份；无附件时回退在线简历并 Toast 提示
+3. **单职位投递**: `sendOneKeyResume(job, resumeId)` → `newReq("net.bosszhipin.api.OneKeySendResumeRequest")` → 反射设 `bossId`/`jobId`/`expectId`/`lid`/`oneKeyType=0`/`resumeId`/`securityId`/`detailInterest=0` → `executeAndWait`（POST `zpgeek/app/geek/resume/onekey/deliver`，复用 `ExportSaveCallback` 泛型 HttpResponse 判定成败）。官方构造参照 `research/smali_all/classes6/b00/p.smali` `M(JILb00/p$y;)` 方法；简历选择对话框参照 `classes6/com/hpbr/bosszhipin/module/my/activity/geek/resume/dialog/n.smali`
+4. **逐职位投递**: 循环 `sendOneContact` 成功时把 job 收进 `resumeJobs`，循环后对每个职位依次 `onekey/deliver`（每次间隔 300ms）
+5. **验证**: `adb logcat -s ExportHelper` 应看到 `user choose annex resume id=..` → `send onekey resume resumeId=..` → `batch send resume onekey deliver total=N ok=M`；真机确认目标 Boss 收到的是附件 PDF
+
+> 注意: 单职位投递是多请求，批量 N 家 = N 次 `onekey/deliver`，比一次 `resume/send` 慢（`resume/send` 是批量投在线简历的官方接口，作为无附件简历时的回退）。本地手机存储直接发文件链路此前已确认不可行（ChatBeanFactory 无附件简历消息工厂；FileUploadRequest 转简历消息链路易失败），故**走平台已上传的附件简历**是最优解。
 
 ### 代码架构（正确路径）
 
@@ -423,7 +424,8 @@ API 签名由 `libyzwg.so` 通过 `YZWG` Java 类生成，使用 spoofed V1 签�
   - `ExportChatCallback` 继承 `ChatSendCallback`（发送回调），`onComplete(Z,Object,Object)V` 调 `ExportHelper.reportSendResult(Z,Object,Object)V`
   - `ExportCreateFriendCallback` 继承 `net/bosszhipin/base/b`，泛型 = `GeekCreateFriendResponse`（建联回调），`onSuccess(Lhg0/a;)V` 解析 `response.relation` → `notifyCreateFriendSuccess`，`onFailed(Lcom/twl/http/error/a;)V` → `notifyCreateFriendFailed`
   - `ExportResumeCallback` 继承 `net/bosszhipin/base/b`，泛型 = `GetUserAccountGeekDetailResponse`（在线简历详情回调），`onSuccess` → `notifyResumeLoaded`，`onFailed` → `notifyResumeFailed`
-  - `ExportSaveCallback` 继承 `net/bosszhipin/base/b`，泛型 = `HttpResponse`（简历增删改通用保存回调），`onSuccess` → `notifySaveLoaded`，`onFailed` → `notifySaveFailed`
+  - `ExportResumeListCallback` 继承 `net/bosszhipin/base/b`，泛型 = `ResumeListResponse`（简历列表回调），`onSuccess` → `notifyResumeListLoaded`，`onFailed` → `notifyResumeListFailed`
+  - `ExportSaveCallback` 继承 `net/bosszhipin/base/b`，泛型 = `HttpResponse`（简历增删改 + 附件投递通用保存回调），`onSuccess` → `notifySaveLoaded`，`onFailed` → `notifySaveFailed`
 - 注入点: `GeekJobRecommendFragment` / `MainActivity.onCreate`（classes6 锚点注入 `ExportHelper.attach`）/ `GetDiscoverHomeFragment`（classes7，发现页宿主）。`build_v6.py` 完成注入 + 替换/新增 DEX + zipalign + V1/V2 签名。
 
 ### 关键实现路径（每个功能怎么做对）
@@ -464,8 +466,9 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 - `ExportDetailCallback` 泛型 = `F1GeekGetJobDetailBatchResponse`
 - `ExportCreateFriendCallback` 泛型 = `GeekCreateFriendResponse`
 - `ExportResumeCallback` 泛型 = `GetUserAccountGeekDetailResponse`
+- `ExportResumeListCallback` 泛型 = `ResumeListResponse`
 - `ExportSaveCallback` 泛型 = `HttpResponse`
-写错泛型 → 响应按错误类型解析 → 数据恒 null。`ExportCreateFriendCallback`/`ExportResumeCallback`/`ExportSaveCallback` 泛型信息在 builder 直接 d8 反编译时会丢失，必须手写 smali 并在 `scripts/build_classes10.sh` 中合并（`SRC_CB_SMALI` 拷贝步骤）。手写回调的 `onSuccess(Lhg0/a;)V` 必须 `.registers 2`，写 1 会被 smali 静默丢弃。
+写错泛型 → 响应按错误类型解析 → 数据恒 null。`ExportCreateFriendCallback`/`ExportResumeCallback`/`ExportSaveCallback`/`ExportResumeListCallback` 泛型信息在 builder 直接 d8 反编译时会丢失，必须手写 smali 并在 `scripts/build_classes10.sh` 中合并（`SRC_CB_SMALI` 拷贝步骤）。手写回调的 `onSuccess(Lhg0/a;)V` 必须 `.registers 2`，写 1 会被 smali 静默丢弃。
 
 `parseResponse` 已重写: 先调用 `com.twl.http.callback.b.d(response)` 得到报文 JSON 并 `notifyRawJson`/`notifyDetailRawJson` 回传 ExportHelper，再按原逻辑解析（code/zpData 提取 + Gson + hg0/a 包装）。详情回调链上 `mCallback` 位于 `com/twl/http/client/a`（请求基类），不要在 `com/twl/http/callback/a` 上找它。
 
@@ -517,6 +520,7 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 - 简历导出: `resume detail request not ok done=.. err=..`（失败时）→ Toast「简历已导出: .../简历MMddHHmmss.md」
 - 简历导入: `import baseinfo result=true/false` → 各 `save*Exp error:`（单条失败时）→ Toast「导入完成: 工作 X/Y, 教育 X/Y, 项目 X/Y, 培训 X/Y, 期望 成功/失败」
 - 沟通: `batch send start total=N` → `batch send role=.. myId=..` → `batch send create friend request friendId=..` → `batch send create friend ok friendId=..`（失败/超时会跳过该职位）→ `batch send fill contact from relation friendId=..` → `batch send save contact DB friendId=..` → `batch send refresh contacts V() friendId=..` → `batch send longlink connected=true` → `batch send ok friendId=...` → `reportSendResult ok=...` → 消息列表可见该会话
+- 批量发简历: `user choose batch send resume count=N` → `resume list request not ok done=.. err=..`（列表失败时）→ `user choose annex resume id=.. name=..` → `batch send resume start total=N annexResumeId=..` → 循环中 `batch send ok friendId=..` → `send onekey resume resumeId=.. bossId=.. jobId=.. securityId=..` → `batch send resume onekey deliver total=M ok=K` → Toast「批量发简历完成: 总数 N, 成功 X, 失败 Y, 附件简历已投递 K 家」
 - Curl 验证: `curl verify http code=200` → `curl verify RESULT: SUCCESS/FAIL`（校验第 1 条）→ Toast「Curl报文已保存: .../Curl[第1条职位名].txt」
 
 ### 参考文件
@@ -531,6 +535,7 @@ ExportHelper.java → javac → *.class → d8 → classes.dex → baksmali → 
 | `src/export2/smali/.../ExportChatCallback.smali` | 手写发送回调 (继承 ChatSendCallback, onComplete→reportSendResult) |
 | `src/export2/smali/.../ExportCreateFriendCallback.smali` | 手写建联回调 (继承 base/b, 泛型=GeekCreateFriendResponse, onSuccess/onFailed→notifyCreateFriend*) |
 | `src/export2/smali/.../ExportResumeCallback.smali` | 手写简历详情回调 (继承 base/b, 泛型=GetUserAccountGeekDetailResponse, onSuccess/onFailed→notifyResume*) |
+| `src/export2/smali/.../ExportResumeListCallback.smali` | 手写简历列表回调 (继承 base/b, 泛型=ResumeListResponse, onSuccess/onFailed→notifyResumeList*) |
 | `src/export2/smali/.../ExportSaveCallback.smali` | 手写简历保存回调 (继承 base/b, 泛型=HttpResponse, onSuccess/onFailed→notifySave*) |
 | `research/.../classes9/net/bosszhipin/api/GeekCreateFriendRequest.smali` | 建联请求类 (求职者端 POST zpgeek/app/friend/add; 构造 (callback,false) 走 Geek 请求体) |
 | `research/.../classes9/net/bosszhipin/api/GeekCreateFriendResponse.smali` | 建联响应类 (字段 `relation` = ServerAddFriendBean) |
@@ -587,4 +592,4 @@ split -b 20M boss2_v6.apk boss2_v6_part_
 md5sum boss2_v6_part_* > parts.md5   # 合并校验: cat boss2_v6_part_* | md5sum 应与整包一致
 ```
 
-部署: 在 `/workspace/boss2` 起 `python3 /tmp/opencode/download_server.py 8080`（后台常驻，支持 Range 断点续传），分段/`parts.md5` 放同目录 `parts/`。下载地址: `https://8080-0e6eb8d98b97f3bf.monkeycode-ai.online/boss2_v6.apk`（curl 直接下载整包）。
+部署: 下载服务器服务 `/tmp/opencode/parts`（后台常驻，支持 Range 断点续传），整包放 `boss2_v6.apk`。下载地址: `https://8080-91e4e2747cc03c27.monkeycode-ai.online/boss2_v6.apk`（curl 直接下载整包）。
